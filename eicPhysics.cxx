@@ -131,7 +131,7 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev ){
     double g1gz = A*g1gZ(x,Q2,n);
     double g5gz = A*g5gZ(x,Q2,n);
 
-    double eta_L = eta_gZ*2.0*(x*y*y + x*(1.0-y)*(2.0-x*y*M/numax))
+    double eta_L = eta_gZ*(x*y*y + x*(1.0-y)*(2.0-x*y*M/numax))
 	           /(x*y*y + 2.0*x*(1.0-y-x*y*M/(2.0*numax)));
     double Y_L   = y*(2.0-y-x*y*M/numax)/(y*y + (1.0-y)*(2.0-x*y*M/numax));
 
