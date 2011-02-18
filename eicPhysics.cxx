@@ -505,13 +505,13 @@ void eicPhysics::ReadPolTable(){
     
     int i,j;
     char dummy[255];
-    char *dummy2[255];
+    char *dummy2 = new char[255];
     size_t dsize;
 
     int nscan;
-    getline(dummy2, &dsize, f);
-    getline(dummy2, &dsize, f);
-    getline(dummy2, &dsize, f);
+    getline(&dummy2, &dsize, f);
+    getline(&dummy2, &dsize, f);
+    getline(&dummy2, &dsize, f);
 
     for( i = 0; i < fNQ2; i++ ){
 	for( j = 0; j < fNx; j++ ){
@@ -521,6 +521,9 @@ void eicPhysics::ReadPolTable(){
 	}
     }
 
+    delete dummy2;
+
+    return;
 }
 
 double eicPhysics::getDeltaq( double x, double Q2, int quark ){
