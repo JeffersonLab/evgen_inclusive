@@ -30,7 +30,9 @@ class eicPhysics {
 	 double GetPhi(   double min = 0, double max = 3.14159*2 );
 	 double GetEf( double, double );
 	 double GetEfmax( double, double );
-
+   
+	 double Dp(double x);
+	 double Dn(double x);
 	 double F2(double x, double Q2, nucl n );
 	 double F1(double x, double Q2, nucl n );
 
