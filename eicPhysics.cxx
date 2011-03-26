@@ -230,6 +230,17 @@ double eicPhysics::F1( double x, double Q2, nucl n ){
     return F2(x,Q2,n)/(2.0*x);
 }
 
+double eicPhysics::Dp( double x) {
+  if (x<0.3 || x>1.0)   return 0.0;
+  if (x>=0.3 && x<0.6)  return 1.0-6.083333*x+9.16666666*pow(x,2);
+  else return 9.149226-2.991434e+01*x+2.610939e+01*pow(x,2);
+}
+
+double eicPhysics::Dn( double x) {
+  if (x<0.3 || x>1.0)   return 0.0;
+  else return 2*(1.771210e-01+2.659544*x-1.596289e+01*pow(x,2)+2.055688e+01*pow(x,3))-Dp(x);
+}
+
 double eicPhysics::F2( double x, double Q2, nucl n ){
     // Sanity checks
     if( x < 0 || 1.0 < x ) return 0.0;
@@ -241,21 +252,24 @@ double eicPhysics::F2( double x, double Q2, nucl n ){
     double e2_u = pow( 2.0/3.0,2.0);
     double e2_d = pow(-1.0/3.0,2.0);
     double f2sum = 0.0;
-
+    double DHT = 0.0;
     int uidx, didx;
 
     switch( n ){
 	case kProton:
 	    uidx = 1;
 	    didx = 2;
+	    DHT = Dp(x);
 	    break;
 	case kNeutron:
     	    uidx = 2;
 	    didx = 1;
+	    DHT = Dn(x);
 	    break;
 	default:
     	    uidx = 1;
 	    didx = 2;
+	    DHT = Dp(x);
 	    break;
     }
 
@@ -270,6 +284,8 @@ double eicPhysics::F2( double x, double Q2, nucl n ){
     f2sum += e2_u*x*cteq_pdf_evolvepdf(fPDF, -uidx, x, sqrt(Q2));
     // dbar
     f2sum += e2_d*x*cteq_pdf_evolvepdf(fPDF, -didx, x, sqrt(Q2));
+
+    f2sum = (1+DHT/Q2) * f2sum;
 
     return f2sum;
 }
