@@ -6,6 +6,8 @@
 #include "eicBeam.h"
 #include "eicIon.h"
 #include "eicEvent.h"
+#include "eicModel.h"
+#include <iostream>
 
 
 #include "TRandom2.h"
@@ -19,6 +21,7 @@ class eicPhysics {
 	~eicPhysics();
 
 	void MakeEvent( eicBeam *, eicIon *, eicEvent * );
+	void MakeEvent2( eicBeam *, eicIon *, eicEvent *, eicModel *);
 
 	enum nucl {kProton, kNeutron};
     private:
@@ -30,9 +33,7 @@ class eicPhysics {
 	 double GetPhi(   double min = 0, double max = 3.14159*2 );
 	 double GetEf( double, double );
 	 double GetEfmax( double, double );
-   
-	 double Dp(double x);
-	 double Dn(double x);
+
 	 double F2(double x, double Q2, nucl n );
 	 double F1(double x, double Q2, nucl n );
 
@@ -49,5 +50,16 @@ class eicPhysics {
 	 double fDeltaq[5][50][50];
 	 double fDeltaqx[50][50];
 	 double fDeltaqQ2[50][50];
+	 
+	 // Pion part
+//	 double Wiser( int Z, int N, char PART, double E_IN, double P_IN, double TH_IN, double radlen_IN);
+
+	 double QUADMO(double &PLOWER,double &PUPPER,double &EPSLON, int &NLVL);
+	 double WISER_ALL_FIT(double E_GAMMA);
+	 double WISER_ALL_SIG(double E0,double P,double THETA_DEG,double RAD_LEN,double TYPE);
+	 double Wiser_func_pip(double *x, double *par);
+	 double Wiser_func_pim(double *x, double *par);
+	 double Wiser_func_pi0(double *x, double *par);
+	 
 };
 #endif//__eicPhysics_h

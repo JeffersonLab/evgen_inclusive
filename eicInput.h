@@ -13,6 +13,7 @@ struct inputdata {
     double ion_mass;
     int    ion_Z;
     int    ion_N;
+    int	   model;  // 1= electron ; 2=pi+ ; 3=pi- ; 4=pi0 
     char   output[255];
 };
 
@@ -30,6 +31,7 @@ class eicInput {
 	double Get_ionMass(){ return fData.ion_mass; }
 	int    Get_ionZ(){ return fData.ion_Z; }
 	int    Get_ionN(){ return fData.ion_N; }
+	int    Get_model(){ return fData.model; }
 	char  *GetOutput(){ return fData.output; }
 
     private:

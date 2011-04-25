@@ -34,6 +34,15 @@ struct eventdata {
 	double A_T;
 	double Y_T;
 	double eta_T;
+
+        int particle_id;
+  int charge;
+  int Z_ion;
+  int N_ion;
+  double mom;
+  double mass;
+
+  
 };
 
 class eicEvent {

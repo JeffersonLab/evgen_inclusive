@@ -20,6 +20,7 @@ eicInput::eicInput(const char *file){
     fscanf(f, "%s%lf%s", dummy, &fData.ion_mass, dummy);
     fscanf(f, "%s%d", dummy, &fData.ion_Z);
     fscanf(f, "%s%d", dummy, &fData.ion_N);
+    fscanf(f, "%s%d", dummy, &fData.model);
     fscanf(f, "%s%s", dummy, fData.output);
 
     fData.lumin *= 1e4; // Convert cm^-2 to m^-2

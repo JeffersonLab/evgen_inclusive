@@ -64,6 +64,16 @@ void eicOutput::InitTree(){
     fTree->Branch("y", &fData.y, "y/D");
 
     fTree->Branch("Y", &fData.Y, "Y/D");
+    
+
+    fTree->Branch("Z_ion", &fData.Z_ion, "Z_ion/I");
+    fTree->Branch("N_ion", &fData.N_ion, "N_ion/I");
+    
+    fTree->Branch("particle_id", &fData.particle_id, "particle_id/I");
+    fTree->Branch("charge", &fData.charge, "charge/I");
+    fTree->Branch("mass", &fData.mass, "mass/D");
+    fTree->Branch("mom", &fData.mom, "mom/D");
+    
 
     return;
 }

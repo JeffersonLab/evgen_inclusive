@@ -7,6 +7,7 @@
 #include "eicInput.h"
 #include "eicOutput.h"
 #include "eicEvent.h"
+#include "eicModel.h"
 
 
 class eicProcess {
@@ -24,6 +25,7 @@ class eicProcess {
 	eicIon      *fion;
 	eicPhysics  *fphy;
 	eicEvent    *fevt;
+	eicModel    *fmodel;
 
 };
 #endif//__eicProcess_h

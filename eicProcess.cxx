@@ -10,6 +10,7 @@ eicProcess::eicProcess(const char *file, char *file2){
     fout  = new eicOutput(finp,file2);
 
     fevt  = new eicEvent();
+    fmodel = new eicModel(finp);
     return;
 }
 
@@ -20,13 +21,25 @@ void eicProcess::Run(){
 
     int evt;
     int nprnt = finp->GetNprnt();
+    int model = fmodel->GetModel();
 
-    for( evt = 0; evt < nevt; evt++ ){
-	if( (evt%nprnt) == 0 ){printf("Event %10d \n", evt);}
-	fphy->MakeEvent(fbeam, fion, fevt);
-	fout->Write(fevt);
+    printf("Model = %d \n", model);
+
+    if (model == 1) { // electron DIS generator
+      for( evt = 0; evt < nevt; evt++ ){
+	  if( (evt%nprnt) == 0 ){printf("Event %10d \n", evt);}
+	  fphy->MakeEvent(fbeam, fion, fevt);
+	  fout->Write(fevt);
+      }
     }
-
+    else { // pion generator
+      printf("Pion cross section \n");
+      for( evt = 0; evt < nevt; evt++ ){
+	  if( (evt%nprnt) == 0 ){printf("Event %10d \n", evt);}
+	  fphy->MakeEvent2(fbeam, fion, fevt, fmodel);
+	  fout->Write(fevt);
+      }
+    }
     fout->Close();
 
     return;

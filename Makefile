@@ -19,7 +19,7 @@ all:            $(PROGRAMS)
 
 $(EICRATE):  $(EICRATEO)
 		@echo "this: $@, $(EICRATEO)"
-		$(LD) $(LDFLAGS) $^ $(GLIBS) -O2 -lEG -lRGL -lGed -lHtml -lThread -lGeom -lcteqpdf $(OutPutOpt)$@
+		$(LD) $(LDFLAGS) $^ $(GLIBS) -ggdb -O2 -lEG -lRGL -lGed -lHtml -lThread -lGeom -lcteqpdf $(OutPutOpt)$@
 		cp eicRate output/
 		@echo "$@ done"
 
