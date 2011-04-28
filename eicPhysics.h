@@ -42,6 +42,19 @@ class eicPhysics {
 	 double g1gZ(double x, double Q2, nucl n );
 	 double g5gZ(double x, double Q2, nucl n );
 
+	 double F1Z(double x, double Q2, nucl n );
+	 double F3Z(double x, double Q2, nucl n );
+	 double g1Z(double x, double Q2, nucl n );
+	 double g5Z(double x, double Q2, nucl n );
+
+
+	 double F1W(double x, double Q2, nucl n, int C );
+	 double F2W(double x, double Q2, nucl n, int C );
+	 double F3W(double x, double Q2, nucl n, int C );
+	 double g1W(double x, double Q2, nucl n, int C );
+	 double g4W(double x, double Q2, nucl n, int C );
+	 double g5W(double x, double Q2, nucl n, int C );
+
 	 void ReadPolTable();
 	 double getDeltaq( double x, double Q2, int quark );
 
@@ -50,6 +63,13 @@ class eicPhysics {
 	 double fDeltaq[5][50][50];
 	 double fDeltaqx[50][50];
 	 double fDeltaqQ2[50][50];
+
+	 int fNxlin;
+	 int fNQ2lin;
+	 // Linearly spaced pol pdfs
+	 double fDeltaqlin[5][50][50];
+	 double fDeltaqxlin[50][50];
+	 double fDeltaqQ2lin[50][50];
 	 
 	 // Pion part
 //	 double Wiser( int Z, int N, char PART, double E_IN, double P_IN, double TH_IN, double radlen_IN);

@@ -5,7 +5,10 @@
 
 struct eventdata {
 	double weight;
+	double Wpweight;
+	double Wmweight;
 	double theta;
+	double jetth;
 	double phi;
 	double ef;
 	double x;
@@ -18,9 +21,19 @@ struct eventdata {
 	double f3gz;
 	double g1gz;
 	double g5gz;
+	double f1wp;
+	double f3wp;
+	double g1wp;
+	double g5wp;
+	double f1wm;
+	double f3wm;
+	double g1wm;
+	double g5wm;
 	double Q2;
 	double eta_gZ;
 	double rate;
+	double Wprate;
+	double Wmrate;
 	double pdf[6];
 	double Dpdf[5];
 
@@ -28,6 +41,8 @@ struct eventdata {
 	double Y;
 
 	double A_L;
+	double A_L_g1;
+	double A_L_g5;
 	double Y_L;
 	double eta_L;
 	
@@ -35,12 +50,23 @@ struct eventdata {
 	double Y_T;
 	double eta_T;
 
+	double AWp;
+	double AWm;
+
+	double AWp_g1;
+	double AWp_g5;
+	double AWm_g1;
+	double AWm_g5;
+
+	double jetE;
+	double jetp;
+
         int particle_id;
-  int charge;
-  int Z_ion;
-  int N_ion;
-  double mom;
-  double mass;
+        int charge;
+        int Z_ion;
+        int N_ion;
+        double mom;
+        double mass;
 
   
 };

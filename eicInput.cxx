@@ -21,7 +21,8 @@ eicInput::eicInput(const char *file){
     fscanf(f, "%s%d", dummy, &fData.ion_Z);
     fscanf(f, "%s%d", dummy, &fData.ion_N);
     fscanf(f, "%s%d", dummy, &fData.model);
-    fscanf(f, "%s%s", dummy, fData.output);
+    fscanf(f, "%s%d", dummy, &fData.out_fmt);
+
 
     fData.lumin *= 1e4; // Convert cm^-2 to m^-2
     fData.runtime *= 3600; // Convert hours to s

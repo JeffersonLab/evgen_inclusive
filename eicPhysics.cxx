@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 #include <math.h>
-
+#include <assert.h>
 
 #include "TRandom.h"
 #include "TLorentzVector.h"
@@ -99,23 +99,13 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev ){
     double f1gz = A*F1gZ(x,Q2,n);
     double f3gz = A*F3gZ(x,Q2,n);
 
-
-    // From Halzen and Marten
-//    double ds_dxdy 
-//	= 2.0*3.14159*(x*y*y*f1 + ((1.0-y)-M*x*y/(2.0*numax))*f2)/(x*x*y*y*M*numax*137.0*137.0);
-
-    //  From PDG
-    double ds_dxdy 
-	= 4.0*3.14159*((1.0-y-pow(x*y*MASS_P,2.0)/Q2)*f2+y*y*x*f1)
-	  /(x*y*Q2*137.0*137.0);
-
-
-//    double ds_dOmegadE = ds_dxdy*ef*J/(2.0*M*e_rest.Energy()*3.14159*y);
-
+    double f1z = A*F1Z(x,Q2,n);
+    double f3z = A*F3Z(x,Q2,n);
     ////////////////////////////////////////////////////
     //  Parity violation
     double G_fermi = 1.16637e-5; // GeV^-2
     double MZ = 91.1876; // GeV
+    double MW = 80.399; // GeV
     double sin2thW = 0.23119;
 
     double Ynum = 2.0*x*(1.0-y/2.0);
@@ -124,18 +114,49 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev ){
     double Y = Ynum/Yden;
 
     double eta_gZ = G_fermi*MZ*MZ*Q2*137.0/(2.0*sqrt(2.0)*3.14159)/(Q2+MZ*MZ);
+    double eta_Z  = eta_gZ*eta_gZ;
 
     double gA = -1.0/2.0;
     double gV = -1.0/2.0 + 2.0*sin2thW;
 
-    double Abeam = -eta_gZ*(gA*f1gz/f1 + Y*gV*f3gz/f1);
+    double f2nc = f2 - gV*eta_gZ*f1gz*2.0*x+(gV*gV+gA*gA)*eta_Z*f1z*2.0*x;
+    double f1nc = f2nc/2.0/x;
+    double f3nc = -gA*eta_gZ*f3gz+2.0*gV*gA*eta_Z*f3z;
+
+    // From Halzen and Marten (Agrees with PDG)
+//    double ds_dxdy 
+//	= 2.0*3.14159*(x*y*y*f1 + ((1.0-y)-M*x*y/(2.0*numax))*f2)/(x*x*y*y*M*numax*137.0*137.0);
+
+    //  From PDG
+    double ds_dxdy 
+//	= 4.0*3.14159*((1.0-y-pow(x*y*MASS_P,2.0)/Q2)*f2+y*y*x*f1)
+//	  /(x*y*Q2*137.0*137.0);
+	= 4.0*3.14159*((1.0-y-pow(x*y*MASS_P,2.0)/Q2)*f2nc+y*y*x*f1nc+(y-y*y/2.0)*x*f3nc)
+	  /(x*y*Q2*137.0*137.0);
+
+
+//    double ds_dOmegadE = ds_dxdy*ef*J/(2.0*M*e_rest.Energy()*3.14159*y);
+
+
+
+//    double Abeam =-eta_gZ*(gA*f1gz/f1 + Y*gV*f3gz/f1);
+    double Abeam = (eta_gZ*gA*f1gz   - 2.0*eta_Z*gV*gA*f1z  
+	          + eta_gZ*Y*gV*f3gz - Y*(gV*gV+gA*gA)*eta_Z*f3z)/(f1nc+Y*f3nc);
 
     double g1gz = A*g1gZ(x,Q2,n);
     double g5gz = A*g5gZ(x,Q2,n);
 
-    double eta_L = eta_gZ*(x*y*y + x*(1.0-y)*(2.0-x*y*M/numax))
+    double g1z = A*g1Z(x,Q2,n);
+    double g5z = A*g5Z(x,Q2,n);
+
+    /* Simplify.  eta_L here is high by a factor of 2...
+    double eta_L = eta_gZ*2.0*(x*y*y + x*(1.0-y)*(2.0-x*y*M/numax))
 	           /(x*y*y + 2.0*x*(1.0-y-x*y*M/(2.0*numax)));
     double Y_L   = y*(2.0-y-x*y*M/numax)/(y*y + (1.0-y)*(2.0-x*y*M/numax));
+    */
+
+    double eta_L = eta_gZ;
+    double Y_L   = y*(2.0-y)/(y*y + (1.0-y)*2.0);
 
     double eta_T = 0.0;
     double Y_T   = 0.0;
@@ -143,10 +164,63 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev ){
     double A_L = eta_L*(gV*g5gz/f1 + Y_L*gA*g1gz/f1);
     double A_T = 0.0;
 
+    double A_L_g1 = eta_L*(Y_L*gA*g1gz/f1);
+    double A_L_g5 = eta_L*(gV*g5gz/f1);
+
+    double Yp = 1.0 + pow(1.0-y,2.0);
+    double Ym = 1.0 - pow(1.0-y,2.0);
+    double etaW = 0.5*pow(G_fermi*MW*MW*137.0*Q2/(Q2+MW*MW)/(4.0*3.14159),2.0);
+
+    double f2wp = A*F2W(x,Q2,n,1);
+    double f3wp = A*F3W(x,Q2,n,1);
+    double g1wp = A*g1W(x,Q2,n,1);
+    double g4wp = A*g4W(x,Q2,n,1);
+
+    double f2wm = A*F2W(x,Q2,n,-1);
+    double f3wm = A*F3W(x,Q2,n,-1);
+    double g1wm = A*g1W(x,Q2,n,-1);
+    double g4wm = A*g4W(x,Q2,n,-1);
+
+    double f1wp = A*F1W(x,Q2,n, 1);
+    double f1wm = A*F1W(x,Q2,n,-1);
+    double g5wp = A*g5W(x,Q2,n, 1);
+    double g5wm = A*g5W(x,Q2,n,-1);
+
+    // For now we are assuming that the electrons/positrons
+    // completely polarized (as per Vogelsang)
+    double dsWmdxy = (etaW*8.0*3.14159/(137.0*137.0*x*y*Q2))*
+	(Yp*f2wm + Ym*x*f3wm);
+    double dsWpdxy = (etaW*8.0*3.14159/(137.0*137.0*x*y*Q2))*
+	(Yp*f2wp - Ym*x*f3wp);
+
+    // W- exchange needs extra minus sign
+    
+    // Sigma+ and Sigma- each get half the luminosity,
+    // So dsWmdxy needs a factor of 2 reduction to get 
+    // the asymmetry 
+    double AWm = (etaW*16.0*3.14159/(137.0*137.0*x*y*Q2))*
+	(-Yp*g4wm + 2.0*Ym*x*g1wm)/(2.0*dsWmdxy);
+
+    double AWp = (etaW*16.0*3.14159/(137.0*137.0*x*y*Q2))*
+	(-Yp*g4wp - 2.0*Ym*x*g1wp)/(2.0*dsWpdxy);
+
+    double AWm_g1 = (etaW*16.0*3.14159/(137.0*137.0*x*y*Q2))*
+	(2.0*Ym*x*g1wm)/(2.0*dsWmdxy);
+    double AWm_g5 = (etaW*16.0*3.14159/(137.0*137.0*x*y*Q2))*
+	(-Yp*g4wm)/(2.0*dsWmdxy);
+
+    double AWp_g1 = (etaW*16.0*3.14159/(137.0*137.0*x*y*Q2))*
+	(-2.0*Ym*x*g1wp)/(2.0*dsWpdxy);
+    double AWp_g5 = (etaW*16.0*3.14159/(137.0*137.0*x*y*Q2))*
+	(-Yp*g4wp)/(2.0*dsWpdxy);
+
+
     ////////////////////////////////////////////////////
 
-    // Boost kf back to EIC frame
+    // Boost q, kf back to EIC frame
     kf.Boost(-blab);
+    TLorentzVector qlab = q;
+    qlab.Boost(-blab);
 
     double th_eic = kf.Theta();
 
@@ -163,6 +237,8 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev ){
     */
 
     double ds_dxdydphi = ds_dxdy/(2.0*3.14159);
+    double dsWp_dxdydphi = dsWpdxy/(2.0*3.14159);
+    double dsWm_dxdydphi = dsWmdxy/(2.0*3.14159);
 
     if( 0.0 < ds_dxdy && ds_dxdy < 1e9 ){
 	data.weight  = ds_dxdydphi*(0.197*0.197*1e-30)*V*J; // GeV^-2 to m^2
@@ -172,13 +248,36 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev ){
 	data.weight = 0.0;
     }
 
+    if( 0.0 < dsWp_dxdydphi && dsWp_dxdydphi < 1e9 ){
+	data.Wpweight  = dsWp_dxdydphi*(0.197*0.197*1e-30)*V*J; // GeV^-2 to m^2
+	data.Wpweight *= beam->GetLumin();
+    } else {
+	// Unphysical for some reason
+	data.Wpweight = 0.0;
+    }
+
+    if( 0.0 < dsWm_dxdydphi && dsWm_dxdydphi < 1e9 ){
+	data.Wmweight  = dsWm_dxdydphi*(0.197*0.197*1e-30)*V*J; // GeV^-2 to m^2
+	data.Wmweight *= beam->GetLumin();
+    } else {
+	// Unphysical for some reason
+	data.Wmweight = 0.0;
+    }
+
+
     data.rate   = 0.0;
+    data.Wprate   = 0.0;
+    data.Wmrate   = 0.0;
 
 //    data.crs    = ds_dOmegadE;
     data.crs    = ds_dxdy;
 
     data.ef     = kf.Energy();
     data.theta  = kf.Theta();
+    data.jetth  = qlab.Theta();
+
+    data.jetE   = 0.0;
+    data.jetp   = qlab.Vect().Mag();
 
     data.phi    = kf.Phi();
     data.x      = x;
@@ -205,9 +304,38 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev ){
     data.eta_L   = eta_L;
     data.Y_L     = Y_L;
 
+    data.A_L_g1     = A_L_g1;
+    data.A_L_g5     = A_L_g5;
+
     data.A_T     = A_T;
     data.eta_T   = eta_T;
     data.Y_T     = Y_T;
+
+    data.AWp     = AWp;
+    data.AWm     = AWm;
+
+    data.AWp_g1  = AWp_g1;
+    data.AWp_g5  = AWp_g5;
+    data.AWm_g1  = AWm_g1;
+    data.AWm_g5  = AWm_g5;
+
+    data.g1wm    = g1wm;
+    data.g1wp    = g1wp;
+    data.g5wm    = g1wm;
+    data.g5wp    = g1wp;
+
+    data.f1wm    = f1wm;
+    data.f1wp    = f1wp;
+    data.f3wm    = f3wm;
+    data.f3wp    = f3wp;
+
+    data.mass    = 0.000511;
+    data.particle_id = 11;
+    data.charge = -1;
+    data.mom =  kf.Energy();
+    data.Z_ion = ion->GetZ();
+    data.N_ion = ion->GetN();
+
 
     // Look at pdf data
     double useQ2;
@@ -384,6 +512,10 @@ double eicPhysics::F2( double x, double Q2, nucl n ){
     f2sum += e2_d*x*cteq_pdf_evolvepdf(fPDF,  3, x, sqrt(Q2));
     f2sum += e2_d*x*cteq_pdf_evolvepdf(fPDF, -3, x, sqrt(Q2));
 
+    // Charm quark
+    f2sum += e2_u*x*cteq_pdf_evolvepdf(fPDF,  4, x, sqrt(Q2));
+    f2sum += e2_u*x*cteq_pdf_evolvepdf(fPDF, -4, x, sqrt(Q2));
+
     // ubar
     f2sum += e2_u*x*cteq_pdf_evolvepdf(fPDF, -uidx, x, sqrt(Q2));
     // dbar
@@ -432,6 +564,10 @@ double eicPhysics::F1gZ( double x, double Q2, nucl n ){
     // Strange quark
     f1sum += e_d*gV_d*cteq_pdf_evolvepdf(fPDF,  3, x, sqrt(Q2));
     f1sum += e_d*gV_d*cteq_pdf_evolvepdf(fPDF, -3, x, sqrt(Q2));
+
+    // Charm quark
+    f1sum += e_u*gV_u*cteq_pdf_evolvepdf(fPDF,  4, x, sqrt(Q2));
+    f1sum += e_u*gV_u*cteq_pdf_evolvepdf(fPDF, -4, x, sqrt(Q2));
 
     // ubar
     f1sum += e_u*gV_u*cteq_pdf_evolvepdf(fPDF, -uidx, x, sqrt(Q2));
@@ -482,10 +618,119 @@ double eicPhysics::F3gZ( double x, double Q2, nucl n ){
     f3sum += e_d*gA_d*cteq_pdf_evolvepdf(fPDF,  3, x, sqrt(Q2));
     f3sum -= e_d*gA_d*cteq_pdf_evolvepdf(fPDF, -3, x, sqrt(Q2));
 
+   // Charm quark
+    f3sum += e_u*gA_u*cteq_pdf_evolvepdf(fPDF,  4, x, sqrt(Q2));
+    f3sum -= e_u*gA_u*cteq_pdf_evolvepdf(fPDF, -4, x, sqrt(Q2));
+
     // ubar
     f3sum -= e_u*gA_u*cteq_pdf_evolvepdf(fPDF, -uidx, x, sqrt(Q2));
     // dbar
     f3sum -= e_d*gA_d*cteq_pdf_evolvepdf(fPDF, -didx, x, sqrt(Q2));
+
+    return f3sum*2.0;
+}
+
+double eicPhysics::F1Z( double x, double Q2, nucl n ){
+    // Sanity checks
+    if( x < 0 || 1.0 < x ) return 0.0;
+    if( Q2 < 0 ) { printf("Negative Q2?!\n"); exit(1); }
+    // To keep things nice, this puts us in the resonance
+    // region so there's nothing useful here anyways
+    if( Q2 < 1.0 ) { Q2 = 1.0; }
+
+    double sin2thW = 0.23119;
+    double gA_u =  0.5;
+    double gA_d = -0.5;
+    double gV_u =  0.5 - 4.0*sin2thW/3.0;
+    double gV_d = -0.5 + 2.0*sin2thW/3.0;
+
+    double f1sum = 0.0;
+
+    int uidx, didx;
+
+    switch( n ){
+	case kProton:
+	    uidx = 1;
+	    didx = 2;
+	    break;
+	case kNeutron:
+    	    uidx = 2;
+	    didx = 1;
+	    break;
+	default:
+    	    uidx = 1;
+	    didx = 2;
+	    break;
+    }
+
+    f1sum += 0.5*(gV_u*gV_u+gA_u*gA_u)*cteq_pdf_evolvepdf(fPDF, uidx, x, sqrt(Q2));
+    f1sum += 0.5*(gV_d*gV_d+gA_d*gA_d)*cteq_pdf_evolvepdf(fPDF, didx, x, sqrt(Q2));
+
+    // Strange quark
+    f1sum += 0.5*(gV_d*gV_d+gA_d*gA_d)*cteq_pdf_evolvepdf(fPDF,  3, x, sqrt(Q2));
+    f1sum += 0.5*(gV_d*gV_d+gA_d*gA_d)*cteq_pdf_evolvepdf(fPDF, -3, x, sqrt(Q2));
+    // Charm quark
+    f1sum += 0.5*(gV_u*gV_u+gA_u*gA_u)*cteq_pdf_evolvepdf(fPDF,  4, x, sqrt(Q2));
+    f1sum += 0.5*(gV_u*gV_u+gA_u*gA_u)*cteq_pdf_evolvepdf(fPDF, -4, x, sqrt(Q2));
+
+    // ubar
+    f1sum += 0.5*(gV_u*gV_u+gA_u*gA_u)*cteq_pdf_evolvepdf(fPDF, -uidx, x, sqrt(Q2));
+    // dbar
+    f1sum += 0.5*(gV_d*gV_d+gA_d*gA_d)*cteq_pdf_evolvepdf(fPDF, -didx, x, sqrt(Q2));
+
+    return f1sum;
+}
+
+double eicPhysics::F3Z( double x, double Q2, nucl n ){
+    // Sanity checks
+    if( x < 0 || 1.0 < x ) return 0.0;
+    if( Q2 < 0 ) { printf("Negative Q2?!\n"); exit(1); }
+    // To keep things nice, this puts us in the resonance
+    // region so there's nothing useful here anyways
+    if( Q2 < 1.0 ) { Q2 = 1.0; }
+
+    double sin2thW = 0.23119;
+
+    double gA_u =  1.0/2.0;
+    double gA_d = -1.0/2.0;
+    double gV_u =  0.5 - 4.0*sin2thW/3.0;
+    double gV_d = -0.5 + 2.0*sin2thW/3.0;
+
+    double f3sum = 0.0;
+
+
+    int uidx, didx;
+
+    switch( n ){
+	case kProton:
+	    uidx = 1;
+	    didx = 2;
+	    break;
+	case kNeutron:
+    	    uidx = 2;
+	    didx = 1;
+	    break;
+	default:
+    	    uidx = 1;
+	    didx = 2;
+	    break;
+    }
+
+    f3sum += gV_u*gA_u*cteq_pdf_evolvepdf(fPDF, uidx, x, sqrt(Q2));
+    f3sum += gV_d*gA_d*cteq_pdf_evolvepdf(fPDF, didx, x, sqrt(Q2));
+
+    // Strange quark
+    f3sum += gV_d*gA_d*cteq_pdf_evolvepdf(fPDF,  3, x, sqrt(Q2));
+    f3sum -= gV_d*gA_d*cteq_pdf_evolvepdf(fPDF, -3, x, sqrt(Q2));
+    
+    // Charm quark
+    f3sum += gV_u*gA_u*cteq_pdf_evolvepdf(fPDF,  4, x, sqrt(Q2));
+    f3sum -= gV_u*gA_u*cteq_pdf_evolvepdf(fPDF, -4, x, sqrt(Q2));
+
+    // ubar
+    f3sum -= gV_u*gA_u*cteq_pdf_evolvepdf(fPDF, -uidx, x, sqrt(Q2));
+    // dbar
+    f3sum -= gV_d*gA_d*cteq_pdf_evolvepdf(fPDF, -didx, x, sqrt(Q2));
 
     return f3sum*2.0;
 }
@@ -611,6 +856,312 @@ double eicPhysics::g5gZ( double x, double Q2, nucl n ){
 }
 
 
+double eicPhysics::g1Z( double x, double Q2, nucl n ){
+    // Sanity checks
+    if( x < 0 || 1.0 < x ) return 0.0;
+    if( Q2 < 0 ) { printf("Negative Q2?!\n"); exit(1); }
+    // To keep things nice, this puts us in the resonance
+    // region so there's nothing useful here anyways
+    if( Q2 < 1.0 ) { Q2 = 1.0; }
+
+    double e_u =  2.0/3.0;
+    double e_d = -1.0/3.0;
+
+    double sin2thW = 0.23119;
+    double gV_u =  0.5 - 4.0*sin2thW/3.0;
+    double gV_d = -0.5 + 2.0*sin2thW/3.0;
+    double gA_u =  1.0/2.0;
+    double gA_d = -1.0/2.0;
+
+    double g1sum = 0.0;
+
+    int uidx, didx;
+
+    switch( n ){
+	case kProton:
+	    uidx = 0;
+	    didx = 1;
+	    break;
+	case kNeutron:
+    	    uidx = 1;
+	    didx = 0;
+	    break;
+	default:
+    	    uidx = 0;
+	    didx = 1;
+	    break;
+    }
+
+    g1sum += (gV_u*gV_u+gA_u*gA_u)*getDeltaq(x, Q2, uidx);
+    g1sum += (gV_d*gV_d+gA_d*gA_d)*getDeltaq(x, Q2, didx);
+
+    // Strange quark
+    g1sum += 2.0*(gV_d*gV_d+gA_d*gA_d)*getDeltaq(x, Q2, 4);
+ 
+    // ubar
+    g1sum += (gV_u*gV_u+gA_u*gA_u)*getDeltaq(x, Q2, uidx+2);
+    // dbar
+    g1sum += (gV_d*gV_d+gA_d*gA_d)*getDeltaq(x, Q2, didx+2);
+    
+    return g1sum/2.0;
+}
+
+double eicPhysics::g5Z( double x, double Q2, nucl n ){
+// Sanity checks
+    if( x < 0 || 1.0 < x ) return 0.0;
+    if( Q2 < 0 ) { printf("Negative Q2?!\n"); exit(1); }
+    // To keep things nice, this puts us in the resonance
+    // region so there's nothing useful here anyways
+    if( Q2 < 1.0 ) { Q2 = 1.0; }
+
+    double e_u =  2.0/3.0;
+    double e_d = -1.0/3.0;
+
+    double sin2thW = 0.23119;
+    double gV_u =  0.5 - 4.0*sin2thW/3.0;
+    double gV_d = -0.5 + 2.0*sin2thW/3.0;
+    double gA_u =  1.0/2.0;
+    double gA_d = -1.0/2.0;
+
+    double g5sum = 0.0;
+
+    int uidx, didx;
+
+    switch( n ){
+	case kProton:
+	    uidx = 0;
+	    didx = 1;
+	    break;
+	case kNeutron:
+    	    uidx = 1;
+	    didx = 0;
+	    break;
+	default:
+    	    uidx = 0;
+	    didx = 1;
+	    break;
+    }
+
+    g5sum += gV_u*gA_u*getDeltaq(x, Q2, uidx);
+    g5sum += gV_d*gA_d*getDeltaq(x, Q2, didx);
+
+    // ubar
+    g5sum -= gV_u*gA_u*getDeltaq(x, Q2, uidx+2);
+    // dbar
+    g5sum -= gV_d*gA_d*getDeltaq(x, Q2, didx+2);
+
+    return g5sum;
+}
+
+
+double eicPhysics::F1W( double x, double Q2, nucl n, int C ){
+    return F2W(x,Q2,n,C)/(2.0*x);
+}
+
+double eicPhysics::F2W( double x, double Q2, nucl n, int C ){
+    // Sanity checks
+    if( x < 0 || 1.0 < x ) return 0.0;
+    if( Q2 < 0 ) { printf("Negative Q2?!\n"); exit(1); }
+    // To keep things nice, this puts us in the resonance
+    // region so there's nothing useful here anyways
+    if( Q2 < 1.0 ) { Q2 = 1.0; }
+
+    double f2sum = 0.0;
+
+    int uidx, didx, sidx, cidx;
+
+    switch( n ){
+	case kProton:
+	    uidx = 1;
+	    didx = 2;
+	    sidx = 3;
+	    cidx = 4;
+	    break;
+	case kNeutron:
+    	    uidx = 2;
+	    didx = 1;
+	    sidx = 3;
+	    cidx = 4;
+	    break;
+	default:
+    	    uidx = 1;
+	    didx = 2;
+	    sidx = 3;
+	    cidx = 4;
+	    break;
+    }
+
+    assert( C==1 || C==-1 );
+
+    // Swap quarks if we have positive charged current
+    int tmp;
+    if( C == 1 ){
+	tmp = didx;
+	didx = uidx;
+	uidx = tmp;
+
+    	tmp = cidx;
+	cidx = sidx;
+	sidx = tmp;
+    }
+
+    f2sum += 2.0*x*cteq_pdf_evolvepdf(fPDF, uidx, x, sqrt(Q2));
+    f2sum += 2.0*x*cteq_pdf_evolvepdf(fPDF,-didx, x, sqrt(Q2));
+
+    // Strange quark
+    f2sum += 2.0*x*cteq_pdf_evolvepdf(fPDF, -sidx, x, sqrt(Q2));
+    f2sum += 2.0*x*cteq_pdf_evolvepdf(fPDF,  cidx, x, sqrt(Q2));
+
+    return f2sum;
+}
+
+double eicPhysics::F3W( double x, double Q2, nucl n, int C ){
+    // Sanity checks
+    if( x < 0 || 1.0 < x ) return 0.0;
+    if( Q2 < 0 ) { printf("Negative Q2?!\n"); exit(1); }
+    // To keep things nice, this puts us in the resonance
+    // region so there's nothing useful here anyways
+    if( Q2 < 1.0 ) { Q2 = 1.0; }
+
+    double f3sum = 0.0;
+
+    int uidx, didx, sidx, cidx;
+
+    switch( n ){
+	case kProton:
+	    uidx = 1;
+	    didx = 2;
+	    sidx = 3;
+	    cidx = 4;
+	    break;
+	case kNeutron:
+    	    uidx = 2;
+	    didx = 1;
+	    sidx = 3;
+	    cidx = 4;
+	    break;
+	default:
+    	    uidx = 1;
+	    didx = 2;
+	    sidx = 3;
+	    cidx = 4;
+	    break;
+    }
+
+    assert( C==1 || C==-1 );
+
+    // Swap quarks if we have positive charged current
+    int tmp;
+    if( C == 1 ){
+	tmp = didx;
+	didx = uidx;
+	uidx = tmp;
+
+    	tmp = cidx;
+	cidx = sidx;
+	sidx = tmp;
+    }
+
+
+    f3sum += 2.0*cteq_pdf_evolvepdf(fPDF, uidx, x, sqrt(Q2));
+    f3sum -= 2.0*cteq_pdf_evolvepdf(fPDF,-didx, x, sqrt(Q2));
+
+    // Strange quark
+    f3sum -= 2.0*cteq_pdf_evolvepdf(fPDF, -sidx, x, sqrt(Q2));
+    f3sum += 2.0*cteq_pdf_evolvepdf(fPDF,  cidx, x, sqrt(Q2));
+
+    return f3sum;
+}
+
+double eicPhysics::g1W( double x, double Q2, nucl n, int C ){
+    // Sanity checks
+    if( x < 0 || 1.0 < x ) return 0.0;
+    if( Q2 < 0 ) { printf("Negative Q2?!\n"); exit(1); }
+    // To keep things nice, this puts us in the resonance
+    // region so there's nothing useful here anyways
+    if( Q2 < 1.0 ) { Q2 = 1.0; }
+
+    double g1sum = 0.0;
+
+    int uidx, didx;
+
+    switch( n ){
+	case kProton:
+	    uidx = 0;
+	    didx = 1;
+	    break;
+	case kNeutron:
+    	    uidx = 1;
+	    didx = 0;
+	    break;
+	default:
+    	    uidx = 0;
+	    didx = 1;
+	    break;
+    }
+
+    assert( C==1 || C==-1 );
+
+    int tmp;
+    if( C == 1 ){
+	tmp = didx;
+	didx = uidx;
+	uidx = tmp;
+    }
+
+    g1sum += getDeltaq(x, Q2, uidx);
+    g1sum += getDeltaq(x, Q2, didx+2);
+    g1sum += getDeltaq(x, Q2, 4);
+
+    return g1sum;
+}
+
+double eicPhysics::g4W( double x, double Q2, nucl n, int C ){
+    return 2.0*x*g5W(x,Q2,n,C);
+}
+
+double eicPhysics::g5W( double x, double Q2, nucl n, int C ){
+// Sanity checks
+    if( x < 0 || 1.0 < x ) return 0.0;
+    if( Q2 < 0 ) { printf("Negative Q2?!\n"); exit(1); }
+    // To keep things nice, this puts us in the resonance
+    // region so there's nothing useful here anyways
+    if( Q2 < 1.0 ) { Q2 = 1.0; }
+
+
+    double g5sum = 0.0;
+
+    int uidx, didx;
+
+    switch( n ){
+	case kProton:
+	    uidx = 0;
+	    didx = 1;
+	    break;
+	case kNeutron:
+    	    uidx = 1;
+	    didx = 0;
+	    break;
+	default:
+    	    uidx = 0;
+	    didx = 1;
+	    break;
+    }
+
+    int tmp;
+    if( C == 1 ){
+	tmp = didx;
+	didx = uidx;
+	uidx = tmp;
+    }
+
+    g5sum -= getDeltaq(x, Q2, uidx);
+    g5sum += getDeltaq(x, Q2, didx+2);
+    g5sum -= C*getDeltaq(x, Q2, 4);
+
+    return g5sum;
+}
+
 void eicPhysics::ReadPolTable(){
     fNx = 41;
     fNQ2 = 11;
@@ -621,24 +1172,64 @@ void eicPhysics::ReadPolTable(){
 
     // First three lines are bad
     
-    int i,j;
+    int i,j,k;
     char dummy[255];
-    char *dummy2[255];
+    char *dummy2 = new char[255];
+    double doubledummy;
     size_t dsize;
 
     int nscan;
-    getline(dummy2, &dsize, f);
-    getline(dummy2, &dsize, f);
-    getline(dummy2, &dsize, f);
+    getline(&dummy2, &dsize, f);
+    getline(&dummy2, &dsize, f);
+    getline(&dummy2, &dsize, f);
 
     for( i = 0; i < fNQ2; i++ ){
 	for( j = 0; j < fNx; j++ ){
 	    nscan = fscanf(f, "%lf%lf%lf%lf%lf%lf%lf", &fDeltaqQ2[i][j], &fDeltaqx[i][j],
 	       &fDeltaq[0][i][j], &fDeltaq[1][i][j], &fDeltaq[2][i][j], &fDeltaq[3][i][j], &fDeltaq[4][i][j]);
-//	    printf("nscan= %d, x = %g, Q2 = %f  Dubar = %f\n", nscan, fDeltaqx[i][j], fDeltaqQ2[i][j], fDeltaq[0][i][j] );
+	  //  printf("nscan= %d, x = %g, Q2 = %f  Dubar = %f\n", nscan, fDeltaqx[i][j], fDeltaqQ2[i][j], fDeltaq[0][i][j] );
 	}
     }
 
+    fclose(f);
+
+    fNxlin = 20;
+    fNQ2lin = 20;
+
+    FILE *f2 = fopen("PolPdf_Linear.txt", "r");
+
+    if( !f2 ){ printf("Can't open file PolPdf_Linear.txt\n"); exit(1);}
+
+    // First three lines are bad
+    
+    for( i = 0; i < fNQ2lin; i++ ){
+	for( j = 0; j < fNxlin-1; j++ ){
+	    nscan = fscanf(f2, "%lf%lf%lf%lf%lf%lf%lf%lf", &fDeltaqxlin[i][j], &fDeltaqQ2lin[i][j],
+	       &fDeltaqlin[0][i][j], &fDeltaqlin[1][i][j], &fDeltaqlin[2][i][j], &fDeltaqlin[3][i][j], &fDeltaqlin[4][i][j], &doubledummy);
+	  //  printf("nscan= %d, x = %g, Q2 = %f  Dubar = %f\n", nscan, fDeltaqx[i][j], fDeltaqQ2[i][j], fDeltaq[0][i][j] );
+	//    printf("%f %f %f %f %f %f %f\n", fDeltaqQ2lin[i][j], fDeltaqxlin[i][j],
+	 //      fDeltaqlin[0][i][j], fDeltaqlin[1][i][j], fDeltaqlin[2][i][j], fDeltaqlin[3][i][j], fDeltaqlin[4][i][j]);
+	}
+    }
+
+    // I guess constrain these to be 0 at 1
+    for( i = 0; i < fNQ2lin; i++ ){
+	for( j = 0; j < 5; j++ ){
+	    fDeltaqlin[j][i][fNxlin-1] = 0.0;
+	    fDeltaqxlin[i][fNxlin-1] = 1.0;
+	    fDeltaqQ2lin[i][fNxlin-1] = fDeltaqQ2lin[i][fNxlin-2];
+	    for( k = 0; k < fNxlin; k++ ){
+		// This distribution is multiplied by x...
+		fDeltaqlin[j][i][k] /= fDeltaqxlin[i][k];
+	    }
+	}
+    }
+    fclose(f2);
+
+    printf("Read in linear\n");
+
+    delete dummy2;
+    return;
 }
 
 double eicPhysics::getDeltaq( double x, double Q2, int quark ){
@@ -647,30 +1238,67 @@ double eicPhysics::getDeltaq( double x, double Q2, int quark ){
     double qmin = log(1.0);
     double qmax = log(1.0e5);
 
+    double xlinmin = 0.05;
+    double xlinmax = 1.0;
+    double qlinmin = 1.0;
+    double qlinmax = 20.0;
+
     double xscale, qscale;
     double xs, qs;
     int    xidx, qidx;
-
-    xscale = (log(x)  - xmin)*(fNx-1)/(xmax-xmin);
-    qscale = (log(Q2) - qmin)*(fNQ2-1)/(qmax-qmin);
-
-    xidx = (int) floor(xscale);
-    qidx = (int) floor(qscale);
-
-    xs = xscale - xidx;
-    qs = qscale - qidx;
-
-    // Bilinear interpolation
-
-//    printf("%g < x = %g < %g;  xidx = %d xs = %f\n", fDeltaqx[0][xidx], x,fDeltaqx[0][xidx+1], xidx, xs);
-    //printf("%g < Q2 = %g < %g;  qidx = %d qs = %f\n", fDeltaqQ2[qidx][0], Q2,fDeltaqQ2[qidx+1][0], qidx, qs);
-
     double sum = 0.0;
 
-    sum += fDeltaq[quark][qidx][xidx]*(1.0-xs)*(1.0-qs);
-    sum += fDeltaq[quark][qidx+1][xidx]*(1.0-xs)*qs;
-    sum += fDeltaq[quark][qidx][xidx+1]*xs*(1.0-qs);
-    sum += fDeltaq[quark][qidx+1][xidx+1]*xs*qs;
+    if( xlinmin < x && x < xlinmax && qlinmin < Q2 && Q2 < qlinmax ){
+	// Use linearly spaced distributions
+	// mostly for fixed target experiments
+	sum = 0.0;
+
+	xscale = (x  - xlinmin)*(fNxlin-1)/(xlinmax-xlinmin);
+	qscale = (Q2 - qlinmin)*(fNQ2lin-1)/(qlinmax-qlinmin);
+
+	xidx = (int) floor(xscale);
+	qidx = (int) floor(qscale);
+
+	xs = xscale - xidx;
+	qs = qscale - qidx;
+
+	// Bilinear interpolation
+
+	//    printf("%g < x = %g < %g;  xidx = %d xs = %f\n", fDeltaqx[0][xidx], x,fDeltaqx[0][xidx+1], xidx, xs);
+	//printf("%g < Q2 = %g < %g;  qidx = %d qs = %f\n", fDeltaqQ2[qidx][0], Q2,fDeltaqQ2[qidx+1][0], qidx, qs);
+
+	sum = 0.0;
+
+	sum += fDeltaqlin[quark][qidx][xidx]*(1.0-xs)*(1.0-qs);
+	sum += fDeltaqlin[quark][qidx+1][xidx]*(1.0-xs)*qs;
+	sum += fDeltaqlin[quark][qidx][xidx+1]*xs*(1.0-qs);
+	sum += fDeltaqlin[quark][qidx+1][xidx+1]*xs*qs;
+    } else {
+	// logarithmically spaced distributions
+	// mostly for collider experiments
+    
+
+	xscale = (log(x)  - xmin)*(fNx-1)/(xmax-xmin);
+	qscale = (log(Q2) - qmin)*(fNQ2-1)/(qmax-qmin);
+
+	xidx = (int) floor(xscale);
+	qidx = (int) floor(qscale);
+
+	xs = xscale - xidx;
+	qs = qscale - qidx;
+
+	// Bilinear interpolation
+
+	//    printf("%g < x = %g < %g;  xidx = %d xs = %f\n", fDeltaqx[0][xidx], x,fDeltaqx[0][xidx+1], xidx, xs);
+	//printf("%g < Q2 = %g < %g;  qidx = %d qs = %f\n", fDeltaqQ2[qidx][0], Q2,fDeltaqQ2[qidx+1][0], qidx, qs);
+
+	sum = 0.0;
+
+	sum += fDeltaq[quark][qidx][xidx]*(1.0-xs)*(1.0-qs);
+	sum += fDeltaq[quark][qidx+1][xidx]*(1.0-xs)*qs;
+	sum += fDeltaq[quark][qidx][xidx+1]*xs*(1.0-qs);
+	sum += fDeltaq[quark][qidx+1][xidx+1]*xs*qs;
+    }
 
     return sum;
 }

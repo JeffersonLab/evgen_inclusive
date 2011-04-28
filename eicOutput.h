@@ -6,6 +6,14 @@
 
 #include "TFile.h"
 #include "TTree.h"
+#include "TString.h"
+#include "TChain.h"
+#include <stdio.h>
+#include <iostream>
+#include <fstream>
+#include <math.h>
+using namespace std; 
+
 
 class eicOutput {
     public:
@@ -14,6 +22,8 @@ class eicOutput {
 
 	void Write( eicEvent *ev );
 	void Close();
+	void MakeFileLUND();
+	void MakeFileSOLLUND();
     private:
 	void InitTree();
 
@@ -26,5 +36,7 @@ class eicOutput {
 	double fNevt;
 
 	eventdata fData;
+
+
 };
 #endif//__eicOutput_h

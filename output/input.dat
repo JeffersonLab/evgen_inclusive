@@ -8,4 +8,4 @@ ion_m	0.938   GeV
 ion_Z	1
 ion_N	0
 model	1
-outfile eicrun.root
+output  3

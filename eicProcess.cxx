@@ -21,6 +21,7 @@ void eicProcess::Run(){
 
     int evt;
     int nprnt = finp->GetNprnt();
+    int fmt = finp->Get_fmt();
     int model = fmodel->GetModel();
 
     printf("Model = %d \n", model);
@@ -41,6 +42,20 @@ void eicProcess::Run(){
       }
     }
     fout->Close();
+
+    if (fmt == 2 ) { // also LUND format 
+      printf("Creating LUND output \n") ;
+      fout->MakeFileLUND();
+
+
+    }
+
+    if (fmt == 3 ) { // also SOLLUND format
+      printf("Creating SOLLUND output \n") ;
+      fout->MakeFileSOLLUND();
+
+    } 
+    
 
     return;
 }
