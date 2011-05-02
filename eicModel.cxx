@@ -3,9 +3,7 @@
 eicModel::eicModel(eicInput *inp):model(0){
     if( inp ){
 	model  = inp->Get_model();
-
-
-	printf("Model = %d \n", model);
+	radlen = inp->Get_radlen();
     }
 
     return;

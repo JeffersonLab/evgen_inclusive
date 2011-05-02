@@ -10,10 +10,13 @@ class eicModel{
 	eicModel(eicInput *inp = 0);
 	~eicModel();
 
-	int GetModel() { return model; }
+	int    GetModel() { return model; }
+	double GetRadLen() {return radlen; }
 	void   SetModel(int m) {  model = m; }
+	void   SetRadLen(double r) { radlen = r; }
 
     private:
 	int model;
+	double radlen;
 };
 #endif//__eicModel_h

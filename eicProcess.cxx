@@ -25,6 +25,7 @@ void eicProcess::Run(){
     int model = fmodel->GetModel();
 
     printf("Model = %d \n", model);
+    printf("Format = %d \n", fmt);
 
     if (model == 1) { // electron DIS generator
       for( evt = 0; evt < nevt; evt++ ){

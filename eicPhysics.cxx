@@ -10,6 +10,9 @@
 #include "TLorentzVector.h"
 #include "TF2.h";
 
+extern"C" {
+void wiser_all_sig_(float *E0,float *P,float *THETA_DEG,float *RAD_LEN,int *TYPE,float *SIGMA);
+}
 
 eicPhysics::eicPhysics(){
     int mode = 400;
@@ -359,9 +362,10 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev ){
 
 void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *model) {
 
-  double density, tlen, radlen=0., mass, weight_v;
+  double density, tlen, radlen=0., mass=0., weight_v;
   int particle_id, charge;
   int modelsig = model->GetModel();
+  radlen = model->GetRadLen();
 
   double ionp  = sqrt( pow(ion->GetEnergy(),2.0) - pow(ion->GetMass(),2.0) );
   double beta  = ionp/ion->GetEnergy();
@@ -382,20 +386,23 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   } else {
     n = kNeutron;
   }
-  
-  if (A==1. && zz==1.) { // hydrogen target
-    density = 0.072 ; // g/cm^3
-    tlen = 40. ; // length target cell in cm 
-    radlen = 4.492 * pow(10,-2); // thickness for 40cm liquid hydrogen in units of radiation lenght for liquid hydrogen
+  if (radlen == 0.) {
+    if (A==1. && zz==1.) { // hydrogen target
+      printf("Hydorgen target \n");
+      density = 0.072 ; // g/cm^3
+      tlen = 40. ; // length target cell in cm 
+      radlen = 4.492 * pow(10,-2); // thickness for 40cm liquid hydrogen in units of radiation lenght for liquid hydrogen
+    }
+    else if (A==2. && zz==1.) {
+      printf("Deuterium target \n");
+      density = 0.162 ; // g/cm^3
+      tlen = 40 ; // length target cell in cm 
+      radlen = 5.366 * pow(10,-2); // thickness for 40cm liquid deuterium in units of radiation lenght for liquid deuterium
+    }
+    else {
+      printf("Target not in this database, update for radiation lenght in the input file!\n"); exit(1);
+    } 
   }
-  else if (A==2. && zz==1.) {
-    density = 0.162 ; // g/cm^3
-    tlen = 40 ; // length target cell in cm 
-    radlen = 5.366 * pow(10,-2); // thickness for 40cm liquid deuterium in units of radiation lenght for liquid deuterium
-  }
-  else {
-    printf("Target not in this database, update for radiation lenght!\n"); exit(1);
-  } 
   radlen = radlen * 100. + 5. ; // radiation lenght needed in percentage with the internal part (normally around 5%)
   
   //  TF2 *func;
@@ -427,17 +434,59 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   double phi_pi = fRandom->Uniform(2 *  3.1415926535);
   double theta_pi = fRandom->Uniform(180.);
   double mom_pi = fRandom->Uniform(En_beam); 
+  double ef = sqrt(pow(mom_pi,2) + pow(mass,2));
+
+  float En_beam2 = float(En_beam);
+  float mom_pi2 = float(mom_pi);
+  float theta_pi2 = float(theta_pi);
+  float radlen2 = float(radlen);
+  float weight_f;
+  int type;
   
   if (particle_id == 211) {
     //   weight_v = WISER_ALL_FIT(mom_pi);
-    weight_v = WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,1);
+    //  weight_v = WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,1);
+    switch( n ){
+    case kProton:
+      type = 1;
+      break;
+    case kNeutron:
+      type = 2;
+      break;
+    default:
+      type = 1;
+      break;
+    }
+    wiser_all_sig_(&En_beam2,&mom_pi2,&theta_pi2,&radlen2,&type,&weight_f);
+
+    weight_v = double(weight_f);
+    //   cout << weight_f << " \t " << weight_v << endl;
     //    printf("%f \n",weight_v);
   }
   else if (particle_id == -211) {
-    weight_v = WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,2);
+    // weight_v = WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,2);
+    switch( n ){
+    case kProton:
+      type = 2;
+      break;
+    case kNeutron:
+      type = 1;
+      break;
+    default:
+      type = 2;
+      break;
+    }
+    wiser_all_sig_(&En_beam2,&mom_pi2,&theta_pi2,&radlen2,&type,&weight_f);
+    weight_v = double(weight_f); 
   }
   else if (particle_id == 111) {
-    weight_v = 0.5 * ( WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,1) + WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,2)) ;
+    //  weight_v = 0.5 * ( WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,1) + WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,2)) ;
+    type = 1;
+    wiser_all_sig_(&En_beam2,&mom_pi2,&theta_pi2,&radlen2,&type,&weight_f);
+    weight_v = 0.5 * double(weight_f);
+    type = 2;
+    wiser_all_sig_(&En_beam2,&mom_pi2,&theta_pi2,&radlen2,&type,&weight_f);
+    weight_v = 0.5 * double(weight_f) + weight_v;
   }
   else weight_v = 0.;
   
@@ -449,11 +498,19 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   eventdata data;
   if( 0.0 < weight_v && weight_v < 1e9 ){
     data.weight  = weight_v; // nanobars/GeV-str
-    data.weight *= beam->GetLumin();
+    //    data.weight *= beam->GetLumin();
   } else {
     // Unphysical for some reason
     data.weight = 0.0;
   }
+
+  data.x      = 0.;
+  data.y      = 0.;
+  data.Q2     = 0.;
+  data.W      = 0.;
+
+
+  data.ef = ef;
   data.mom = mom_pi;
   data.theta = theta_pi;
   data.phi = phi_pi;
@@ -1395,272 +1452,272 @@ double eicPhysics::getDeltaq( double x, double Q2, int quark ){
 // }
 
 
-double eicPhysics::QUADMO(double &PLOWER,double &PUPPER,double &EPSLON, int &NLVL) { // In this code the fortran version
-// uses QUADMO just as a QUADMO(WISER_ALL_FIT,E_GAMMA_MIN,E08,EPSILON,N), in C WISER_ALL_FIT can be called inside 
-// the function, without declaring it in the argouments                                                   
-   int   LEVEL, MINLVL=3 ,MAXLVL=24, IRETRN[50],I, NLVL2 ;                 
-   double VALINT[50][2], VMX[50], RX[50], FMX[50], FRX[50], FMRX[50], ESTRX[50], EPSX[50] ;                                 
-   double  FL, FML, FM, FMR, FR, EST, ESTL, ESTR, ESTINT, DIFFEST, AREA, ABAREA, VM, COEF, ROMBRG ;                        
-   double VL, R, EPS;
-    LEVEL = 0  ;                                                   
-    NLVL2 = 0 ;                                                     
-    ABAREA = 0.0 ;                                                 
-    VL = PLOWER ;                                                     
-    R = PUPPER ;                                                    
-    FL = WISER_ALL_FIT(VL) ;                                                 
-    FM = WISER_ALL_FIT(0.5*(VL+R)) ;                                         
-    FR = WISER_ALL_FIT(R) ;                                                
-    EST = 0.0 ;                                                    
-    EPS = EPSLON ; 
+// double eicPhysics::QUADMO(double &PLOWER,double &PUPPER,double &EPSLON, int &NLVL) { // In this code the fortran version
+// // uses QUADMO just as a QUADMO(WISER_ALL_FIT,E_GAMMA_MIN,E08,EPSILON,N), in C WISER_ALL_FIT can be called inside 
+// // the function, without declaring it in the argouments                                                   
+//    int   LEVEL, MINLVL=3 ,MAXLVL=24, IRETRN[50],I, NLVL2 ;                 
+//    double VALINT[50][2], VMX[50], RX[50], FMX[50], FRX[50], FMRX[50], ESTRX[50], EPSX[50] ;                                 
+//    double  FL, FML, FM, FMR, FR, EST, ESTL, ESTR, ESTINT, DIFFEST, AREA, ABAREA, VM, COEF, ROMBRG ;                        
+//    double VL, R, EPS;
+//     LEVEL = 0  ;                                                   
+//     NLVL2 = 0 ;                                                     
+//     ABAREA = 0.0 ;                                                 
+//     VL = PLOWER ;                                                     
+//     R = PUPPER ;                                                    
+//     FL = WISER_ALL_FIT(VL) ;                                                 
+//     FM = WISER_ALL_FIT(0.5*(VL+R)) ;                                         
+//     FR = WISER_ALL_FIT(R) ;                                                
+//     EST = 0.0 ;                                                    
+//     EPS = EPSLON ; 
     
-L100:
-    ++LEVEL;
-    VM = 0.5*(VL+R) ;
-    COEF = R-VL;
-    if (COEF != 0.) {
-      goto L150;
-    }
-    ROMBRG = EST ;
-    goto L300;
-L150:
-    FML = WISER_ALL_FIT(0.5*(VL+VM));                                           
-    FMR = WISER_ALL_FIT(0.5*(VM+R));                                           
-    ESTL = (FL+4.0*FML+FM)*COEF ;                                      
-    ESTR = (FM+4.0*FMR+FR)*COEF ;                                     
-    ESTINT = ESTL+ESTR ;
-    AREA=abs(ESTL)+abs(ESTR) ;                                       
-    ABAREA=AREA+ABAREA-abs(EST) ;
-    if (LEVEL != MAXLVL) {
-	goto L200;
-    }
-    ++(NLVL2);
-    ROMBRG = ESTINT ;
-    goto L300;
-L200:
-    if ((DIFFEST = EST - ESTINT, abs(DIFFEST)) > EPS * ABAREA || LEVEL < MINLVL) {
-	goto L400;
-    }
-    ROMBRG = (16.*ESTINT-EST)/15.0 ;
-L300:
-    --LEVEL;
-    I = IRETRN[LEVEL -1] ;
-    VALINT[LEVEL -1][I-1] = ROMBRG; 
-    switch (I) {
-      case 1: goto L500;
-      case 2: goto L600;
-    }
-L400:
-    IRETRN[LEVEL - 1] = 1 ;                                              
-    VMX[LEVEL - 1] = VM ;                                                
-    RX[LEVEL - 1] = R  ;                                               
-    FMX[LEVEL - 1] = FM ;                                              
-    FMRX[LEVEL - 1] = FMR ;                                             
-    FRX[LEVEL - 1] = FR ;                                               
-    ESTRX[LEVEL - 1] = ESTR ;                                          
-    EPSX[LEVEL - 1] = EPS ;                                            
-    EPS = EPS/1.4 ;
-    R = VM;                                                         
-    FR = FM ;                                                      
-    FM = FML ;                                                     
-    EST = ESTL ;
-    goto L100;
-L500:
-    IRETRN[LEVEL - 1] = 2 ;                                             
-    VL = VMX[LEVEL - 1] ;                                                 
-    R = RX[LEVEL - 1] ;                                                 
-    FL = FMX[LEVEL - 1] ;                                              
-    FM = FMRX[LEVEL - 1] ;                                              
-    FR = FRX[LEVEL - 1]  ;                                              
-    EST = ESTRX[LEVEL - 1] ;                                            
-    EPS = EPSX[LEVEL - 1] ;
-    goto L100;
-L600:
-    ROMBRG = VALINT[LEVEL-1][0]+VALINT[LEVEL][1] ;
-    if (LEVEL > 1) {
-      goto L300;
-    }
-    double ret_val = ROMBRG /12. ;
-    return ret_val;
+// L100:
+//     ++LEVEL;
+//     VM = 0.5*(VL+R) ;
+//     COEF = R-VL;
+//     if (COEF != 0.) {
+//       goto L150;
+//     }
+//     ROMBRG = EST ;
+//     goto L300;
+// L150:
+//     FML = WISER_ALL_FIT(0.5*(VL+VM));                                           
+//     FMR = WISER_ALL_FIT(0.5*(VM+R));                                           
+//     ESTL = (FL+4.0*FML+FM)*COEF ;                                      
+//     ESTR = (FM+4.0*FMR+FR)*COEF ;                                     
+//     ESTINT = ESTL+ESTR ;
+//     AREA=abs(ESTL)+abs(ESTR) ;                                       
+//     ABAREA=AREA+ABAREA-abs(EST) ;
+//     if (LEVEL != MAXLVL) {
+// 	goto L200;
+//     }
+//     ++(NLVL2);
+//     ROMBRG = ESTINT ;
+//     goto L300;
+// L200:
+//     if ((DIFFEST = EST - ESTINT, abs(DIFFEST)) > EPS * ABAREA || LEVEL < MINLVL) {
+// 	goto L400;
+//     }
+//     ROMBRG = (16.*ESTINT-EST)/15.0 ;
+// L300:
+//     --LEVEL;
+//     I = IRETRN[LEVEL -1] ;
+//     VALINT[LEVEL -1][I-1] = ROMBRG; 
+//     switch (I) {
+//       case 1: goto L500;
+//       case 2: goto L600;
+//     }
+// L400:
+//     IRETRN[LEVEL - 1] = 1 ;                                              
+//     VMX[LEVEL - 1] = VM ;                                                
+//     RX[LEVEL - 1] = R  ;                                               
+//     FMX[LEVEL - 1] = FM ;                                              
+//     FMRX[LEVEL - 1] = FMR ;                                             
+//     FRX[LEVEL - 1] = FR ;                                               
+//     ESTRX[LEVEL - 1] = ESTR ;                                          
+//     EPSX[LEVEL - 1] = EPS ;                                            
+//     EPS = EPS/1.4 ;
+//     R = VM;                                                         
+//     FR = FM ;                                                      
+//     FM = FML ;                                                     
+//     EST = ESTL ;
+//     goto L100;
+// L500:
+//     IRETRN[LEVEL - 1] = 2 ;                                             
+//     VL = VMX[LEVEL - 1] ;                                                 
+//     R = RX[LEVEL - 1] ;                                                 
+//     FL = FMX[LEVEL - 1] ;                                              
+//     FM = FMRX[LEVEL - 1] ;                                              
+//     FR = FRX[LEVEL - 1]  ;                                              
+//     EST = ESTRX[LEVEL - 1] ;                                            
+//     EPS = EPSX[LEVEL - 1] ;
+//     goto L100;
+// L600:
+//     ROMBRG = VALINT[LEVEL-1][0]+VALINT[LEVEL][1] ;
+//     if (LEVEL > 1) {
+//       goto L300;
+//     }
+//     double ret_val = ROMBRG /12. ;
+//     return ret_val;
     
-}
+// }
 
 
-double eicPhysics::WISER_ALL_FIT(double E_GAMMA) {
-    //---------------------------------------------------------
-// Calculates  pi, k, p  cross section for gamma + p -> k
-//  It is already divided by E_GAMMA, the bremstrulung spectra
-// David Wiser's fit from Thesis, eq. IV-A-2 and Table III.
-// Can be called from WISER_SIG using integration routine QUADMO
-// E,P are KAON energy and momentum
-// P_t is KAON transverse momentum
-// P_CM is KAON center of mass momentum
-// P_CM_L is KAON center of mass longitudinal momentum
-// TYPE:     1 for pi+;  2 for pi-, 3=k+, 4=k-, 5=p, 6=p-bar
-// E_GAMMA is photon energy.
-//             Steve Rock 2/21/96
-//---------------------------------------------------------
+// double eicPhysics::WISER_ALL_FIT(double E_GAMMA) {
+//     //---------------------------------------------------------
+// // Calculates  pi, k, p  cross section for gamma + p -> k
+// //  It is already divided by E_GAMMA, the bremstrulung spectra
+// // David Wiser's fit from Thesis, eq. IV-A-2 and Table III.
+// // Can be called from WISER_SIG using integration routine QUADMO
+// // E,P are KAON energy and momentum
+// // P_t is KAON transverse momentum
+// // P_CM is KAON center of mass momentum
+// // P_CM_L is KAON center of mass longitudinal momentum
+// // TYPE:     1 for pi+;  2 for pi-, 3=k+, 4=k-, 5=p, 6=p-bar
+// // E_GAMMA is photon energy.
+// //             Steve Rock 2/21/96
+// //---------------------------------------------------------
   
-  double  E,P,COST,P_T,M_X,U_MAN, ret_val ;
-  int  TYPE ;  //  1 for pi+;  2 for pi-, 3=k+, 4=k-, 5=p, 6=p-bar
-  int PARTICLE ;   // 1= pi, 2= K, 3 =P
-//  Wiser's fit    pi+     pi-    k+     k-     p+       p- 
-   double A1[6] = {566.,  486.,   368., 18.2,  1.33E5,  1.63E3 } ; 
-   double A2[6] = {829.,  115.,   1.91, 307.,  5.69E4, -4.30E3 } ; 
-   double A3[6] = {1.79,  1.77,   1.91, 0.98,  1.41,    1.79 }; 
-   double A4[6] = {2.10,  2.18,   1.15, 1.83,   .72,    2.24 } ;
-   double A6 = 1.90 ,A7 =-.0117;  //proton only
-   double MASS2[3] = {.019488, .2437, .8804} ;
-   double MASS[3] = {.1396, .4973, .9383} ; 
-   double MP2=.8804 ,MP=.9383 , RADDEG=.0174533 ;
-   double X_R, S,B_CM, GAM_CM,  P_CM ;
-   double P_CM_MAX, P_CM_L ;
- //Mandlestam variables                                                
-   S = MP2 + 2.* E_GAMMA * MP ;   
+//   double  E,P,COST,P_T,M_X,U_MAN, ret_val ;
+//   int  TYPE ;  //  1 for pi+;  2 for pi-, 3=k+, 4=k-, 5=p, 6=p-bar
+//   int PARTICLE ;   // 1= pi, 2= K, 3 =P
+// //  Wiser's fit    pi+     pi-    k+     k-     p+       p- 
+//    double A1[6] = {566.,  486.,   368., 18.2,  1.33E5,  1.63E3 } ; 
+//    double A2[6] = {829.,  115.,   1.91, 307.,  5.69E4, -4.30E3 } ; 
+//    double A3[6] = {1.79,  1.77,   1.91, 0.98,  1.41,    1.79 }; 
+//    double A4[6] = {2.10,  2.18,   1.15, 1.83,   .72,    2.24 } ;
+//    double A6 = 1.90 ,A7 =-.0117;  //proton only
+//    double MASS2[3] = {.019488, .2437, .8804} ;
+//    double MASS[3] = {.1396, .4973, .9383} ; 
+//    double MP2=.8804 ,MP=.9383 , RADDEG=.0174533 ;
+//    double X_R, S,B_CM, GAM_CM,  P_CM ;
+//    double P_CM_MAX, P_CM_L ;
+//  //Mandlestam variables                                                
+//    S = MP2 + 2.* E_GAMMA * MP ;   
 
-//Go to Center of Mass to get X_R
-   B_CM = E_GAMMA/(E_GAMMA+MP) ;
-   GAM_CM = 1./sqrt(1.-pow(B_CM,2)) ;
-   P_CM_L = -GAM_CM *B_CM *E + GAM_CM * P * COST ;
-   P_CM = sqrt(pow(P_CM_L,2) + pow(P_T,2)) ;  
+// //Go to Center of Mass to get X_R
+//    B_CM = E_GAMMA/(E_GAMMA+MP) ;
+//    GAM_CM = 1./sqrt(1.-pow(B_CM,2)) ;
+//    P_CM_L = -GAM_CM *B_CM *E + GAM_CM * P * COST ;
+//    P_CM = sqrt(pow(P_CM_L,2) + pow(P_T,2)) ;  
 
 
-   P_CM_MAX =sqrt(S +pow((pow(M_X,2)-MASS2[PARTICLE-1]),2)/S -2.*(pow(M_X,2) +MASS2[PARTICLE-1]))/2. ;
-   X_R =  P_CM/P_CM_MAX ;  
-   if(X_R>1.) { // Out of kinematic range
-     ret_val = 0. ;
-   }
-   else if(TYPE != 5) { // not the proton
-     ret_val = (A1[TYPE-1] + A2[TYPE-1]/sqrt(S)) * pow((1. -X_R + pow(A3[TYPE-1],2)/S),A4[TYPE-1])/E_GAMMA ;
-   }
-   else  { // special formula for proton
-     ret_val = ( (A1[TYPE-1] + A2[TYPE-1]/sqrt(S)) * pow((1. -X_R + pow(A3[TYPE-1],2)/S),A4[TYPE-1]) / pow((1.+U_MAN),(A6+A7*S)) )/E_GAMMA  ;
-   }
+//    P_CM_MAX =sqrt(S +pow((pow(M_X,2)-MASS2[PARTICLE-1]),2)/S -2.*(pow(M_X,2) +MASS2[PARTICLE-1]))/2. ;
+//    X_R =  P_CM/P_CM_MAX ;  
+//    if(X_R>1.) { // Out of kinematic range
+//      ret_val = 0. ;
+//    }
+//    else if(TYPE != 5) { // not the proton
+//      ret_val = (A1[TYPE-1] + A2[TYPE-1]/sqrt(S)) * pow((1. -X_R + pow(A3[TYPE-1],2)/S),A4[TYPE-1])/E_GAMMA ;
+//    }
+//    else  { // special formula for proton
+//      ret_val = ( (A1[TYPE-1] + A2[TYPE-1]/sqrt(S)) * pow((1. -X_R + pow(A3[TYPE-1],2)/S),A4[TYPE-1]) / pow((1.+U_MAN),(A6+A7*S)) )/E_GAMMA  ;
+//    }
       
-   return ret_val;
+//    return ret_val;
        
-}
+// }
 
-double eicPhysics::WISER_ALL_SIG(double E0,double P,double THETA_DEG,double RAD_LEN,double TYPE)  {
+// double eicPhysics::WISER_ALL_SIG(double E0,double P,double THETA_DEG,double RAD_LEN,double TYPE)  {
   
-//------------------------------------------------------------------------------
-// Calculate pi,K,p  cross section for electron beam on a proton target
-// IntegrateQs over function WISER_FIT using integration routine QUADMO
-// E0         is electron beam energy, OR max of Brem spectra
-// P,E       is scattered particle  momentum,energy
-// THETA_DEG  is kaon angle in degrees
-// RAD_LEN (%)is the radiation length of target, including internal
-//                (typically 5%)
-//               = .5 *(target radiation length in %) +5.
-//       ***  =100. IF BREMSTRULUNG PHOTON BEAM OF 1 EQUIVIVENT QUANTA ***
-// TYPE:     1 for pi+;  2 for pi-, 3=k+, 4=k-, 5=p, 6=p-bar
-// SIGMA      is output cross section in nanobars/GeV-str
-//------------------------------------------------------------------------------
+// //------------------------------------------------------------------------------
+// // Calculate pi,K,p  cross section for electron beam on a proton target
+// // IntegrateQs over function WISER_FIT using integration routine QUADMO
+// // E0         is electron beam energy, OR max of Brem spectra
+// // P,E       is scattered particle  momentum,energy
+// // THETA_DEG  is kaon angle in degrees
+// // RAD_LEN (%)is the radiation length of target, including internal
+// //                (typically 5%)
+// //               = .5 *(target radiation length in %) +5.
+// //       ***  =100. IF BREMSTRULUNG PHOTON BEAM OF 1 EQUIVIVENT QUANTA ***
+// // TYPE:     1 for pi+;  2 for pi-, 3=k+, 4=k-, 5=p, 6=p-bar
+// // SIGMA      is output cross section in nanobars/GeV-str
+// //------------------------------------------------------------------------------
     
-    double SIGMA;
-    double E,P_COM,COST,P_T,M_X,U_MAN ;
-    int TYPE_COM,PARTICLE ;
-//  Wiser's fit    pi+     pi-    k+     k-     p+      p-   
-    double A5[6] = {-5.49,  -5.23, -5.91, -4.45, -6.77,  -6.53} ;
-    double A6[6] = {-1.73,  -1.82, -1.74, -3.23,  1.90,  -2.45} ;
-    double MASS2[3] = {.019488, .2437, .8804} ;
-    double MASS[3] = {.1396, .4973, .9383} ; 
-    double MP=.9383 ,  MP2=.8804 , RADDEG=.0174533 ;
-    double  M_L,SIG_E ;
-    double E_GAMMA_MIN,E08,EPSILON=.003 ;                      
-    int N,CHARGE ;
+//     double SIGMA;
+//     double E,P_COM,COST,P_T,M_X,U_MAN ;
+//     int TYPE_COM,PARTICLE ;
+// //  Wiser's fit    pi+     pi-    k+     k-     p+      p-   
+//     double A5[6] = {-5.49,  -5.23, -5.91, -4.45, -6.77,  -6.53} ;
+//     double A6[6] = {-1.73,  -1.82, -1.74, -3.23,  1.90,  -2.45} ;
+//     double MASS2[3] = {.019488, .2437, .8804} ;
+//     double MASS[3] = {.1396, .4973, .9383} ; 
+//     double MP=.9383 ,  MP2=.8804 , RADDEG=.0174533 ;
+//     double  M_L,SIG_E ;
+//     double E_GAMMA_MIN,E08,EPSILON=.003 ;                      
+//     int N,CHARGE ;
     
-    P_COM = P  ;
-    TYPE_COM = int(TYPE) ;
-    PARTICLE = (TYPE_COM+1)/2 ; // 1= pi, 2= K, 3 =P
-    CHARGE = TYPE_COM -2*PARTICLE +2 ; // 1 for + charge, 2 for - charge
-    E08 =E0 ;
+//     P_COM = P  ;
+//     TYPE_COM = int(TYPE) ;
+//     PARTICLE = (TYPE_COM+1)/2 ; // 1= pi, 2= K, 3 =P
+//     CHARGE = TYPE_COM -2*PARTICLE +2 ; // 1 for + charge, 2 for - charge
+//     E08 =E0 ;
     
-    E =sqrt(MASS2[PARTICLE-1] + pow(P,2)) ;
+//     E =sqrt(MASS2[PARTICLE-1] + pow(P,2)) ;
 
-    COST = cos(RADDEG * THETA_DEG) ;
-    P_T = P * sin(RADDEG * THETA_DEG) ;
+//     COST = cos(RADDEG * THETA_DEG) ;
+//     P_T = P * sin(RADDEG * THETA_DEG) ;
     
-    if(TYPE_COM<=4) {  //mesons
-       if(CHARGE==1) {   // K+ n final state
-        M_X = MP ;
-       }
-       else {   // K- K+ P final state
-        M_X = MP+ MASS[PARTICLE-1] ;
-       }
-    }
-    else {  // baryons 
-       if(CHARGE==1) {   // pi p  final state
-        M_X = MASS[0] ; // pion mass
-       }
-       else { // P P-bar  P final state
-        M_X = 2.*MP ;
-       }  
-    }
+//     if(TYPE_COM<=4) {  //mesons
+//        if(CHARGE==1) {   // K+ n final state
+//         M_X = MP ;
+//        }
+//        else {   // K- K+ P final state
+//         M_X = MP+ MASS[PARTICLE-1] ;
+//        }
+//     }
+//     else {  // baryons 
+//        if(CHARGE==1) {   // pi p  final state
+//         M_X = MASS[0] ; // pion mass
+//        }
+//        else { // P P-bar  P final state
+//         M_X = 2.*MP ;
+//        }  
+//     }
     
-    E_GAMMA_MIN = (pow(M_X,2) -MASS2[PARTICLE -1] - MP2+2.*MP*E)/ (2.*(MP -E +P*COST)) ;
+//     E_GAMMA_MIN = (pow(M_X,2) -MASS2[PARTICLE -1] - MP2+2.*MP*E)/ (2.*(MP -E +P*COST)) ;
     
-    if (E_GAMMA_MIN>.1){ //Kinematically allowed?
-       M_L = sqrt(pow(P_T,2) + MASS2[PARTICLE-1]) ;    
+//     if (E_GAMMA_MIN>.1){ //Kinematically allowed?
+//        M_L = sqrt(pow(P_T,2) + MASS2[PARTICLE-1]) ;    
 
-       if (TYPE_COM != 5) {  // everything but proton
-        SIG_E = QUADMO(E_GAMMA_MIN,E08,EPSILON,N)  *  exp(A5[TYPE_COM-1] *M_L) * exp(A6[TYPE_COM-1] *pow(P_T,2)/E) ;
-       }
-       else { // proton 
-        U_MAN = abs(MP2 + MASS2[PARTICLE-1] -2.*MP*E) ;
-        SIG_E = QUADMO(E_GAMMA_MIN,E08,EPSILON,N)  *  exp(A5[TYPE_COM-1] *M_L) ; 
-       }
-       SIGMA = pow(P,2)/E * 1000. * RAD_LEN/100. *SIG_E ;
-    }
-    else {   // Kinematically forbidden
-       SIGMA = 0. ;
-    }    
+//        if (TYPE_COM != 5) {  // everything but proton
+//         SIG_E = QUADMO(E_GAMMA_MIN,E08,EPSILON,N)  *  exp(A5[TYPE_COM-1] *M_L) * exp(A6[TYPE_COM-1] *pow(P_T,2)/E) ;
+//        }
+//        else { // proton 
+//         U_MAN = abs(MP2 + MASS2[PARTICLE-1] -2.*MP*E) ;
+//         SIG_E = QUADMO(E_GAMMA_MIN,E08,EPSILON,N)  *  exp(A5[TYPE_COM-1] *M_L) ; 
+//        }
+//        SIGMA = pow(P,2)/E * 1000. * RAD_LEN/100. *SIG_E ;
+//     }
+//     else {   // Kinematically forbidden
+//        SIGMA = 0. ;
+//     }    
   
-    return SIGMA;
-}
+//     return SIGMA;
+// }
 
 
 
-double eicPhysics::Wiser_func_pip(double *x, double *par) {
-  // WISER_ALL_SIG(double E0,double P,double THETA_DEG,double RAD_LEN,int TYPE)
-  // E0 = par[0]
-  // RAD_LEN = par[1] 
-  // TYPE:     1 for pi+;  2 for pi-, 3=k+, 4=k-, 5=p, 6=p-bar
-  // P  = x[0]
-  // THETA_DEG = x[1]
-  double value = 0;
-  // need to modify TYPE
-  value = WISER_ALL_SIG(par[0],x[0],x[1],par[1],1);
+// double eicPhysics::Wiser_func_pip(double *x, double *par) {
+//   // WISER_ALL_SIG(double E0,double P,double THETA_DEG,double RAD_LEN,int TYPE)
+//   // E0 = par[0]
+//   // RAD_LEN = par[1] 
+//   // TYPE:     1 for pi+;  2 for pi-, 3=k+, 4=k-, 5=p, 6=p-bar
+//   // P  = x[0]
+//   // THETA_DEG = x[1]
+//   double value = 0;
+//   // need to modify TYPE
+//   value = WISER_ALL_SIG(par[0],x[0],x[1],par[1],1);
 
-  return value;
+//   return value;
 
-}
+// }
 
-double eicPhysics::Wiser_func_pim(double *x, double *par) {
-  // WISER_ALL_SIG(double E0,double P,double THETA_DEG,double RAD_LEN,int TYPE)
-  // E0 = par[0]
-  // RAD_LEN = par[1] 
-  // TYPE:     1 for pi+;  2 for pi-, 3=k+, 4=k-, 5=p, 6=p-bar
-  // P  = x[0]
-  // THETA_DEG = x[1]
-  double value = 0;
-  // need to modify TYPE
-  value = WISER_ALL_SIG(par[0],x[0],x[1],par[1],2);
+// double eicPhysics::Wiser_func_pim(double *x, double *par) {
+//   // WISER_ALL_SIG(double E0,double P,double THETA_DEG,double RAD_LEN,int TYPE)
+//   // E0 = par[0]
+//   // RAD_LEN = par[1] 
+//   // TYPE:     1 for pi+;  2 for pi-, 3=k+, 4=k-, 5=p, 6=p-bar
+//   // P  = x[0]
+//   // THETA_DEG = x[1]
+//   double value = 0;
+//   // need to modify TYPE
+//   value = WISER_ALL_SIG(par[0],x[0],x[1],par[1],2);
 
-  return value;
+//   return value;
 
-}
+// }
 
-double eicPhysics::Wiser_func_pi0(double *x, double *par) {
-  // WISER_ALL_SIG(double E0,double P,double THETA_DEG,double RAD_LEN,int TYPE)
-  // E0 = par[0]
-  // RAD_LEN = par[1] 
-  // TYPE:     1 for pi+;  2 for pi-, 3=k+, 4=k-, 5=p, 6=p-bar
-  // P  = x[0]
-  // THETA_DEG = x[1]
-  double value = 0;
-  // need to modify TYPE
-  value = 0.5 * (  WISER_ALL_SIG(par[0],x[0],x[1],par[1],1) + WISER_ALL_SIG(par[0],x[0],x[1],par[1],2)  );
+// double eicPhysics::Wiser_func_pi0(double *x, double *par) {
+//   // WISER_ALL_SIG(double E0,double P,double THETA_DEG,double RAD_LEN,int TYPE)
+//   // E0 = par[0]
+//   // RAD_LEN = par[1] 
+//   // TYPE:     1 for pi+;  2 for pi-, 3=k+, 4=k-, 5=p, 6=p-bar
+//   // P  = x[0]
+//   // THETA_DEG = x[1]
+//   double value = 0;
+//   // need to modify TYPE
+//   value = 0.5 * (  WISER_ALL_SIG(par[0],x[0],x[1],par[1],1) + WISER_ALL_SIG(par[0],x[0],x[1],par[1],2)  );
 
-  return value;
+//   return value;
 
-}
+// }

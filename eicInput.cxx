@@ -20,6 +20,7 @@ eicInput::eicInput(const char *file){
     fscanf(f, "%s%lf%s", dummy, &fData.ion_mass, dummy);
     fscanf(f, "%s%d", dummy, &fData.ion_Z);
     fscanf(f, "%s%d", dummy, &fData.ion_N);
+    fscanf(f, "%s%lf%s", dummy, &fData.radlen, dummy);
     fscanf(f, "%s%d", dummy, &fData.model);
     fscanf(f, "%s%d", dummy, &fData.out_fmt);
 

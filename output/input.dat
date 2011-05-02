@@ -1,11 +1,12 @@
-nevt    2500000
+nevt    25000
 nprint  1000000
 lumin	1.0e37  Hz/cm^2
 runtime 48.0    hours
-e-_en	5.5     GeV
+e-_en	6.0     GeV
 ion_en	0.938   GeV
 ion_m	0.938   GeV
 ion_Z	1
-ion_N	0
+ion_N	1
+radlen	0.1	normalized_to_1	
 model	1
 output  3

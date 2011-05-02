@@ -13,6 +13,7 @@ struct inputdata {
     double ion_mass;
     int    ion_Z;
     int    ion_N;
+    double radlen;
     int	   model;  // 1= electron ; 2=pi+ ; 3=pi- ; 4=pi0 
     int    out_fmt; // 1=root 2=root+LUND 3=root+SOLLUND
 
@@ -32,8 +33,10 @@ class eicInput {
 	double Get_ionMass(){ return fData.ion_mass; }
 	int    Get_ionZ(){ return fData.ion_Z; }
 	int    Get_ionN(){ return fData.ion_N; }
+	double Get_radlen(){ return fData.radlen; }
 	int    Get_model(){ return fData.model; }
 	int    Get_fmt(){ return fData.out_fmt; }
+	
 
 
     private:

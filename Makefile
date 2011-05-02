@@ -11,15 +11,18 @@ OBJS          = $(EICRATEO)
 
 PROGRAMS      = $(EICRATE)
 
+FC=gfortran
+FFLAGS=
+
 #------------------------------------------------------------------------------
 
 .SUFFIXES: .$(SrcSuf) .$(ObjSuf) .$(DllSuf)
 
 all:            $(PROGRAMS)
 
-$(EICRATE):  $(EICRATEO)
+$(EICRATE):  $(EICRATEO) piajp.o
 		@echo "this: $@, $(EICRATEO)"
-		$(LD) $(LDFLAGS) $^ $(GLIBS) -L/home/${USER}/lib -ggdb -O2 -lEG -lRGL -lGed -lHtml -lThread -lGeom -lcteqpdf $(OutPutOpt)$@
+		$(LD) $(LDFLAGS) $^ $(GLIBS) -ggdb -lgfortran -O2 -lEG -lRGL -lGed -lHtml -lThread -lGeom -lcteqpdf $(OutPutOpt)$@
 		cp eicRate output/
 		@echo "$@ done"
 
@@ -27,8 +30,11 @@ eicRate.$(SrcSuf):
 		@echo "Generating dictionary $@..."
 		@rootcint -f $@ -c $^
 
+piajp.o : piajp.f
+		$(FC) -c $(FFLAGS) $< -o $@
+
 clean:
-		@rm -f $(OBJS) *.res core
+		@rm -f $(OBJS) *.res core piajp.o
 
 distclean:      clean
 		@rm -f $(PROGRAMS) *Dict.* *.def *.exp \
