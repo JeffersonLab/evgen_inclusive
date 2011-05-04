@@ -7,6 +7,7 @@ ion_en	0.938   GeV
 ion_m	0.938   GeV
 ion_Z	1
 ion_N	1
-radlen	0.1	normalized_to_1	
-model	1
+dens	0.162	g/cm^3	
+length	40	cm	
+model	2
 output  3

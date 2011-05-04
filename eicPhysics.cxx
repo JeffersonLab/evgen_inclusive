@@ -362,7 +362,7 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev ){
 
 void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *model) {
 
-  double density, tlen, radlen=0., mass=0., weight_v;
+  double radlen=0., mass=0., weight_v;
   int particle_id, charge;
   int modelsig = model->GetModel();
   radlen = model->GetRadLen();
@@ -386,23 +386,7 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   } else {
     n = kNeutron;
   }
-  if (radlen == 0.) {
-    if (A==1. && zz==1.) { // hydrogen target
-      printf("Hydorgen target \n");
-      density = 0.072 ; // g/cm^3
-      tlen = 40. ; // length target cell in cm 
-      radlen = 4.492 * pow(10,-2); // thickness for 40cm liquid hydrogen in units of radiation lenght for liquid hydrogen
-    }
-    else if (A==2. && zz==1.) {
-      printf("Deuterium target \n");
-      density = 0.162 ; // g/cm^3
-      tlen = 40 ; // length target cell in cm 
-      radlen = 5.366 * pow(10,-2); // thickness for 40cm liquid deuterium in units of radiation lenght for liquid deuterium
-    }
-    else {
-      printf("Target not in this database, update for radiation lenght in the input file!\n"); exit(1);
-    } 
-  }
+
   radlen = radlen * 100. + 5. ; // radiation lenght needed in percentage with the internal part (normally around 5%)
   
   //  TF2 *func;

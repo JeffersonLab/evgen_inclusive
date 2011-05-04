@@ -2,6 +2,8 @@
 #define __eicModel_h
 
 #include "eicInput.h"
+#include <math.h>
+#include <cstdlib>
 
 // EIC electron beam
 
