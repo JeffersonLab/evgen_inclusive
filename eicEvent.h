@@ -2,6 +2,7 @@
 #define __eicEvent_h
 
 #include "TObject.h"
+#include "TLorentzVector.h"
 
 struct eventdata {
 	double weight;
@@ -68,6 +69,8 @@ struct eventdata {
         double mom;
         double mass;
 
+        TLorentzVector pi0_g1;
+        TLorentzVector pi0_g2;
   
 };
 

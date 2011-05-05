@@ -7,8 +7,7 @@
 #include <assert.h>
 
 #include "TRandom.h"
-#include "TLorentzVector.h"
-#include "TF2.h";
+
 
 extern"C" {
 void wiser_all_sig_(float *E0,float *P,float *THETA_DEG,float *RAD_LEN,int *TYPE,float *SIGMA);
@@ -21,6 +20,7 @@ eicPhysics::eicPhysics(){
     fRandom = new TRandom2(0);
     printf("Seed number %d\n",fRandom->GetSeed());
     ReadPolTable();
+ 
 
     return;
 }
@@ -426,6 +426,8 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   float radlen2 = float(radlen);
   float weight_f;
   int type;
+  Gamma1.SetXYZT(0.,0.,0.,0.);
+  Gamma2.SetXYZT(0.,0.,0.,0.);
   
   if (particle_id == 211) {
     //   weight_v = WISER_ALL_FIT(mom_pi);
@@ -471,6 +473,12 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
     type = 2;
     wiser_all_sig_(&En_beam2,&mom_pi2,&theta_pi2,&radlen2,&type,&weight_f);
     weight_v = 0.5 * double(weight_f) + weight_v;
+    TVector3 vp(1.,1.,1.);
+    vp.SetMag(mom_pi);
+    vp.SetTheta(theta_pi);
+    vp.SetPhi(phi_pi);
+    Decay_pi0(vp);
+    
   }
   else weight_v = 0.;
   
@@ -505,6 +513,8 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   data.Z_ion = ion->GetZ();
   data.N_ion = ion->GetN();
   
+  data.pi0_g1 = Gamma1;
+  data.pi0_g2 = Gamma2;
   
   ev->SetEventData(data);
   
@@ -1705,3 +1715,29 @@ double eicPhysics::getDeltaq( double x, double Q2, int quark ){
 //   return value;
 
 // }
+
+
+void eicPhysics::Decay_pi0(TVector3 vp) {
+  double mp0 = 0.1349766 ; // mass pi0 in GeV
+  TLorentzVector Vp_4(vp,sqrt(vp.Mag2() + pow(mp0,2))); // pi0 quadrimomentum
+  TVector3 b_3 ; // beta to boost the LAB frame for going in the pi0 rest frame 
+  b_3 = Vp_4.BoostVector(); // return (px/E,py/E,pz/E) (is all in GeV)
+
+  TVector3 g1(1.,1.,1.);
+  TVector3 g2(1.,1.,1.); // two photons 3-momentum, set to 1 , so that they can be stretched and turned, setting the magnitude and the angles
+  g1.SetMag(mp0/2); //In the pi0 rest frame the two photons are generated isotropically with half the energy of the pion (the mass)
+  double thetag = fRandom->Uniform(0.0,TMath::Pi());
+  double phig = fRandom->Uniform(0.0,2*TMath::Pi());
+  g1.SetTheta(thetag);
+  g1.SetPhi(phig);
+  g2 = -g1; // still rest frame of the pion
+  Gamma1.SetVect(g1); // defining the 4-vectors
+  Gamma1.SetE(mp0/2);
+  Gamma2.SetVect(g2);
+  Gamma2.SetE(mp0/2);  
+  Gamma1.Boost(b_3); // boosting in the LAB frame
+  Gamma2.Boost(b_3);
+   
+  return;
+
+}

@@ -8,7 +8,9 @@
 #include "eicEvent.h"
 #include "eicModel.h"
 #include <iostream>
-
+#include "TLorentzVector.h"
+#include "TF2.h"
+#include "TVector3.h"
 
 #include "TRandom2.h"
 
@@ -29,6 +31,8 @@ class eicPhysics {
 	 cteq_pdf_t *fPDF;
 
 	 TRandom2 *fRandom;
+	 TLorentzVector Gamma1;
+	 TLorentzVector Gamma2;
 
 	 double GetTheta( double min = 0, double max = 3.14159 );
 	 double GetPhi(   double min = 0, double max = 3.14159*2 );
@@ -58,6 +62,8 @@ class eicPhysics {
 
 	 void ReadPolTable();
 	 double getDeltaq( double x, double Q2, int quark );
+
+	 void Decay_pi0(TVector3 vp);
 
 	 int fNx;
 	 int fNQ2;
