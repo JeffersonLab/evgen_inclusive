@@ -10,5 +10,5 @@ ion_N	1
 dens	0.162	g/cm^3	
 length	40	cm
 radius	3	cm	
-model	4
+model	1
 output  3

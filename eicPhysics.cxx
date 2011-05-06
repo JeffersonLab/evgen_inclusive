@@ -30,7 +30,12 @@ eicPhysics::~eicPhysics(){
     return;
 }
 
-void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev ){
+void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *model){
+  // target info
+    double tgradius = model->GetRadius();
+    double tglength = model->GetLength();
+    TF1 * funcrandom = new TF1("funcrandom","x",0,tgradius);
+
     // We're going to work in the lab frame
     
     // Get beta of ion
@@ -227,6 +232,20 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev ){
 
     double th_eic = kf.Theta();
 
+    // Determine the vertex
+    // Generating the vertex randomly in the target
+    TVector3 vert;
+    double vert_x, vert_y,vert_z,vert_th,vert_rho;
+    vert_rho = funcrandom->GetRandom(0.,tgradius); // Generate the rho cohordinate following the probability given by funcrandom
+    vert_th = fRandom->Uniform(2*TMath::Pi()); // Uniform in theta
+    vert_z = fRandom->Uniform((-tglength/2),(tglength/2));
+    vert_x = vert_rho * cos(vert_th);
+    vert_y = vert_rho * sin(vert_th);
+
+    vert.SetXYZ(vert_x,vert_y,vert_z);
+
+
+
     eventdata data;
 
     /*
@@ -338,7 +357,9 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev ){
     data.mom =  kf.Energy();
     data.Z_ion = ion->GetZ();
     data.N_ion = ion->GetN();
+    data.p_vertex = vert;
 
+ 
 
     // Look at pdf data
     double useQ2;

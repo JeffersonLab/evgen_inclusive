@@ -30,7 +30,7 @@ void eicProcess::Run(){
     if (model == 1) { // electron DIS generator
       for( evt = 0; evt < nevt; evt++ ){
 	  if( (evt%nprnt) == 0 ){printf("Event %10d \n", evt);}
-	  fphy->MakeEvent(fbeam, fion, fevt);
+	  fphy->MakeEvent(fbeam, fion, fevt, fmodel);
 	  fout->Write(fevt);
       }
     }
