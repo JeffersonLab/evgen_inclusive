@@ -41,7 +41,10 @@ eicModel::eicModel(eicInput *inp):model(0){
 	  else {
 	    printf("Target not in this database, update length in the input file!\n"); exit(1);
 	  }
-	}    
+	} 
+	if (radius <= 0. ) {
+	  printf("Target radius not in this database, update radius in the input file!\n"); exit(1);
+	}
 
 	if (length> 0 && X0> 0) {
 	  radlen = length / X0;
