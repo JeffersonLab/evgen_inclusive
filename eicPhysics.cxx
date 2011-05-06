@@ -366,6 +366,9 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   int particle_id, charge;
   int modelsig = model->GetModel();
   radlen = model->GetRadLen();
+  double tgradius = model->GetRadius();
+  double tglength = model->GetLength();
+  TF1 * funcrandom = new TF1("funcrandom","x",0,tgradius);
 
   double ionp  = sqrt( pow(ion->GetEnergy(),2.0) - pow(ion->GetMass(),2.0) );
   double beta  = ionp/ion->GetEnergy();
@@ -419,6 +422,17 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   double theta_pi = fRandom->Uniform(180.);
   double mom_pi = fRandom->Uniform(En_beam); 
   double ef = sqrt(pow(mom_pi,2) + pow(mass,2));
+ 
+  // Generating the vertex randomly in the target
+  TVector3 vert;
+  double vert_x, vert_y,vert_z,vert_th,vert_rho;
+  vert_rho = funcrandom->GetRandom(0.,tgradius); // Generate the rho cohordinate following the probability given by funcrandom
+  vert_th = fRandom->Uniform(2*TMath::Pi()); // Uniform in theta
+  vert_z = fRandom->Uniform((-tglength/2),(tglength/2));
+  vert_x = vert_rho * cos(vert_th);
+  vert_y = vert_rho * sin(vert_th);
+
+  vert.SetXYZ(vert_x,vert_y,vert_z);
 
   float En_beam2 = float(En_beam);
   float mom_pi2 = float(mom_pi);
@@ -428,6 +442,8 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   int type;
   Gamma1.SetXYZT(0.,0.,0.,0.);
   Gamma2.SetXYZT(0.,0.,0.,0.);
+  Gamma1_vt.SetXYZ(0.,0.,0.);
+ 
   
   if (particle_id == 211) {
     //   weight_v = WISER_ALL_FIT(mom_pi);
@@ -477,7 +493,7 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
     vp.SetMag(mom_pi);
     vp.SetTheta(theta_pi);
     vp.SetPhi(phi_pi);
-    Decay_pi0(vp);
+    Decay_pi0(vp,vert);
     
   }
   else weight_v = 0.;
@@ -512,9 +528,13 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   data.mass = mass;
   data.Z_ion = ion->GetZ();
   data.N_ion = ion->GetN();
+  data.p_vertex = vert;
+
   
   data.pi0_g1 = Gamma1;
   data.pi0_g2 = Gamma2;
+  data.pi0_g1_vertex = Gamma1_vt;
+
   
   ev->SetEventData(data);
   
@@ -1717,12 +1737,13 @@ double eicPhysics::getDeltaq( double x, double Q2, int quark ){
 // }
 
 
-void eicPhysics::Decay_pi0(TVector3 vp) {
+void eicPhysics::Decay_pi0(TVector3 vp, TVector3 vert) {
   double mp0 = 0.1349766 ; // mass pi0 in GeV
   TLorentzVector Vp_4(vp,sqrt(vp.Mag2() + pow(mp0,2))); // pi0 quadrimomentum
   TVector3 b_3 ; // beta to boost the LAB frame for going in the pi0 rest frame 
   b_3 = Vp_4.BoostVector(); // return (px/E,py/E,pz/E) (is all in GeV)
 
+  // decay of the pi0 in two photons
   TVector3 g1(1.,1.,1.);
   TVector3 g2(1.,1.,1.); // two photons 3-momentum, set to 1 , so that they can be stretched and turned, setting the magnitude and the angles
   g1.SetMag(mp0/2); //In the pi0 rest frame the two photons are generated isotropically with half the energy of the pion (the mass)
@@ -1737,6 +1758,15 @@ void eicPhysics::Decay_pi0(TVector3 vp) {
   Gamma2.SetE(mp0/2);  
   Gamma1.Boost(b_3); // boosting in the LAB frame
   Gamma2.Boost(b_3);
+
+  //define vertex of the two gammas .... guess one was fine too...
+  TF1 *fr = new TF1("fr","exp(-x/(8.4e-17))",0,1.0e-14) ; // 8.4e-17 is the mean lifetime of the pi0
+  double time = fr->GetRandom(0.,1.0e-14);
+  TLorentzVector move(0.,0.,0.,time); // displacement for the creation of the two gammas in the pi0 rest frame
+  move.Boost(b_3); // displacement for the creation of the two gammas in the LAB frame
+  Gamma1_vt.SetX( vert.X() + move.X() );
+  Gamma1_vt.SetY( vert.Y() + move.Y() );
+  Gamma1_vt.SetZ( vert.Z() + move.Z() );
    
   return;
 

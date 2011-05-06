@@ -8,6 +8,7 @@ ion_m	0.938   GeV
 ion_Z	1
 ion_N	1
 dens	0.162	g/cm^3	
-length	40	cm	
+length	40	cm
+radius	3	cm	
 model	4
 output  3

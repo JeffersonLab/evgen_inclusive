@@ -1,7 +1,7 @@
 #include "eicModel.h"
 
 eicModel::eicModel(eicInput *inp):model(0){
-  double length,dens,X0=0.;
+  double dens,X0=0.;
   int Z,N;
     if( inp ){
 	model  = inp->Get_model();
@@ -11,6 +11,7 @@ eicModel::eicModel(eicInput *inp):model(0){
 	N = inp->Get_ionN();
 	dens = inp->Get_dens();
 	length = inp->Get_length();
+	radius = inp->Get_radius();
 
 	if (dens == 0.) {
 	  if (Z==1 && N==0) {// hydrogen target

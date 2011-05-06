@@ -3,6 +3,7 @@
 
 #include "TObject.h"
 #include "TLorentzVector.h"
+#include "TVector3.h"
 
 struct eventdata {
 	double weight;
@@ -68,9 +69,13 @@ struct eventdata {
         int N_ion;
         double mom;
         double mass;
+        TVector3 p_vertex;
 
         TLorentzVector pi0_g1;
         TLorentzVector pi0_g2;
+  
+        TVector3 pi0_g1_vertex;
+
   
 };
 
