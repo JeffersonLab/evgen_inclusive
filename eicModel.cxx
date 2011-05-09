@@ -55,6 +55,9 @@ eicModel::eicModel(eicInput *inp):model(0){
 	}
     }
 
+    length = length / 100. ; // conversion distances in cm
+    radius = radius / 100. ; 
+
     return;
 }
 
