@@ -1785,9 +1785,9 @@ void eicPhysics::Decay_pi0(TVector3 vp, TVector3 vert) {
   double time = fr->GetRandom(0.,1.0e-14);
   TLorentzVector move(0.,0.,0.,time); // displacement for the creation of the two gammas in the pi0 rest frame
   move.Boost(b_3); // displacement for the creation of the two gammas in the LAB frame
-  Gamma1_vt.SetX( vert.X() + move.X() *100. ); // vert I wrote it in cm
-  Gamma1_vt.SetY( vert.Y() + move.Y() *100.);
-  Gamma1_vt.SetZ( vert.Z() + move.Z() *100.);
+  Gamma1_vt.SetX( vert.X() + move.X() );
+  Gamma1_vt.SetY( vert.Y() + move.Y() );
+  Gamma1_vt.SetZ( vert.Z() + move.Z() );
    
   return;
 
