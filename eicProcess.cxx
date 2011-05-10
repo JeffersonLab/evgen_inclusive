@@ -21,11 +21,20 @@ void eicProcess::Run(){
 
     int evt;
     int nprnt = finp->GetNprnt();
+    TString fmtst[3];
+    TString modelst[4];
+    modelst[0] = "Electron DIS";
+    modelst[1] = "Pi+";
+    modelst[2] = "Pi-";
+    modelst[3] = "Pi0";
+    fmtst[0] = "ROOT";
+    fmtst[1] = "ROOT and LUND";
+    fmtst[2] = "ROOT and SOLLUND";
     int fmt = finp->Get_fmt();
     int model = fmodel->GetModel();
 
-    printf("Model = %d \n", model);
-    printf("Format = %d \n", fmt);
+    printf("Model = %s \n", modelst[(model-1)].Data() );
+    printf("Format = %s \n", fmtst[(fmt-1)].Data() );
 
     if (model == 1) { // electron DIS generator
       for( evt = 0; evt < nevt; evt++ ){

@@ -8,6 +8,7 @@
 #include "eicOutput.h"
 #include "eicEvent.h"
 #include "eicModel.h"
+#include "TString.h"
 
 
 class eicProcess {
