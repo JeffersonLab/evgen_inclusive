@@ -236,13 +236,20 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *
     // Generating the vertex randomly in the target
     TVector3 vert;
     double vert_x, vert_y,vert_z,vert_th,vert_rho;
-    vert_rho = funcrandom->GetRandom(0.,tgradius); // Generate the rho cohordinate following the probability given by funcrandom
-    vert_th = fRandom->Uniform(2*TMath::Pi()); // Uniform in theta
-    vert_z = fRandom->Uniform((-tglength/2),(tglength/2));
-    vert_x = vert_rho * cos(vert_th);
-    vert_y = vert_rho * sin(vert_th);
-
+    if (tgradius > 0.) {
+      vert_rho = funcrandom->GetRandom(0.,tgradius); // Generate the rho cohordinate following the probability given by funcrandom
+      vert_th = fRandom->Uniform(2*TMath::Pi()); // Uniform in theta
+      vert_z = fRandom->Uniform((-tglength/2),(tglength/2));
+      vert_x = vert_rho * cos(vert_th);
+      vert_y = vert_rho * sin(vert_th);
+    }
+    else {
+      vert_x = 0.; 
+      vert_y = 0.;
+      vert_z = 0.;
+    }
     vert.SetXYZ(vert_x,vert_y,vert_z);
+   
 
 
 
@@ -391,6 +398,7 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   double tglength = model->GetLength();
   TF1 * funcrandom = new TF1("funcrandom","x",0,tgradius);
 
+
   double ionp  = sqrt( pow(ion->GetEnergy(),2.0) - pow(ion->GetMass(),2.0) );
   double beta  = ionp/ion->GetEnergy();
   double gamma = 1.0/sqrt(1.0-beta*beta);
@@ -438,20 +446,33 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   //  func->SetParameters(En_beam,radlen);
   //  double mom_pi= 0, theta_pi= 0;
   //  func->GetRandom2(mom_pi,theta_pi);
+  double x_pi=0.,y_pi=0.,z_pi=0.;
+
  
-  double phi_pi = fRandom->Uniform(2 *  3.1415926535);
-  double theta_pi = fRandom->Uniform(180.);
   double mom_pi = fRandom->Uniform(En_beam); 
+  fRandom->Sphere(x_pi,y_pi,z_pi,mom_pi); // generate random  vectors, uniformly distributed over the surface
+  // of a sphere of radius mom_pi
+  TVector3 v3_pi(x_pi,y_pi,z_pi);
+  double theta_pi = v3_pi.Theta();
+  double phi_pi = v3_pi.Phi();
+  
   double ef = sqrt(pow(mom_pi,2) + pow(mass,2));
  
   // Generating the vertex randomly in the target
   TVector3 vert;
   double vert_x, vert_y,vert_z,vert_th,vert_rho;
-  vert_rho = funcrandom->GetRandom(0.,tgradius); // Generate the rho cohordinate following the probability given by funcrandom
-  vert_th = fRandom->Uniform(2*TMath::Pi()); // Uniform in theta
-  vert_z = fRandom->Uniform((-tglength/2),(tglength/2));
-  vert_x = vert_rho * cos(vert_th);
-  vert_y = vert_rho * sin(vert_th);
+  if (tgradius > 0.) {
+    vert_rho = funcrandom->GetRandom(0.,tgradius); // Generate the rho cohordinate following the probability given by funcrandom
+    vert_th = fRandom->Uniform(2*TMath::Pi()); // Uniform in theta
+    vert_z = fRandom->Uniform((-tglength/2),(tglength/2));
+    vert_x = vert_rho * cos(vert_th);
+    vert_y = vert_rho * sin(vert_th);
+  }
+  else {
+    vert_x = 0.; 
+    vert_y = 0.;
+    vert_z = 0.;
+  }
 
   vert.SetXYZ(vert_x,vert_y,vert_z);
 
@@ -526,7 +547,7 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
 
   eventdata data;
   if( 0.0 < weight_v && weight_v < 1e9 ){
-    data.weight  = weight_v; // nanobars/GeV-str
+    data.weight  = weight_v * En_beam * 4 * TMath::Pi() * A; // nanobars/GeV-str-nuclei * (DeltaE sample generated) * (Full angle generated) * (Number of nucleons)
     //    data.weight *= beam->GetLumin();
   } else {
     // Unphysical for some reason

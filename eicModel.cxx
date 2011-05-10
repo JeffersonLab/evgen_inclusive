@@ -42,7 +42,7 @@ eicModel::eicModel(eicInput *inp):model(0){
 	    printf("Target not in this database, update length in the input file!\n"); exit(1);
 	  }
 	} 
-	if (radius <= 0. ) {
+	if (radius < 0. ) {
 	  printf("Target radius not in this database, update radius in the input file!\n"); exit(1);
 	}
 
