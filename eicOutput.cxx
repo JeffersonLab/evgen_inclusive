@@ -101,15 +101,19 @@ void eicOutput::InitTree(){
     fTree->Branch("particle_id", &fData.particle_id, "particle_id/I");
     fTree->Branch("charge", &fData.charge, "charge/I");
     fTree->Branch("mass", &fData.mass, "mass/D");
-    fTree->Branch("mom", &fData.mom, "mom/D");
-    fTree->Branch("p_vertex","TVector3", &fData.p_vertex, 32000, 1);
+    fTree->Branch("pf", &fData.pf, "pf/D");
 
-    fTree->Branch("pi0_g1","TLorentzVector", &fData.pi0_g1, 32000, 1);
-    fTree->Branch("pi0_g2","TLorentzVector", &fData.pi0_g2, 32000, 1);
-    fTree->Branch("pi0_g1_vertex","TVector3", &fData.pi0_g1_vertex, 32000, 1);
- 
+    fTree->Branch("vx", &fData.vx, "vx/D");
+    fTree->Branch("vy", &fData.vy, "vy/D");
+    fTree->Branch("vz", &fData.vz, "vz/D");
 
- 
+    fTree->Branch("g1_theta", &fData.g1_theta, "g1_theta/D");
+    fTree->Branch("g1_phi", &fData.g1_phi, "g1_phi/D");
+    fTree->Branch("g1_p", &fData.g1_p, "g1_p/D");
+
+    fTree->Branch("g2_theta", &fData.g2_theta, "g2_theta/D");
+    fTree->Branch("g2_phi", &fData.g2_phi, "g2_phi/D");
+    fTree->Branch("g2_p", &fData.g2_p, "g2_p/D");
 
     return;
 }
@@ -177,12 +181,17 @@ void  eicOutput::MakeFileLUND(){
   int charge;
   int Z_ion;
   int N_ion;
-  double mom;
+  double pf;
   double mass;
-  TVector3 *p_vertex = 0;
-  TLorentzVector *pi0_g1 = 0;
-  TLorentzVector *pi0_g2 = 0;
-  TVector3 *pi0_g1_vertex = 0;
+
+  TVector3 p_vertex;
+  TLorentzVector pi0_g1;
+  TLorentzVector pi0_g2;
+
+  double vx, vy, vz;
+  double g1_theta, g1_phi, g1_p;
+  double g2_theta, g2_phi, g2_p;
+
  
   
   TString file(fOutName);
@@ -225,15 +234,22 @@ void  eicOutput::MakeFileLUND(){
   input_chain.SetBranchAddress("charge",&charge);
   input_chain.SetBranchAddress("Z_ion",&Z_ion);
   input_chain.SetBranchAddress("N_ion",&N_ion);
-  input_chain.SetBranchAddress("mom",&mom);
+  input_chain.SetBranchAddress("pf",&pf);
   input_chain.SetBranchAddress("mass",&mass);
-  input_chain.SetBranchAddress("p_vertex",&p_vertex);
-  input_chain.SetBranchAddress("pi0_g1",&pi0_g1);
-  input_chain.SetBranchAddress("pi0_g2",&pi0_g2);
-  input_chain.SetBranchAddress("pi0_g1_vertex",&pi0_g1_vertex);
+
+  input_chain.SetBranchAddress("vx",&vx);
+  input_chain.SetBranchAddress("vy",&vy);
+  input_chain.SetBranchAddress("vz",&vz);
+
+  input_chain.SetBranchAddress("g1_theta",&g1_theta);
+  input_chain.SetBranchAddress("g1_phi",&g1_phi);
+  input_chain.SetBranchAddress("g1_p",&g1_p);
+
+  input_chain.SetBranchAddress("g2_theta",&g2_theta);
+  input_chain.SetBranchAddress("g2_phi",&g2_phi);
+  input_chain.SetBranchAddress("g2_p",&g2_p);
 
   
-
   Int_t nentries = (Int_t)input_chain.GetEntries();
   double pmod,px,py,pz,nu;
   double MASS_p = 0.938;
@@ -257,13 +273,13 @@ void  eicOutput::MakeFileLUND(){
 
     if (particle_id != 111) {
       OUT << "1" << " \t " << (Z_ion + N_ion)  << " \t " << Z_ion  << " \t " << "0"  << " \t " << "0" << " \t "  << x << " \t " << y  << " \t " << W  << " \t " << Q2  << " \t " << nu << endl;
-      OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << mass << " \t " << p_vertex->X()  << " \t " << p_vertex->Y() << " \t " << p_vertex->Z() << endl;
+      OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << mass << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
     }
     else {
       OUT << "3" << " \t " << (Z_ion + N_ion)  << " \t " << Z_ion  << " \t " << "0"  << " \t " << "0" << " \t "  << x << " \t " << y  << " \t " << W  << " \t " << Q2  << " \t " << nu << endl;
-      OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << mass << " \t " << p_vertex->X()  << " \t " << p_vertex->Y() << " \t " << p_vertex->Z() << endl;
-      OUT << " \t " << "2" << " \t " << "0.0" << " \t " << "1" << " \t " << "22" << " \t " << "0" << " \t " << "0" << " \t " << pi0_g1->Px() << " \t " << pi0_g1->Py() << " \t " << pi0_g1->Pz() << " \t " << pi0_g1->E() << " \t " << "0.0" << " \t " << pi0_g1_vertex->X()  << " \t " << pi0_g1_vertex->Y() << " \t " << pi0_g1_vertex->Z() << endl;
-      OUT << " \t " << "3" << " \t " << "0.0" << " \t " << "1" << " \t " << "22" << " \t " << "0" << " \t " << "0" << " \t " << pi0_g2->Px() << " \t " << pi0_g2->Py() << " \t " << pi0_g2->Pz() << " \t " << pi0_g2->E() << " \t " << "0.0" << " \t " << pi0_g1_vertex->X()  << " \t " << pi0_g1_vertex->Y() << " \t " << pi0_g1_vertex->Z() << endl;
+      OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << mass << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
+      OUT << " \t " << "2" << " \t " << "0.0" << " \t " << "1" << " \t " << "22" << " \t " << "0" << " \t " << "0" << " \t " << pi0_g1.Px() << " \t " << pi0_g1.Py() << " \t " << pi0_g1.Pz() << " \t " << pi0_g1.E() << " \t " << "0.0" << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
+      OUT << " \t " << "3" << " \t " << "0.0" << " \t " << "1" << " \t " << "22" << " \t " << "0" << " \t " << "0" << " \t " << pi0_g2.Px() << " \t " << pi0_g2.Py() << " \t " << pi0_g2.Pz() << " \t " << pi0_g2.E() << " \t " << "0.0" << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
     }
 
   }
@@ -309,12 +325,14 @@ void  eicOutput::MakeFileSOLLUND(){
   int charge;
   int Z_ion;
   int N_ion;
-  double mom;
   double mass;
-  TVector3 *p_vertex = 0;
-  TLorentzVector *pi0_g1 = 0;
-  TLorentzVector *pi0_g2 = 0;
-  TVector3 *pi0_g1_vertex = 0;
+  TVector3 p_vertex;
+  TLorentzVector pi0_g1;
+  TLorentzVector pi0_g2;
+
+  double vx, vy, vz, pf;
+  double g1_theta, g1_phi, g1_p;
+  double g2_theta, g2_phi, g2_p;
 
   TString file(fOutName);
   file.ReplaceAll("root","sollund"); 
@@ -356,12 +374,20 @@ void  eicOutput::MakeFileSOLLUND(){
   input_chain.SetBranchAddress("charge",&charge);
   input_chain.SetBranchAddress("Z_ion",&Z_ion);
   input_chain.SetBranchAddress("N_ion",&N_ion);
-  input_chain.SetBranchAddress("mom",&mom);
+  input_chain.SetBranchAddress("pf",&pf);
   input_chain.SetBranchAddress("mass",&mass);
-  input_chain.SetBranchAddress("p_vertex",&p_vertex);
-  input_chain.SetBranchAddress("pi0_g1",&pi0_g1);
-  input_chain.SetBranchAddress("pi0_g2",&pi0_g2);
-  input_chain.SetBranchAddress("pi0_g1_vertex",&pi0_g1_vertex);
+
+  input_chain.SetBranchAddress("vx",&vx);
+  input_chain.SetBranchAddress("vy",&vy);
+  input_chain.SetBranchAddress("vz",&vz);
+
+  input_chain.SetBranchAddress("g1_theta",&g1_theta);
+  input_chain.SetBranchAddress("g1_phi",&g1_phi);
+  input_chain.SetBranchAddress("g1_p",&g1_p);
+
+  input_chain.SetBranchAddress("g2_theta",&g2_theta);
+  input_chain.SetBranchAddress("g2_phi",&g2_phi);
+  input_chain.SetBranchAddress("g2_p",&g2_p);
 
 
   Int_t nentries = (Int_t)input_chain.GetEntries();
@@ -375,6 +401,14 @@ void  eicOutput::MakeFileSOLLUND(){
       printf("Translated %09d events of total %09d \n",i,nentries);
     }
 
+    p_vertex.SetXYZ(vx, vy, vz);
+
+    TVector3 vtemp;
+    vtemp.SetMagThetaPhi(g1_p, g1_theta, g1_phi);
+    pi0_g1.SetVectM(vtemp, 0.0);
+    vtemp.SetMagThetaPhi(g2_p, g2_theta, g2_phi);
+    pi0_g2.SetVectM(vtemp, 0.0);
+
     if (x>0)   nu = Q2 / (2 * MASS_p * x) ;
     else nu = 0;
     pmod = pow(Ef,2) - pow(mass,2) ;
@@ -387,13 +421,13 @@ void  eicOutput::MakeFileSOLLUND(){
 
     if (particle_id != 111) {
       OUT << "1" << " \t "  << weight << " \t " << (Z_ion + N_ion)  << " \t " << Z_ion  << " \t " << "0"  << " \t " << "0" << " \t "  << x << " \t " << y  << " \t " << W  << " \t " << Q2  << " \t " << nu << endl;
-      OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << mass << " \t " << p_vertex->X()  << " \t " << p_vertex->Y() << " \t " << p_vertex->Z() << endl;
+      OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << mass << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
     }
     else {
       OUT << "3" << " \t "  << weight << " \t " << (Z_ion + N_ion)  << " \t " << Z_ion  << " \t " << "0"  << " \t " << "0" << " \t "  << x << " \t " << y  << " \t " << W  << " \t " << Q2  << " \t " << nu << endl;
-      OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << mass << " \t " << p_vertex->X()  << " \t " << p_vertex->Y() << " \t " << p_vertex->Z() << endl;
-      OUT << " \t " << "2" << " \t " << "0.0" << " \t " << "1" << " \t " << "22" << " \t " << "0" << " \t " << "0" << " \t " << pi0_g1->Px() << " \t " << pi0_g1->Py() << " \t " << pi0_g1->Pz() << " \t " << pi0_g1->E() << " \t " << "0.0" << " \t " << pi0_g1_vertex->X()  << " \t " << pi0_g1_vertex->Y() << " \t " << pi0_g1_vertex->Z() << endl;
-      OUT << " \t " << "3" << " \t " << "0.0" << " \t " << "1" << " \t " << "22" << " \t " << "0" << " \t " << "0" << " \t " << pi0_g2->Px() << " \t " << pi0_g2->Py() << " \t " << pi0_g2->Pz() << " \t " << pi0_g2->E() << " \t " << "0.0" << " \t " << pi0_g1_vertex->X()  << " \t " << pi0_g1_vertex->Y() << " \t " << pi0_g1_vertex->Z() << endl;
+      OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << mass << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
+      OUT << " \t " << "2" << " \t " << "0.0" << " \t " << "1" << " \t " << "22" << " \t " << "0" << " \t " << "0" << " \t " << pi0_g1.Px() << " \t " << pi0_g1.Py() << " \t " << pi0_g1.Pz() << " \t " << pi0_g1.E() << " \t " << "0.0" << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
+      OUT << " \t " << "3" << " \t " << "0.0" << " \t " << "1" << " \t " << "22" << " \t " << "0" << " \t " << "0" << " \t " << pi0_g2.Px() << " \t " << pi0_g2.Py() << " \t " << pi0_g2.Pz() << " \t " << pi0_g2.E() << " \t " << "0.0" << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
     }
 
   }

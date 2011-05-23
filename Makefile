@@ -12,7 +12,7 @@ OBJS          = $(EICRATEO)
 PROGRAMS      = $(EICRATE)
 
 FC=gfortran
-FFLAGS=
+FFLAGS= -O2
 
 #------------------------------------------------------------------------------
 
@@ -44,7 +44,7 @@ distclean:      clean
 ###
 
 .$(SrcSuf).$(ObjSuf): 
-		$(CXX) $(CXXFLAGS) -c $<
+		$(CXX) $(CXXFLAGS) -c -g $<
 
 eicRateDict.$(SrcSuf): LinkDef.h
 		@echo "Generating dictionary $@..."

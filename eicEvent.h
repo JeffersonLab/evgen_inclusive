@@ -67,16 +67,13 @@ struct eventdata {
         int charge;
         int Z_ion;
         int N_ion;
-        double mom;
+        double pf;
         double mass;
-        TVector3 p_vertex;
 
-        TLorentzVector pi0_g1;
-        TLorentzVector pi0_g2;
-  
-        TVector3 pi0_g1_vertex;
+	double vx, vy, vz;
 
-  
+	double g1_theta, g1_phi, g1_p;
+	double g2_theta, g2_phi, g2_p;
 };
 
 class eicEvent {

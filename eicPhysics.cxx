@@ -21,7 +21,6 @@ eicPhysics::eicPhysics(){
     printf("Seed number %d\n",fRandom->GetSeed());
     ReadPolTable();
  
-
     return;
 }
 
@@ -34,7 +33,6 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *
   // target info
     double tgradius = model->GetRadius();
     double tglength = model->GetLength();
-    TF1 * funcrandom = new TF1("funcrandom","x",0,tgradius);
 
     // We're going to work in the lab frame
     
@@ -235,19 +233,13 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *
     // Determine the vertex
     // Generating the vertex randomly in the target
     TVector3 vert;
+
     double vert_x, vert_y,vert_z,vert_th,vert_rho;
-    if (tgradius > 0.) {
-      vert_rho = funcrandom->GetRandom(0.,tgradius); // Generate the rho cohordinate following the probability given by funcrandom
-      vert_th = fRandom->Uniform(2*TMath::Pi()); // Uniform in theta
-      vert_z = fRandom->Uniform((-tglength/2),(tglength/2));
-      vert_x = vert_rho * cos(vert_th);
-      vert_y = vert_rho * sin(vert_th);
-    }
-    else {
-      vert_x = 0.; 
-      vert_y = 0.;
-      vert_z = 0.;
-    }
+
+    vert_x = 0.; 
+    vert_y = 0.;
+    vert_z = fRandom->Uniform((-tglength/2),(tglength/2));
+
     vert.SetXYZ(vert_x,vert_y,vert_z);
    
 
@@ -361,11 +353,13 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *
     data.mass    = 0.000511;
     data.particle_id = 11;
     data.charge = -1;
-    data.mom =  kf.Energy();
+    data.pf =  kf.Energy();
     data.Z_ion = ion->GetZ();
     data.N_ion = ion->GetN();
-    data.p_vertex = vert;
 
+    data.vx = vert.X();
+    data.vy = vert.Y();
+    data.vz = vert.Z();
  
 
     // Look at pdf data
@@ -396,8 +390,11 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   radlen = model->GetRadLen();
   double tgradius = model->GetRadius();
   double tglength = model->GetLength();
-  TF1 * funcrandom = new TF1("funcrandom","x",0,tgradius);
 
+
+  // Initialize variables
+  particle_id = 1e9;
+  charge      = 1e9;
 
   double ionp  = sqrt( pow(ion->GetEnergy(),2.0) - pow(ion->GetMass(),2.0) );
   double beta  = ionp/ion->GetEnergy();
@@ -461,18 +458,10 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   // Generating the vertex randomly in the target
   TVector3 vert;
   double vert_x, vert_y,vert_z,vert_th,vert_rho;
-  if (tgradius > 0.) {
-    vert_rho = funcrandom->GetRandom(0.,tgradius); // Generate the rho cohordinate following the probability given by funcrandom
-    vert_th = fRandom->Uniform(2*TMath::Pi()); // Uniform in theta
-    vert_z = fRandom->Uniform((-tglength/2),(tglength/2));
-    vert_x = vert_rho * cos(vert_th);
-    vert_y = vert_rho * sin(vert_th);
-  }
-  else {
-    vert_x = 0.; 
-    vert_y = 0.;
-    vert_z = 0.;
-  }
+
+  vert_x = 0.; 
+  vert_y = 0.;
+  vert_z = fRandom->Uniform((-tglength/2),(tglength/2));
 
   vert.SetXYZ(vert_x,vert_y,vert_z);
 
@@ -561,7 +550,7 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
 
 
   data.ef = ef;
-  data.mom = mom_pi;
+  data.pf = mom_pi;
   data.theta = theta_pi;
   data.phi = phi_pi;
   
@@ -570,17 +559,21 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   data.mass = mass;
   data.Z_ion = ion->GetZ();
   data.N_ion = ion->GetN();
-  data.p_vertex = vert;
+  data.vx = vert.X();
+  data.vy = vert.Y();
+  data.vz = vert.Z();
 
-  
-  data.pi0_g1 = Gamma1;
-  data.pi0_g2 = Gamma2;
-  data.pi0_g1_vertex = Gamma1_vt;
+  data.g1_theta = Gamma1.Theta();
+  data.g1_phi   = Gamma1.Phi();
+  data.g1_p     = Gamma1.P();
 
+  data.g2_theta = Gamma2.Theta();
+  data.g2_phi   = Gamma2.Phi();
+  data.g2_p     = Gamma2.P();
   
   ev->SetEventData(data);
-  
-    return;
+
+  return;
   
 }
 
@@ -1809,6 +1802,8 @@ void eicPhysics::Decay_pi0(TVector3 vp, TVector3 vert) {
   Gamma1_vt.SetX( vert.X() + move.X() );
   Gamma1_vt.SetY( vert.Y() + move.Y() );
   Gamma1_vt.SetZ( vert.Z() + move.Z() );
+
+  delete fr;
    
   return;
 
