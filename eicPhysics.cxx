@@ -31,7 +31,8 @@ eicPhysics::~eicPhysics(){
 
 void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *model){
   // target info
-    double tgradius = model->GetRadius();
+    double tglx = model->GetLx();
+    double tgly = model->GetLy();
     double tglength = model->GetLength();
 
     // We're going to work in the lab frame
@@ -235,9 +236,8 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *
     TVector3 vert;
 
     double vert_x, vert_y,vert_z,vert_th,vert_rho;
-
-    vert_x = 0.; 
-    vert_y = 0.;
+    vert_x = fRandom->Uniform((-tglx/2),(tglx/2));
+    vert_y = fRandom->Uniform((-tgly/2),(tgly/2));
     vert_z = fRandom->Uniform((-tglength/2),(tglength/2));
 
     vert.SetXYZ(vert_x,vert_y,vert_z);
@@ -388,7 +388,8 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   int particle_id, charge;
   int modelsig = model->GetModel();
   radlen = model->GetRadLen();
-  double tgradius = model->GetRadius();
+  double tglx = model->GetLx();
+  double tgly = model->GetLy();
   double tglength = model->GetLength();
 
 
@@ -459,8 +460,8 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   TVector3 vert;
   double vert_x, vert_y,vert_z,vert_th,vert_rho;
 
-  vert_x = 0.; 
-  vert_y = 0.;
+  vert_x = fRandom->Uniform((-tglx/2),(tglx/2));
+  vert_y = fRandom->Uniform((-tgly/2),(tgly/2));
   vert_z = fRandom->Uniform((-tglength/2),(tglength/2));
 
   vert.SetXYZ(vert_x,vert_y,vert_z);

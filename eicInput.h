@@ -15,7 +15,8 @@ struct inputdata {
     int    ion_N;
     double dens;
     double length;
-    double radius;
+    double lenx;
+    double leny;
     int	   model;  // 1= electron ; 2=pi+ ; 3=pi- ; 4=pi0 
     int    out_fmt; // 1=root 2=root+LUND 3=root+SOLLUND
 
@@ -37,7 +38,8 @@ class eicInput {
 	int    Get_ionN(){ return fData.ion_N; }
 	double Get_dens(){ return fData.dens; }
 	double Get_length(){ return fData.length; }
-	double Get_radius(){ return fData.radius; }
+	double Get_lenx(){ return fData.lenx; }
+	double Get_leny(){ return fData.leny; }
 	int    Get_model(){ return fData.model; }
 	int    Get_fmt(){ return fData.out_fmt; }
 	

@@ -15,7 +15,8 @@ class eicModel{
 	int    GetModel() { return model; }
 	double GetRadLen() {return radlen; }
 	double GetLength() {return length; }
-	double GetRadius() {return radius; }
+	double GetLx() {return len_x; }
+	double GetLy() {return len_y; }
 	void   SetModel(int m) {  model = m; }
 	void   SetRadLen(double r) { radlen = r; }
 
@@ -23,6 +24,7 @@ class eicModel{
 	int model;
 	double radlen;
 	double length;
-	double radius;
+	double len_x;
+	double len_y;
 };
 #endif//__eicModel_h

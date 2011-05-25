@@ -11,7 +11,8 @@ eicModel::eicModel(eicInput *inp):model(0){
 	N = inp->Get_ionN();
 	dens = inp->Get_dens();
 	length = inp->Get_length();
-	radius = inp->Get_radius();
+	len_x = inp->Get_lenx();
+	len_y = inp->Get_leny();
 
 	if (dens == 0.) {
 	  if (Z==1 && N==0) {// hydrogen target
@@ -42,8 +43,8 @@ eicModel::eicModel(eicInput *inp):model(0){
 	    printf("Target not in this database, update length in the input file!\n"); exit(1);
 	  }
 	} 
-	if (radius < 0. ) {
-	  printf("Target radius not in this database, update radius in the input file!\n"); exit(1);
+	if (len_x < 0. || len_y < 0. ) {
+	  printf("Raster lx or ly not in this database, update radius in the input file!\n"); exit(1);
 	}
 
 	if (length> 0 && X0> 0) {
@@ -55,9 +56,9 @@ eicModel::eicModel(eicInput *inp):model(0){
 	}
     }
 
-    length = length / 100. ; // conversion distances in cm
-    radius = radius / 100. ; 
-
+    length = length / 100. ; // conversion distances in m
+    len_x = len_x / 100. ; 
+    len_y = len_y / 100. ; 
     return;
 }
 

@@ -21,8 +21,9 @@ eicInput::eicInput(const char *file){
     fscanf(f, "%s%d", dummy, &fData.ion_Z);
     fscanf(f, "%s%d", dummy, &fData.ion_N);
     fscanf(f, "%s%lf%s", dummy, &fData.dens, dummy);
-    fscanf(f, "%s%lf%s", dummy, &fData.length, dummy);
-    fscanf(f, "%s%lf%s", dummy, &fData.radius, dummy);
+    fscanf(f, "%s%lf%s", dummy, &fData.length, dummy);    
+    fscanf(f, "%s%lf%s", dummy, &fData.lenx, dummy);
+    fscanf(f, "%s%lf%s", dummy, &fData.leny, dummy);
     fscanf(f, "%s%d", dummy, &fData.model);
     fscanf(f, "%s%d", dummy, &fData.out_fmt);
 
