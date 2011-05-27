@@ -5,6 +5,8 @@
 #include <math.h>
 #include <cstdlib>
 
+#include <TVector3.h>
+
 // EIC electron beam
 
 class eicModel{
@@ -20,11 +22,15 @@ class eicModel{
 	void   SetModel(int m) {  model = m; }
 	void   SetRadLen(double r) { radlen = r; }
 
+	TVector3 GetTgtOffset(){ return offset; }
+
     private:
 	int model;
 	double radlen;
 	double length;
 	double len_x;
 	double len_y;
+
+	TVector3 offset;
 };
 #endif//__eicModel_h

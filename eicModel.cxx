@@ -14,6 +14,10 @@ eicModel::eicModel(eicInput *inp):model(0){
 	len_x = inp->Get_lenx();
 	len_y = inp->Get_leny();
 
+	offset.SetXYZ( inp->GetTgtXoff(),
+		       inp->GetTgtYoff(),
+		       inp->GetTgtZoff() );
+
 	if (dens == 0.) {
 	  if (Z==1 && N==0) {// hydrogen target
             printf("Density Hydrogen target \n");
@@ -59,6 +63,8 @@ eicModel::eicModel(eicInput *inp):model(0){
     length = length / 100. ; // conversion distances in m
     len_x = len_x / 100. ; 
     len_y = len_y / 100. ; 
+    offset *= 1e-2; // conversion distances in cm to m
+
     return;
 }
 

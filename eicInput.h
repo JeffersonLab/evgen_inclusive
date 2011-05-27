@@ -17,6 +17,11 @@ struct inputdata {
     double length;
     double lenx;
     double leny;
+
+    double off_x;
+    double off_y;
+    double off_z;
+
     int	   model;  // 1= electron ; 2=pi+ ; 3=pi- ; 4=pi0 
     int    out_fmt; // 1=root 2=root+LUND 3=root+SOLLUND
 
@@ -42,6 +47,10 @@ class eicInput {
 	double Get_leny(){ return fData.leny; }
 	int    Get_model(){ return fData.model; }
 	int    Get_fmt(){ return fData.out_fmt; }
+
+	double GetTgtXoff(){ return fData.off_x; }
+	double GetTgtYoff(){ return fData.off_y; }
+	double GetTgtZoff(){ return fData.off_z; }
 	
 
 

@@ -401,7 +401,8 @@ void  eicOutput::MakeFileSOLLUND(){
       printf("Translated %09d events of total %09d \n",i,nentries);
     }
 
-    p_vertex.SetXYZ(vx, vy, vz);
+    // Vertex needs to be in units of cm
+    p_vertex.SetXYZ(vx*100.0, vy*100.0, vz*100.0);
 
     TVector3 vtemp;
     vtemp.SetMagThetaPhi(g1_p, g1_theta, g1_phi);

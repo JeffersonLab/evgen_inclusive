@@ -35,6 +35,8 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *
     double tgly = model->GetLy();
     double tglength = model->GetLength();
 
+    TVector3 tgtoff = model->GetTgtOffset();
+
     // We're going to work in the lab frame
     
     // Get beta of ion
@@ -236,15 +238,13 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *
     TVector3 vert;
 
     double vert_x, vert_y,vert_z,vert_th,vert_rho;
-    vert_x = fRandom->Uniform((-tglx/2),(tglx/2));
-    vert_y = fRandom->Uniform((-tgly/2),(tgly/2));
-    vert_z = fRandom->Uniform((-tglength/2),(tglength/2));
+
+    vert_x = fRandom->Uniform((-tglx/2),(tglx/2)) + tgtoff.X();
+    vert_y = fRandom->Uniform((-tgly/2),(tgly/2)) + tgtoff.Y();
+    vert_z = fRandom->Uniform((-tglength/2),(tglength/2))+ tgtoff.Z();;
 
     vert.SetXYZ(vert_x,vert_y,vert_z);
    
-
-
-
     eventdata data;
 
     /*
@@ -392,6 +392,8 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   double tgly = model->GetLy();
   double tglength = model->GetLength();
 
+  TVector3 tgtoff = model->GetTgtOffset();
+
 
   // Initialize variables
   particle_id = 1e9;
@@ -460,15 +462,15 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   TVector3 vert;
   double vert_x, vert_y,vert_z,vert_th,vert_rho;
 
-  vert_x = fRandom->Uniform((-tglx/2),(tglx/2));
-  vert_y = fRandom->Uniform((-tgly/2),(tgly/2));
-  vert_z = fRandom->Uniform((-tglength/2),(tglength/2));
+  vert_x = fRandom->Uniform((-tglx/2),(tglx/2))+tgtoff.X(); ;
+  vert_y = fRandom->Uniform((-tgly/2),(tgly/2))+tgtoff.Y(); ;
+  vert_z = fRandom->Uniform((-tglength/2),(tglength/2))+tgtoff.Z(); ;
 
   vert.SetXYZ(vert_x,vert_y,vert_z);
 
   float En_beam2 = float(En_beam);
   float mom_pi2 = float(mom_pi);
-  float theta_pi2 = float(theta_pi);
+  float theta_pi2 = float(theta_pi*180.0/3.14159); // theta pi in deg
   float radlen2 = float(radlen);
   float weight_f;
   int type;
@@ -530,11 +532,6 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   }
   else weight_v = 0.;
   
-
-  theta_pi = theta_pi /180 * 3.1415926 ; // transforming angle in radiant
-
-
-
   eventdata data;
   if( 0.0 < weight_v && weight_v < 1e9 ){
     data.weight  = weight_v * En_beam * 4 * TMath::Pi() * A; // nanobars/GeV-str-nuclei * (DeltaE sample generated) * (Full angle generated) * (Number of nucleons)

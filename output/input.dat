@@ -1,4 +1,4 @@
-nevt    20000
+nevt    2000000
 nprint  100000
 lumin	1.0e37  Hz/cm^2
 runtime 48.0    hours
@@ -9,7 +9,19 @@ ion_Z	1
 ion_N	1
 dens	0.162	g/cm^3	
 length	40	cm
-lenx	0.2	cm
-leny	0.2	cm	
-model	4
+ras x	0.2	cm
+ras y	0.2	cm	
+offset  0.0 0.0 0.0 cm
+model	1
 output  3
+
+# models
+# 1  e-
+# 2  pi+
+# 3  pi-
+# 4  pi0
+
+# output
+# 1  ROOT only
+# 2  ROOT + LUND
+# 3  ROOT + SOLLUND
