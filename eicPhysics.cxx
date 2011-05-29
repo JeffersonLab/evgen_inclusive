@@ -536,15 +536,21 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   if( 0.0 < weight_v && weight_v < 1e9 ){
     data.weight  = weight_v * En_beam * 4 * TMath::Pi() * A; // nanobars/GeV-str-nuclei * (DeltaE sample generated) * (Full angle generated) * (Number of nucleons)
     //    data.weight *= beam->GetLumin();
+    data.weight *= 1e-37 ; // nb to m^2
+
+    data.weight *= beam->GetLumin();
+	
   } else {
     // Unphysical for some reason
     data.weight = 0.0;
   }
 
-  data.x      = 0.;
-  data.y      = 0.;
-  data.Q2     = 0.;
-  data.W      = 0.;
+  // Fixed target kinematics...  This needs to be done properly
+  data.Q2     = 2.0*En_beam*ef*(1.0-cos(theta_pi));
+
+  data.x      = data.Q2/(2.0*MASS_P*(En_beam-ef));
+  data.y      = (En_beam-ef)/En_beam;
+  data.W      = sqrt(MASS_P*MASS_P + 2.0*MASS_P*(En_beam-ef) -data.Q2);
 
 
   data.ef = ef;
