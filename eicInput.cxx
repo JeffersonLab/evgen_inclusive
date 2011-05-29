@@ -10,6 +10,7 @@ eicInput::eicInput(const char *file){
     if( !f ){ printf("%s cannot be opened\n", file); exit(1); }
 
     char dummy[255];
+    int nscan;
 
     fscanf(f, "%s%d", dummy, &fData.nevt);
     fscanf(f, "%s%d", dummy, &fData.nprnt);
@@ -29,7 +30,6 @@ eicInput::eicInput(const char *file){
 	    		       &fData.off_z, dummy);
     fscanf(f, "%s%d", dummy, &fData.model);
     fscanf(f, "%s%d", dummy, &fData.out_fmt);
-
 
     fData.lumin *= 1e4; // Convert cm^-2 to m^-2
     fData.runtime *= 3600; // Convert hours to s
