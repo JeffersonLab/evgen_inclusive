@@ -1783,13 +1783,13 @@ void eicPhysics::Decay_pi0(TVector3 vp, TVector3 vert) {
   b_3 = Vp_4.BoostVector(); // return (px/E,py/E,pz/E) (is all in GeV)
 
   // decay of the pi0 in two photons
-  TVector3 g1(1.,1.,1.);
+
+  double x_pi=0.,y_pi=0.,z_pi=0.;
+  fRandom->Sphere(x_pi,y_pi,z_pi,mp0/2); // In the pi0 rest frame the two photons are generated isotropically with half the energy of the pion (the mass)
+  TVector3 g1(x_pi,y_pi,z_pi);
   TVector3 g2(1.,1.,1.); // two photons 3-momentum, set to 1 , so that they can be stretched and turned, setting the magnitude and the angles
-  g1.SetMag(mp0/2); //In the pi0 rest frame the two photons are generated isotropically with half the energy of the pion (the mass)
-  double thetag = fRandom->Uniform(0.0,TMath::Pi());
-  double phig = fRandom->Uniform(0.0,2*TMath::Pi());
-  g1.SetTheta(thetag);
-  g1.SetPhi(phig);
+
+
   g2 = -g1; // still rest frame of the pion
   Gamma1.SetVect(g1); // defining the 4-vectors
   Gamma1.SetE(mp0/2);

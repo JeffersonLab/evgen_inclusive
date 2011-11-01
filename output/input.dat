@@ -12,7 +12,7 @@ length	40	cm
 ras_x	0.2	cm
 ras_y	0.2	cm	
 offset  0.0 0.0 0.0 cm
-model	1
+model	4
 output  3
 
 # models
