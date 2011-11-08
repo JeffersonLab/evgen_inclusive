@@ -581,6 +581,160 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   
 }
 
+void eicPhysics::MakeEvent3(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *model) {
+
+  double radlen=0., mass=0., weight_v;
+  int particle_id, charge;
+  int modelsig = model->GetModel();
+  radlen = model->GetRadLen();
+  double tglx = model->GetLx();
+  double tgly = model->GetLy();
+  double tglength = model->GetLength();
+
+  TVector3 tgtoff = model->GetTgtOffset();
+
+
+  // Initialize variables
+  particle_id = 1e9;
+  charge      = 1e9;
+
+  double ionp  = sqrt( pow(ion->GetEnergy(),2.0) - pow(ion->GetMass(),2.0) );
+  double beta  = ionp/ion->GetEnergy();
+  double gamma = 1.0/sqrt(1.0-beta*beta);
+  
+  double e_lab = beam->GetEnergy()*gamma*(1.0+beta);
+  
+  TLorentzVector e_rest( 0.0, 0.0, e_lab, e_lab);
+  TVector3 blab(0.0, 0.0, beta);
+
+  nucl n;
+  double A = ((double) (ion->GetZ()+ion->GetN()));
+  double zz = ((double) (ion->GetZ())) ;
+  double prot_prob = ((double) ion->GetZ())/A;
+  // Determine which type of nucleon we hit
+  if( fRandom->Uniform() < prot_prob ){
+    n = kProton;
+  } else {
+    n = kNeutron;
+  }
+
+ 
+  
+
+  // this is the part that I got from my code
+  
+  // E_1 = x[0]                                                                                                                               
+  // theta = par[0]                                                                                                                           
+  // aa = par[1]                                                                                                                             
+  double d_sig, tau, mi_th, sin2, cos2, G_E2, G_M2, GEp, GMp, GMn, G_Mn2;                                                                   
+  double MV2=0.71;                                                                                                                          
+  double mu_p=2.792847; //magnetic moment of the proton                                                                                     
+  double mu_n = 1.91; // magnetic moment of the neutron = (-1.91), but here I need the abs                                                  
+  double alpha= 7.297352*pow(10,-3); // alpha EM interaction                                                                                
+  double m_e= 0.00051099892; // electron mass in GeV                                                                                        
+  double m_p= 0.93827203; // proton mass in GeV                                                                                             
+  double m_n= 0.93956536; // neutron mass in GeV                                                                                            
+  double dsigdOdE_el_nb;                                                                                                                    
+  double nbarn = 0.389 * pow(10,6); //  barn: (1 GeV)**-2 = 0.389e-3 barn
+
+  double x_e=0.,y_e=0.,z_e=0.;
+
+ 
+  // double mom_e = fRandom->Uniform(En_beam); 
+  fRandom->Sphere(x_e,y_e,z_e,1.0); // generate random  vectors, uniformly distributed over the surface
+  // of a sphere of radius mom_pi
+  TVector3 v3_e(x_e,y_e,z_e);
+  double theta_e = v3_e.Theta();
+  double phi_e = v3_e.Phi();
+  double E_2_v = 0;
+  double q2_dis = 0;
+  int type;
+  switch( n ){
+    case kProton:
+      type = 1;
+      break;
+    case kNeutron:
+      type = 2;
+      break;
+    default:
+      type = 1;
+      break;
+  }
+     
+  if (type==1) {                                                                 
+    E_2_v = e_lab/ (1 + e_lab/m_p * (1 - cos(theta_e))); // value applying the delta of Dirac from eq A.13 in Mo Tsai                     
+    q2_dis = 4 * e_lab * E_2_v * pow(sin(theta_e/2),2); // determine again q2_dis with the new E_2             
+    GEp = 1. / pow( 1. + q2_dis / MV2 , 2.);                                                                     
+    GMp = mu_p / pow( 1. + q2_dis / MV2 , 2.);                                                                    
+    sin2 = pow(sin(theta_e/2.0),2);                                                                                
+    cos2 = pow(cos(theta_e/2.0),2);                                                       
+    G_E2 = pow(GEp,2);                                                                                         
+    G_M2 = pow(GMp,2);                                               
+    tau = q2_dis/4/pow(m_p,2); 
+
+    d_sig = pow(alpha,2)/4./pow(e_lab,2)/pow(sin2,2)/(1.+2.*e_lab/m_p*sin2) *((G_E2+tau*G_M2)/(1.+tau)*cos2 + 2.*tau*G_M2*sin2); // this cross se \
+    // ction is already d2sigma/dOdE for elastic scattering, eta and delta of equation of A.13 are already applied and the delta is already expanded \
+                                                                        
+    dsigdOdE_el_nb = d_sig*nbarn ; // cross section from elas.c is determined in mubarn, so I substitute hbc2 with nbarn for termining it in nanobarn                                                                                                                                   
+  }                                                                                                                                      
+  else {                                  
+    E_2_v = e_lab/ (1 + e_lab/m_n * (1 - cos(theta_e))); // value modified for the neutron                                                       
+    q2_dis = 4 * e_lab * E_2_v * pow(sin(theta_e/2),2); // value modified for the neutron                                                       
+    tau = q2_dis/4/pow(m_n,2); // value modified for the neutron                                                                              
+    GMn = mu_n /  pow( 1. + q2_dis / MV2 , 2.);                                                                                               
+    G_Mn2 = pow(GMn,2);                                                                                                                       
+    d_sig = pow(alpha,2)/4./pow(e_lab,2)/pow(sin2,2)/(1.+2.*e_lab/m_p*sin2) *((tau*G_Mn2)/(1.+tau)*cos2 + 2.*tau*G_Mn2*sin2); // same for proton, but now G_En = 0                                                                                                                           
+    dsigdOdE_el_nb = d_sig*nbarn ;                                                                                           
+  }                                                                                                                                       
+
+ 
+  // Generating the vertex randomly in the target
+  TVector3 vert;
+  double vert_x, vert_y,vert_z,vert_th,vert_rho;
+
+  vert_x = fRandom->Uniform((-tglx/2),(tglx/2))+tgtoff.X(); ;
+  vert_y = fRandom->Uniform((-tgly/2),(tgly/2))+tgtoff.Y(); ;
+  vert_z = fRandom->Uniform((-tglength/2),(tglength/2))+tgtoff.Z(); ;
+
+  vert.SetXYZ(vert_x,vert_y,vert_z);
+  
+  eventdata data;
+  
+  if(0.0 < dsigdOdE_el_nb && dsigdOdE_el_nb < 1e29 ){
+    data.weight  = dsigdOdE_el_nb*(1e-37); // nanobarn to m^2
+    data.weight *= beam->GetLumin();
+  } else {
+    // Unphysical for some reason
+    data.weight = 0.0;
+  }
+
+  data.ef     = E_2_v;
+  data.theta  = theta_e;
+  data.phi    = phi_e;
+  data.Q2     = q2_dis;
+  data.mass    = 0.000511;
+  data.particle_id = 11;
+  data.charge = -1;
+  data.pf =  E_2_v;
+  data.Z_ion = ion->GetZ();
+  data.N_ion = ion->GetN();
+
+  data.x      = q2_dis/(2.0*MASS_P*(e_lab-E_2_v));
+  data.y      = (e_lab-E_2_v)/e_lab;
+  data.W      = sqrt(MASS_P*MASS_P + 2.0*MASS_P*(e_lab-E_2_v) -q2_dis);
+
+
+  data.vx = vert.X();
+  data.vy = vert.Y();
+  data.vz = vert.Z();
+
+  ev->SetEventData(data);
+
+  return;
+    
+
+
+}
 
 double eicPhysics::F1( double x, double Q2, nucl n ){
     return F2(x,Q2,n)/(2.0*x);

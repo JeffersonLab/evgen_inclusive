@@ -43,6 +43,14 @@ void eicProcess::Run(){
 	  fout->Write(fevt);
       }
     }
+    else if (model == 5) { // electron ELASTIC generator
+      printf("Elastic cross section \n");
+      for( evt = 0; evt < nevt; evt++ ){
+	  if( (evt%nprnt) == 0 ){printf("Event %10d \n", evt);}
+	  fphy->MakeEvent3(fbeam, fion, fevt, fmodel);
+	  fout->Write(fevt);
+      }
+    }
     else { // pion generator
       printf("Pion cross section \n");
       for( evt = 0; evt < nevt; evt++ ){

@@ -12,14 +12,15 @@ length	40	cm
 ras_x	0.2	cm
 ras_y	0.2	cm	
 offset  0.0 0.0 0.0 cm
-model	4
+model	5
 output  3
 
 # models
-# 1  e-
+# 1  e- Deep Inelastic 
 # 2  pi+
 # 3  pi-
 # 4  pi0
+# 5  e- Elastic
 
 # output
 # 1  ROOT only

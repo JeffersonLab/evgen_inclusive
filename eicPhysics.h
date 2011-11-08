@@ -26,6 +26,7 @@ class eicPhysics {
 
 	void MakeEvent( eicBeam *, eicIon *, eicEvent * , eicModel *);
 	void MakeEvent2( eicBeam *, eicIon *, eicEvent *, eicModel *);
+	void MakeEvent3( eicBeam *, eicIon *, eicEvent *, eicModel *);
 
 	enum nucl {kProton, kNeutron};
     private:
