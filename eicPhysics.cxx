@@ -237,7 +237,7 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *
     // Generating the vertex randomly in the target
     TVector3 vert;
 
-    double vert_x, vert_y,vert_z,vert_th,vert_rho;
+    double vert_x, vert_y,vert_z;
 
     vert_x = fRandom->Uniform((-tglx/2),(tglx/2)) + tgtoff.X();
     vert_y = fRandom->Uniform((-tgly/2),(tgly/2)) + tgtoff.Y();
@@ -410,7 +410,6 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
 
   nucl n;
   double A = ((double) (ion->GetZ()+ion->GetN()));
-  double zz = ((double) (ion->GetZ())) ;
   double prot_prob = ((double) ion->GetZ())/A;
   // Determine which type of nucleon we hit
   if( fRandom->Uniform() < prot_prob ){
@@ -460,7 +459,7 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
  
   // Generating the vertex randomly in the target
   TVector3 vert;
-  double vert_x, vert_y,vert_z,vert_th,vert_rho;
+  double vert_x, vert_y,vert_z;
 
   vert_x = fRandom->Uniform((-tglx/2),(tglx/2))+tgtoff.X(); ;
   vert_y = fRandom->Uniform((-tgly/2),(tgly/2))+tgtoff.Y(); ;
@@ -583,9 +582,8 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
 
 void eicPhysics::MakeEvent3(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *model) {
 
-  double radlen=0., mass=0., weight_v;
+  double radlen=0.;
   int particle_id, charge;
-  int modelsig = model->GetModel();
   radlen = model->GetRadLen();
   double tglx = model->GetLx();
   double tgly = model->GetLy();
@@ -609,7 +607,6 @@ void eicPhysics::MakeEvent3(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
 
   nucl n;
   double A = ((double) (ion->GetZ()+ion->GetN()));
-  double zz = ((double) (ion->GetZ())) ;
   double prot_prob = ((double) ion->GetZ())/A;
   // Determine which type of nucleon we hit
   if( fRandom->Uniform() < prot_prob ){
@@ -622,21 +619,17 @@ void eicPhysics::MakeEvent3(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   
 
   // this is the part that I got from my code
-  
-  // E_1 = x[0]                                                                                                                               
-  // theta = par[0]                                                                                                                           
-  // aa = par[1]                                                                                                                             
-  double d_sig, tau, mi_th, sin2, cos2, G_E2, G_M2, GEp, GMp, GMn, G_Mn2;                                                                   
-  double MV2=0.71;                                                                                                                          
-  double mu_p=2.792847; //magnetic moment of the proton                                                                                     
-  double mu_n = 1.91; // magnetic moment of the neutron = (-1.91), but here I need the abs                                                  
-  double alpha= 7.297352*pow(10,-3); // alpha EM interaction                                                                                
-  double m_e= 0.00051099892; // electron mass in GeV                                                                                        
-  double m_p= 0.93827203; // proton mass in GeV                                                                                             
-  double m_n= 0.93956536; // neutron mass in GeV                                                                                            
-  double dsigdOdE_el_nb;                                                                                                                    
+     
+  double d_sig, tau, sin2, cos2, G_E2, G_M2, GEp, GMp, GMn, G_Mn2;                                                 
+  double MV2=0.71;                                                                                                
+  double mu_p=2.792847; //magnetic moment of the proton                                             
+  double mu_n = 1.91; // magnetic moment of the neutron = (-1.91), but here I need the abs             
+  double alpha= 7.297352*pow(10,-3); // alpha EM interaction                                               
+  //  double m_e= 0.00051099892; // electron mass in GeV                                           
+  double m_p= 0.93827203; // proton mass in GeV                                           
+  double m_n= 0.93956536; // neutron mass in GeV                                                        
+  double dsigdOdE_el_nb;                                                     
   double nbarn = 0.389 * pow(10,6); //  barn: (1 GeV)**-2 = 0.389e-3 barn
-
   double x_e=0.,y_e=0.,z_e=0.;
 
  
@@ -675,22 +668,22 @@ void eicPhysics::MakeEvent3(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
     d_sig = pow(alpha,2)/4./pow(e_lab,2)/pow(sin2,2)/(1.+2.*e_lab/m_p*sin2) *((G_E2+tau*G_M2)/(1.+tau)*cos2 + 2.*tau*G_M2*sin2); // this cross se \
     // ction is already d2sigma/dOdE for elastic scattering, eta and delta of equation of A.13 are already applied and the delta is already expanded \
                                                                         
-    dsigdOdE_el_nb = d_sig*nbarn ; // cross section from elas.c is determined in mubarn, so I substitute hbc2 with nbarn for termining it in nanobarn                                                                                                                                   
-  }                                                                                                                                      
+    dsigdOdE_el_nb = d_sig*nbarn ; // cross section from elas.c is determined in mubarn, so I substitute hbc2 with nbarn for termining it in nanobarn                                                        
+  }                                                                
   else {                                  
-    E_2_v = e_lab/ (1 + e_lab/m_n * (1 - cos(theta_e))); // value modified for the neutron                                                       
-    q2_dis = 4 * e_lab * E_2_v * pow(sin(theta_e/2),2); // value modified for the neutron                                                       
-    tau = q2_dis/4/pow(m_n,2); // value modified for the neutron                                                                              
-    GMn = mu_n /  pow( 1. + q2_dis / MV2 , 2.);                                                                                               
-    G_Mn2 = pow(GMn,2);                                                                                                                       
-    d_sig = pow(alpha,2)/4./pow(e_lab,2)/pow(sin2,2)/(1.+2.*e_lab/m_p*sin2) *((tau*G_Mn2)/(1.+tau)*cos2 + 2.*tau*G_Mn2*sin2); // same for proton, but now G_En = 0                                                                                                                           
-    dsigdOdE_el_nb = d_sig*nbarn ;                                                                                           
-  }                                                                                                                                       
+    E_2_v = e_lab/ (1 + e_lab/m_n * (1 - cos(theta_e))); // value modified for the neutron                    
+    q2_dis = 4 * e_lab * E_2_v * pow(sin(theta_e/2),2); // value modified for the neutron     
+    tau = q2_dis/4/pow(m_n,2); // value modified for the neutron                    
+    GMn = mu_n /  pow( 1. + q2_dis / MV2 , 2.);       
+    G_Mn2 = pow(GMn,2);                                          
+    d_sig = pow(alpha,2)/4./pow(e_lab,2)/pow(sin2,2)/(1.+2.*e_lab/m_p*sin2) *((tau*G_Mn2)/(1.+tau)*cos2 + 2.*tau*G_Mn2*sin2); // same for proton, but now G_En = 0          
+    dsigdOdE_el_nb = d_sig*nbarn ;                        
+  }               
 
  
   // Generating the vertex randomly in the target
   TVector3 vert;
-  double vert_x, vert_y,vert_z,vert_th,vert_rho;
+  double vert_x, vert_y,vert_z;
 
   vert_x = fRandom->Uniform((-tglx/2),(tglx/2))+tgtoff.X(); ;
   vert_y = fRandom->Uniform((-tgly/2),(tgly/2))+tgtoff.Y(); ;
