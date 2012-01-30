@@ -253,6 +253,7 @@ void  eicOutput::MakeFileLUND(){
   Int_t nentries = (Int_t)input_chain.GetEntries();
   double pmod,px,py,pz,nu;
   double MASS_p = 0.938;
+  TVector3 vtemp;
 
   ofstream OUT (file.Data());
   for (int i=0; i<nentries ; i++) {
@@ -269,15 +270,23 @@ void  eicOutput::MakeFileLUND(){
     px = pmod * sin(theta) * cos(phi);
     py = pmod * sin(theta)* sin(phi);
     pz = pmod * cos(theta);
+    // Vertex needs to be in units of cm
+    p_vertex.SetXYZ(vx*100.0, vy*100.0, vz*100.0);
+    vtemp.SetMagThetaPhi(g1_p, g1_theta, g1_phi);
+    pi0_g1.SetVectM(vtemp, 0.0);
+    vtemp.SetMagThetaPhi(g2_p, g2_theta, g2_phi);
+    pi0_g2.SetVectM(vtemp, 0.0);
 
+
+    // NB at now, rather than the mass of the particle, will be stored the weight. This is done because the mass is not used by GEMC. For full variables and mass value, one should use the SOLLUND format
 
     if (particle_id != 111) {
       OUT << "1" << " \t " << (Z_ion + N_ion)  << " \t " << Z_ion  << " \t " << "0"  << " \t " << "0" << " \t "  << x << " \t " << y  << " \t " << W  << " \t " << Q2  << " \t " << nu << endl;
-      OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << mass << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
+      OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << weight << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
     }
     else {
       OUT << "3" << " \t " << (Z_ion + N_ion)  << " \t " << Z_ion  << " \t " << "0"  << " \t " << "0" << " \t "  << x << " \t " << y  << " \t " << W  << " \t " << Q2  << " \t " << nu << endl;
-      OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << mass << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
+      OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << weight << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
       OUT << " \t " << "2" << " \t " << "0.0" << " \t " << "1" << " \t " << "22" << " \t " << "0" << " \t " << "0" << " \t " << pi0_g1.Px() << " \t " << pi0_g1.Py() << " \t " << pi0_g1.Pz() << " \t " << pi0_g1.E() << " \t " << "0.0" << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
       OUT << " \t " << "3" << " \t " << "0.0" << " \t " << "1" << " \t " << "22" << " \t " << "0" << " \t " << "0" << " \t " << pi0_g2.Px() << " \t " << pi0_g2.Py() << " \t " << pi0_g2.Pz() << " \t " << pi0_g2.E() << " \t " << "0.0" << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
     }
@@ -393,6 +402,7 @@ void  eicOutput::MakeFileSOLLUND(){
   Int_t nentries = (Int_t)input_chain.GetEntries();
   double pmod,px,py,pz,nu;
   double MASS_p = 0.938;
+  TVector3 vtemp;
 
   ofstream OUT (file.Data());
   for (int i=0; i<nentries ; i++) {
@@ -404,7 +414,7 @@ void  eicOutput::MakeFileSOLLUND(){
     // Vertex needs to be in units of cm
     p_vertex.SetXYZ(vx*100.0, vy*100.0, vz*100.0);
 
-    TVector3 vtemp;
+
     vtemp.SetMagThetaPhi(g1_p, g1_theta, g1_phi);
     pi0_g1.SetVectM(vtemp, 0.0);
     vtemp.SetMagThetaPhi(g2_p, g2_theta, g2_phi);

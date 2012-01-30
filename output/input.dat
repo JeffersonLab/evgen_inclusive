@@ -12,8 +12,8 @@ length	40	cm
 ras_x	0.2	cm
 ras_y	0.2	cm	
 offset  0.0 0.0 0.0 cm
-model	5
-output  3
+model	2
+output  2
 
 # models
 # 1  e- Deep Inelastic 
