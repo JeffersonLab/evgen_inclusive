@@ -549,7 +549,9 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
 
   data.x      = data.Q2/(2.0*MASS_P*(En_beam-ef));
   data.y      = (En_beam-ef)/En_beam;
-  data.W      = sqrt(MASS_P*MASS_P + 2.0*MASS_P*(En_beam-ef) -data.Q2);
+  data.W      = MASS_P*MASS_P + 2.0*MASS_P*(En_beam-ef) -data.Q2;
+  if (data.W > 0 ) data.W = sqrt(data.W);
+  else data.W = 0.0;
 
 
   data.ef = ef;
