@@ -1,0 +1,59 @@
+////////////////////////////////////
+Output for eicRate
+
+weight		weight to give counts given the luminosity and running time in 
+		the input file
+rate		counts/s given the luminosity
+theta		angle of the scattered electron [rad]
+jetth		angle of three-momentum transfer [rad]
+phi		azimuthal angle of the scattered electron [rad]
+x		Bjorken x
+Ef		Final electron energy
+src		Differential cross section dsigma/dxdy [GeV^-2]
+F1		Structure function F1
+F2		Structure function F2
+F1gZ		Structure function F1-gammaZ
+F3gZ		Structure function F3-gammaZ
+F1Wp		Structure function F1 for W+ exchange
+F3Wp		Structure function F3 for W+ exchange
+F1Wm		Structure function F1 for W- exchange
+F3Wm		Structure function F3 for W- exchange
+eta_gZ		eta factor [G_F MZ^2 /( alpha 2sqrt(2) pi)]*[Q^2/(Q^2+MZ^2)]
+Q2		Negative four-momentum transfer squared
+pdf		Array of pdf values for this x
+		idx 0-5 are u,d,s,u-bar,d-bar,s-bar
+Dpdf		Array of Delta-pdf (spin distribution) values for this x
+		idx 0-4 are u,d,u-bar,d-bar,s
+Abeam		PV asymmetry for long. polarized beam - unpolarized target
+A_L		PV asymmetry for unpolarize beam - long. polarized target
+A_L_g1		g1-gammaZ contribution to A_L
+A_L_g5		g5-gammaZ contribution to A_L
+A_T		Identically 0
+W		Invariant mass of the process [GeV]
+y		nu/Ebeam in nucleon rest frame, kinematic variable y
+Y		Big Y, [ 1-(1-y)^2 ]/[ 1 + (1-y)^2 ]
+AWp		PV asymmetry for W+ exchange
+AWm		PV asymmetry for W- exchange
+Wpweight	Event weight to give counts for W+ exchange
+Wmweight	Event weight to give counts for W- exchange
+Wprate		Event weight to give counts/s for W+ exchange
+Wmrate		Event weight to give counts/s for W- exchange
+jetp		Magnitude of 3-momentum transfer [GeV]
+jetE		energy Transfer [GeV]
+Z_ion		Z of the nucleus
+N_ion		N of the nucleus
+particle_id	PDG encoding of particle produced (for pion production 
+		simulation)
+charge		Charge of particle produced (for pion production simulation)
+mass		mass of particle produce [GeV] (for pion production simulation)
+pf  		3mom of particle produce [GeV] (for pion production simulation)
+vx		Vertex x position in target [m]
+vy		Vertex y position in target [m]
+vz		Vertex z position in target [m]
+g1_theta	gamma 1 polar angle wrt 3mom xfer in lab for pi0 decay [rad]
+g2_theta	gamma 2 polar angle wrt 3mom xfer in lab for pi0 decay [rad]
+g1_phi  	gamma 1 azimuthal angle wrt 3mom xfer for pi0 decay [rad]
+g2_phi  	gamma 2 azimuthal angle wrt 3mom xfer for pi0 decay [rad]
+g1_p		gamma 1 energy in lab for pi0 decay [GeV]
+g2_p		gamma 2 energy in lab for pi0 decay [GeV]
+
