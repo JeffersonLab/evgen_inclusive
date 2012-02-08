@@ -9,7 +9,7 @@ jetth		angle of three-momentum transfer [rad]
 phi		azimuthal angle of the scattered electron [rad]
 x		Bjorken x
 Ef		Final electron energy
-src		Differential cross section dsigma/dxdy [GeV^-2]
+crs		Differential cross section dsigma/dxdy [GeV^-2]
 F1		Structure function F1
 F2		Structure function F2
 F1gZ		Structure function F1-gammaZ
