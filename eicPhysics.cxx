@@ -669,6 +669,7 @@ void eicPhysics::MakeEvent3(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
 
     d_sig = pow(alpha,2)/4./pow(e_lab,2)/pow(sin2,2)/(1.+2.*e_lab/m_p*sin2) *((G_E2+tau*G_M2)/(1.+tau)*cos2 + 2.*tau*G_M2*sin2); // this cross se \
     // ction is already d2sigma/dOdE for elastic scattering, eta and delta of equation of A.13 are already applied and the delta is already expanded \
+
                                                                         
     dsigdOdE_el_nb = d_sig*nbarn ; // cross section from elas.c is determined in mubarn, so I substitute hbc2 with nbarn for termining it in nanobarn                                                        
   }                                                                
@@ -695,13 +696,19 @@ void eicPhysics::MakeEvent3(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   
   eventdata data;
   
+ // Volume term - volume we sample in is just a sphere, so 4pi
+  double V = 4.0*3.14159;
+ 
   if(0.0 < dsigdOdE_el_nb && dsigdOdE_el_nb < 1e29 ){
     data.weight  = dsigdOdE_el_nb*(1e-37); // nanobarn to m^2
     data.weight *= beam->GetLumin();
+    data.weight *= V*A;  // multiply by sampling volume and number of nucleons
   } else {
     // Unphysical for some reason
     data.weight = 0.0;
   }
+
+  
 
   data.ef     = E_2_v;
   data.theta  = theta_e;
