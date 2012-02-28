@@ -418,7 +418,6 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
     n = kNeutron;
   }
 
-  radlen = radlen * 100. + 5. ; // radiation lenght needed in percentage with the internal part (normally around 5%)
   
   //  TF2 *func;
   double En_beam = beam->GetEnergy(); // Energy in MeV
@@ -463,9 +462,24 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
 
   vert_x = fRandom->Uniform((-tglx/2),(tglx/2))+tgtoff.X(); ;
   vert_y = fRandom->Uniform((-tgly/2),(tgly/2))+tgtoff.Y(); ;
-  vert_z = fRandom->Uniform((-tglength/2),(tglength/2))+tgtoff.Z(); ;
+  double targprop = fRandom->Uniform();
+//  vert_z = fRandom->Uniform((-tglength/2),(tglength/2))+tgtoff.Z(); ;
+  vert_z = (fRandom->Uniform()-0.5)*tglength+tgtoff.Z(); ;
 
   vert.SetXYZ(vert_x,vert_y,vert_z);
+
+  radlen = targprop*radlen * 100. + 2.8; // radiation lenght needed in percentage with the internal part
+  				    // SPR - 2/28
+  		   		    // The internal part we use is something like ~2.8 for Q2 ~ 6 GeV2
+				    // t = (3/4)(alpha/pi)[ ln(Q2/m^2) - 1]  for initial and final radiation
+				    // I'm not convinced it's supposed to be half this, but it's about what
+				    // Eugene and Xin have both used, so fine
+				    // 
+				    // The external part is proportional to the distance in the target
+				    // traversed, so instead of using 1/2, we use the proportion of the
+				    // target we've seen (this then includes angularly corrleated effects
+				    // if it matters)
+
 
   float En_beam2 = float(En_beam);
   float mom_pi2 = float(mom_pi);
