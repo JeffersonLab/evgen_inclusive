@@ -438,6 +438,7 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
     charge = 0;
     mass = 0.1350; // mass in GeV
     //   func = new TF2("sigma_pip",Wiser_func_pi0,0, En_beam,0,360,2);
+
   }  
   
  
@@ -464,7 +465,7 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   vert_y = fRandom->Uniform((-tgly/2),(tgly/2))+tgtoff.Y(); ;
   double targprop = fRandom->Uniform();
 //  vert_z = fRandom->Uniform((-tglength/2),(tglength/2))+tgtoff.Z(); ;
-  vert_z = (fRandom->Uniform()-0.5)*tglength+tgtoff.Z(); ;
+  vert_z = (targprop-0.5)*tglength+tgtoff.Z();
 
   vert.SetXYZ(vert_x,vert_y,vert_z);
 
