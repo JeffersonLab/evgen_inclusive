@@ -469,17 +469,11 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
 
   vert.SetXYZ(vert_x,vert_y,vert_z);
 
-  radlen = targprop*radlen * 100. + 2.8; // radiation lenght needed in percentage with the internal part
-  				    // SPR - 2/28
-  		   		    // The internal part we use is something like ~2.8 for Q2 ~ 6 GeV2
-				    // t = (3/4)(alpha/pi)[ ln(Q2/m^2) - 1]  for initial and final radiation
-				    // I'm not convinced it's supposed to be half this, but it's about what
-				    // Eugene and Xin have both used, so fine
-				    // 
-				    // The external part is proportional to the distance in the target
-				    // traversed, so instead of using 1/2, we use the proportion of the
-				    // target we've seen (this then includes angularly corrleated effects
-				    // if it matters)
+  double intrad = ln(e_lab/0.000511)/(137.0*3.14159);
+
+  radlen = targprop*radlen*100.*(4.0/3.0) + intrad*100.0; 
+  //  The radiation spectrum is proportional to 4/3/k (for small k).
+  //  Internal factor for lab system when E >> Mn is (alpha/pi)ln(Elab/me)
 
 
   float En_beam2 = float(En_beam);
