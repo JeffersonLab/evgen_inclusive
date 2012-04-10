@@ -469,7 +469,7 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
 
   vert.SetXYZ(vert_x,vert_y,vert_z);
 
-  radlen = (1.0-targprop)*radlen * 100. + 2.8; // radiation lenght needed in percentage with the internal part
+  radlen = targprop*radlen * 100. + 2.8; // radiation lenght needed in percentage with the internal part
   				    // SPR - 2/28
   		   		    // The internal part we use is something like ~2.8 for Q2 ~ 6 GeV2
 				    // t = (3/4)(alpha/pi)[ ln(Q2/m^2) - 1]  for initial and final radiation
