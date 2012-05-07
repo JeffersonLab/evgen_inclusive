@@ -469,7 +469,7 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
 
   vert.SetXYZ(vert_x,vert_y,vert_z);
 
-  double intrad = ln(e_lab/0.000511)/(137.0*3.14159);
+  double intrad = 2.0*log(e_lab/0.000511)/(137.0*3.14159);
 
   radlen = targprop*radlen*100.*(4.0/3.0) + intrad*100.0; 
   //  The radiation spectrum is proportional to 4/3/k (for small k).
