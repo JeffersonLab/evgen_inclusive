@@ -21,6 +21,10 @@ output  2
 # 3  pi-
 # 4  pi0
 # 5  e- Elastic
+# 6  K+
+# 7  K-
+# 8  Ks
+# 9  p
 
 # output
 # 1  ROOT only

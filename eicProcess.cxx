@@ -21,12 +21,17 @@ void eicProcess::Run(){
 
     int evt;
     int nprnt = finp->GetNprnt();
-    TString fmtst[3];
-    TString modelst[4];
-    modelst[0] = "Electron DIS";
-    modelst[1] = "Pi+";
-    modelst[2] = "Pi-";
-    modelst[3] = "Pi0";
+    TString modelst[9];
+    modelst[0] = "electron DIS";
+    modelst[1] = "pi+";
+    modelst[2] = "pi-";
+    modelst[3] = "pi0";
+    modelst[4] = "electron elastic";        
+    modelst[5] = "K+";
+    modelst[6] = "K-";
+    modelst[7] = "Ks";
+    modelst[8] = "p";   
+    TString fmtst[3];    
     fmtst[0] = "ROOT";
     fmtst[1] = "ROOT and LUND";
     fmtst[2] = "ROOT and SOLLUND";
