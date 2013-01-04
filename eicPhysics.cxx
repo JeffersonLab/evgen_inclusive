@@ -627,13 +627,11 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   }
 
   // Fixed target kinematics...  This needs to be done properly
-  data.Q2     = 2.0*En_beam*ef*(1.0-cos(theta_pi));
-
-  data.x      = data.Q2/(2.0*MASS_P*(En_beam-ef));
-  data.y      = (En_beam-ef)/En_beam;
-  data.W      = MASS_P*MASS_P + 2.0*MASS_P*(En_beam-ef) -data.Q2;
-  if (data.W > 0 ) data.W = sqrt(data.W);
-  else data.W = 0.0;
+  // for particle other than scattering electron, these vlaues are not meaningful
+  data.Q2     = 0.0;
+  data.x      = 0.0;
+  data.y      = 0.0;
+  data.W      = 0.0;
 
 
   data.ef = ef;
