@@ -1,0 +1,33 @@
+nevt    1000000
+nprint  100000
+lumin	1e36  Hz/cm^2
+runtime 1.0    hours
+e-_en	11.0    GeV
+ion_en	2.814   GeV
+ion_m	2.814   GeV
+ion_Z	2
+ion_N	1
+dens	1.345e-3 g/cm^3	
+length	40	cm
+ras_x	0.5	cm
+ras_y	0.5	cm	
+offset  0.0 0.0 -350 cm
+model	2
+output  2
+
+# models
+# 1  e- Deep Inelastic 
+# 2  pi+
+# 3  pi-
+# 4  pi0
+# 5  e- Elastic
+# 6  K+
+# 7  K-
+# 8  Ks
+# 9  Kl
+#10  p
+
+# output
+# 1  ROOT only
+# 2  ROOT + LUND
+# 3  ROOT + SOLLUND
