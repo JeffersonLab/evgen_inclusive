@@ -280,17 +280,19 @@ void  eicOutput::MakeFileLUND(){
 
     // NB at now, rather than the mass of the particle, will be stored the weight. This is done because the mass is not used by GEMC. For full variables and mass value, one should use the SOLLUND format
 
-    if (particle_id != 111) {
+//     if (particle_id != 111) {
+//       OUT << "1" << " \t " << (Z_ion + N_ion)  << " \t " << Z_ion  << " \t " << "0"  << " \t " << "0" << " \t "  << x << " \t " << y  << " \t " << W  << " \t " << Q2  << " \t " << nu << endl;
+//       OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << weight << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
+//     }
+//     else {
+//       OUT << "3" << " \t " << (Z_ion + N_ion)  << " \t " << Z_ion  << " \t " << "0"  << " \t " << "0" << " \t "  << x << " \t " << y  << " \t " << W  << " \t " << Q2  << " \t " << nu << endl;
+//       OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << weight << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
+//       OUT << " \t " << "2" << " \t " << "0.0" << " \t " << "1" << " \t " << "22" << " \t " << "0" << " \t " << "0" << " \t " << pi0_g1.Px() << " \t " << pi0_g1.Py() << " \t " << pi0_g1.Pz() << " \t " << pi0_g1.E() << " \t " << "0.0" << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
+//       OUT << " \t " << "3" << " \t " << "0.0" << " \t " << "1" << " \t " << "22" << " \t " << "0" << " \t " << "0" << " \t " << pi0_g2.Px() << " \t " << pi0_g2.Py() << " \t " << pi0_g2.Pz() << " \t " << pi0_g2.E() << " \t " << "0.0" << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
+//     }
+    
       OUT << "1" << " \t " << (Z_ion + N_ion)  << " \t " << Z_ion  << " \t " << "0"  << " \t " << "0" << " \t "  << x << " \t " << y  << " \t " << W  << " \t " << Q2  << " \t " << nu << endl;
       OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << weight << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
-    }
-    else {
-      OUT << "3" << " \t " << (Z_ion + N_ion)  << " \t " << Z_ion  << " \t " << "0"  << " \t " << "0" << " \t "  << x << " \t " << y  << " \t " << W  << " \t " << Q2  << " \t " << nu << endl;
-      OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << weight << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
-      OUT << " \t " << "2" << " \t " << "0.0" << " \t " << "1" << " \t " << "22" << " \t " << "0" << " \t " << "0" << " \t " << pi0_g1.Px() << " \t " << pi0_g1.Py() << " \t " << pi0_g1.Pz() << " \t " << pi0_g1.E() << " \t " << "0.0" << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
-      OUT << " \t " << "3" << " \t " << "0.0" << " \t " << "1" << " \t " << "22" << " \t " << "0" << " \t " << "0" << " \t " << pi0_g2.Px() << " \t " << pi0_g2.Py() << " \t " << pi0_g2.Pz() << " \t " << pi0_g2.E() << " \t " << "0.0" << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
-    }
-
   }
 
   OUT.close();
@@ -439,8 +441,7 @@ void  eicOutput::MakeFileSOLLUND(){
       OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << mass << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
       OUT << " \t " << "2" << " \t " << "0.0" << " \t " << "1" << " \t " << "22" << " \t " << "0" << " \t " << "0" << " \t " << pi0_g1.Px() << " \t " << pi0_g1.Py() << " \t " << pi0_g1.Pz() << " \t " << pi0_g1.E() << " \t " << "0.0" << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
       OUT << " \t " << "3" << " \t " << "0.0" << " \t " << "1" << " \t " << "22" << " \t " << "0" << " \t " << "0" << " \t " << pi0_g2.Px() << " \t " << pi0_g2.Py() << " \t " << pi0_g2.Pz() << " \t " << pi0_g2.E() << " \t " << "0.0" << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
-    }
-
+    }    
   }
 
   OUT.close();
