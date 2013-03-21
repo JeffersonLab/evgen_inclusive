@@ -21,7 +21,7 @@ void eicProcess::Run(){
 
     int evt;
     int nprnt = finp->GetNprnt();
-    TString modelst[9];
+    TString modelst[10];
     modelst[0] = "electron DIS";
     modelst[1] = "pi+";
     modelst[2] = "pi-";
@@ -30,7 +30,8 @@ void eicProcess::Run(){
     modelst[5] = "K+";
     modelst[6] = "K-";
     modelst[7] = "Ks";
-    modelst[8] = "p";   
+    modelst[8] = "Kl";
+    modelst[9] = "p";   
     TString fmtst[3];    
     fmtst[0] = "ROOT";
     fmtst[1] = "ROOT and LUND";

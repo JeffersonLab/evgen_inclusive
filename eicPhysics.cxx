@@ -439,25 +439,31 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
     mass = 0.1350; // mass in GeV
     //   func = new TF2("sigma_pip",Wiser_func_pi0,0, En_beam,0,360,2);
   }  
-  else if (modelsig == 6) { //k+
+  else if (modelsig == 6) { //K+
     particle_id = 321;
     charge = +1;
     mass = 0.4937; // mass in GeV
     //   func = new TF2("sigma_pip",Wiser_func_pi0,0, En_beam,0,360,2);
   }  
-  else if (modelsig == 7) { //k-
+  else if (modelsig == 7) { //K-
     particle_id = -321;
     charge = -1;
     mass = 0.4937; // mass in GeV
     //   func = new TF2("sigma_pip",Wiser_func_pi0,0, En_beam,0,360,2);
   }  
-  else if (modelsig == 8) { //ks
+  else if (modelsig == 8) { //Ks
     particle_id = 310;
     charge = 0;
     mass = 0.4976; // mass in GeV
     //   func = new TF2("sigma_pip",Wiser_func_pi0,0, En_beam,0,360,2);
   }  
-  else if (modelsig == 9) { //p
+  else if (modelsig == 9) { //Kl
+    particle_id = 130;
+    charge = 0;
+    mass = 0.4976; // mass in GeV
+    //   func = new TF2("sigma_pip",Wiser_func_pi0,0, En_beam,0,360,2);
+  }    
+  else if (modelsig == 10) { //p
     particle_id = 2212;
     charge = +1;
     mass = 0.9383; // mass in GeV
@@ -610,6 +616,31 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
 //     vp.SetTheta(theta_pi);
 //     vp.SetPhi(phi_pi);
 //     Decay_pi0(vp,vert);    
+  }  
+  else if (particle_id == 130) {
+    //  weight_v = 0.5 * ( WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,1) + WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,2)) ;
+    type = 3;
+    wiser_all_sig_(&En_beam2,&mom_pi2,&theta_pi2,&radlen2,&type,&weight_f);
+    weight_v = 0.5 * double(weight_f);
+    type = 4;
+    wiser_all_sig_(&En_beam2,&mom_pi2,&theta_pi2,&radlen2,&type,&weight_f);
+    weight_v = 0.5 * double(weight_f) + weight_v;
+    weight_v = 0.5*weight_v;   ///Kl is only half of K0
+//     TVector3 vp(1.,1.,1.);
+//     vp.SetMag(mom_pi);
+//     vp.SetTheta(theta_pi);
+//     vp.SetPhi(phi_pi);
+//     Decay_pi0(vp,vert);    
+  }
+  else if (particle_id == 2212) {
+    //   weight_v = WISER_ALL_FIT(mom_pi);
+    //  weight_v = WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,1);
+    type=5;
+    wiser_all_sig_(&En_beam2,&mom_pi2,&theta_pi2,&radlen2,&type,&weight_f);
+
+    weight_v = double(weight_f);
+    //   cout << weight_f << " \t " << weight_v << endl;
+    //    printf("%f \n",weight_v);
   }  
   else weight_v = 0.;
   
