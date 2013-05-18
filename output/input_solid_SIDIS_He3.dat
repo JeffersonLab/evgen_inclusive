@@ -3,8 +3,8 @@ nprint  100000
 lumin	1e36  Hz/cm^2
 runtime 1.0    hours
 e-_en	11.0    GeV
-ion_en	2.814   GeV
-ion_m	2.814   GeV
+ion_en	2.81   GeV
+ion_m	2.81   GeV
 ion_Z	2
 ion_N	1
 dens	1.345e-3 g/cm^3	
