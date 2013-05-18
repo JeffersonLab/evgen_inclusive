@@ -3,8 +3,8 @@ nprint  100000
 lumin	0.63e39  Hz/cm^2
 runtime 1.0    hours
 e-_en	11.0    GeV
-ion_en	2.014   GeV
-ion_m	2.014   GeV
+ion_en	1.876  GeV
+ion_m	1.876   GeV
 ion_Z	1
 ion_N	1
 dens	0.169 g/cm^3	
@@ -12,7 +12,7 @@ length	40	cm
 ras_x	0.5	cm
 ras_y	0.5	cm	
 offset  0.0 0.0 10.0 cm
-model	10
+model	1
 output  2
 
 # models
