@@ -9,7 +9,7 @@ eicOutput::eicOutput(eicInput *inp, char *fileout){
 	strcpy(fOutName, defaultname);
     }
     printf("output file set as %s\n", fOutName);
-
+    fOutfile = new TFile(fOutName, "RECREATE");
     fTree = new TTree("T", "EIC Monte Carlo");
     fRunTime = inp->GetRunTime();
     fNevt    = ((double) inp->GetNevt());
@@ -136,7 +136,6 @@ void eicOutput::Write( eicEvent *ev ){
 }
 
 void eicOutput::Close(){
-    fOutfile = new TFile(fOutName, "RECREATE");
     fTree->Write();
     fOutfile->Close();
     delete fOutfile;
