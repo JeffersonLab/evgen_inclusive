@@ -2,6 +2,8 @@
 
 #include "cteqpdf.h"
 
+#include "wiser_pion.h"
+
 #include <stdio.h>
 #include <math.h>
 #include <assert.h>
@@ -20,7 +22,7 @@ eicPhysics::eicPhysics(){
     fRandom = new TRandom2(0);
     printf("Seed number %d\n",fRandom->GetSeed());
     ReadPolTable();
- 
+
     return;
 }
 
@@ -90,7 +92,7 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *
 
 
     double W     = (q+pi).Mag();
-    double s     = (ki+pi).Mag2();
+//    double s     = (ki+pi).Mag2();
 
     nucl n;
     double A = ((double) (ion->GetZ()+ion->GetN()));
@@ -155,8 +157,8 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *
     double g1gz = A*g1gZ(x,Q2,n);
     double g5gz = A*g5gZ(x,Q2,n);
 
-    double g1z = A*g1Z(x,Q2,n);
-    double g5z = A*g5Z(x,Q2,n);
+//    double g1z = A*g1Z(x,Q2,n);
+//    double g5z = A*g5Z(x,Q2,n);
 
     /* Simplify.  eta_L here is high by a factor of 2...
     double eta_L = eta_gZ*2.0*(x*y*y + x*(1.0-y)*(2.0-x*y*M/numax))
@@ -192,8 +194,8 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *
 
     double f1wp = A*F1W(x,Q2,n, 1);
     double f1wm = A*F1W(x,Q2,n,-1);
-    double g5wp = A*g5W(x,Q2,n, 1);
-    double g5wm = A*g5W(x,Q2,n,-1);
+//    double g5wp = A*g5W(x,Q2,n, 1);
+//    double g5wm = A*g5W(x,Q2,n,-1);
 
     // For now we are assuming that the electrons/positrons
     // completely polarized (as per Vogelsang)
@@ -231,7 +233,7 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *
     TLorentzVector qlab = q;
     qlab.Boost(-blab);
 
-    double th_eic = kf.Theta();
+//    double th_eic = kf.Theta();
 
     // Determine the vertex
     // Generating the vertex randomly in the target
@@ -439,31 +441,31 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
     mass = 0.1350; // mass in GeV
     //   func = new TF2("sigma_pip",Wiser_func_pi0,0, En_beam,0,360,2);
   }  
-  else if (modelsig == 6) { //K+
+  else if (modelsig == 7) { //K+
     particle_id = 321;
     charge = +1;
     mass = 0.4937; // mass in GeV
     //   func = new TF2("sigma_pip",Wiser_func_pi0,0, En_beam,0,360,2);
   }  
-  else if (modelsig == 7) { //K-
+  else if (modelsig == 8) { //K-
     particle_id = -321;
     charge = -1;
     mass = 0.4937; // mass in GeV
     //   func = new TF2("sigma_pip",Wiser_func_pi0,0, En_beam,0,360,2);
   }  
-  else if (modelsig == 8) { //Ks
+  else if (modelsig == 9) { //Ks
     particle_id = 310;
     charge = 0;
     mass = 0.4976; // mass in GeV
     //   func = new TF2("sigma_pip",Wiser_func_pi0,0, En_beam,0,360,2);
   }  
-  else if (modelsig == 9) { //Kl
+  else if (modelsig == 10) { //Kl
     particle_id = 130;
     charge = 0;
     mass = 0.4976; // mass in GeV
     //   func = new TF2("sigma_pip",Wiser_func_pi0,0, En_beam,0,360,2);
   }    
-  else if (modelsig == 10) { //p
+  else if (modelsig == 11) { //p
     particle_id = 2212;
     charge = +1;
     mass = 0.9383; // mass in GeV
@@ -501,6 +503,7 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   double intrad = 2.0*log(e_lab/0.000511)/(137.0*3.14159);
 
   radlen = targprop*radlen*100.*(4.0/3.0) + intrad*100.0; 
+
   //  The radiation spectrum is proportional to 4/3/k (for small k).
   //  Internal factor for lab system when E >> Mn is (alpha/pi)ln(Elab/me)
 
@@ -515,7 +518,6 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   Gamma2.SetXYZT(0.,0.,0.,0.);
   Gamma1_vt.SetXYZ(0.,0.,0.);
  
-  
   if (particle_id == 211) {
     //   weight_v = WISER_ALL_FIT(mom_pi);
     //  weight_v = WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,1);
@@ -530,6 +532,7 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
       type = 1;
       break;
     }
+
     wiser_all_sig_(&En_beam2,&mom_pi2,&theta_pi2,&radlen2,&type,&weight_f);
 
     weight_v = double(weight_f);
@@ -549,6 +552,9 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
       type = 2;
       break;
     }
+    
+
+
     wiser_all_sig_(&En_beam2,&mom_pi2,&theta_pi2,&radlen2,&type,&weight_f);
     weight_v = double(weight_f); 
   }
@@ -643,6 +649,8 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
     //    printf("%f \n",weight_v);
   }  
   else weight_v = 0.;
+
+  //printf("sigma = %e\n", weight_v*1e-3 );
   
   eventdata data;
   if( 0.0 < weight_v && weight_v < 1e9 ){
@@ -695,9 +703,6 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
 
 void eicPhysics::MakeEvent3(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *model) {
 
-  double radlen=0.;
-  int particle_id, charge;
-  radlen = model->GetRadLen();
   double tglx = model->GetLx();
   double tgly = model->GetLy();
   double tglength = model->GetLength();
@@ -706,8 +711,6 @@ void eicPhysics::MakeEvent3(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
 
 
   // Initialize variables
-  particle_id = 1e9;
-  charge      = 1e9;
 
   double ionp  = sqrt( pow(ion->GetEnergy(),2.0) - pow(ion->GetMass(),2.0) );
   double beta  = ionp/ion->GetEnergy();
@@ -766,6 +769,10 @@ void eicPhysics::MakeEvent3(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
       type = 1;
       break;
   }
+
+  // Initialize these
+  sin2 = 1e-9;                                                                                
+  cos2 = 1e-9;                                                       
      
   if (type==1) {                                                                 
     E_2_v = e_lab/ (1 + e_lab/m_p * (1 - cos(theta_e))); // value applying the delta of Dirac from eq A.13 in Mo Tsai                     
@@ -778,8 +785,8 @@ void eicPhysics::MakeEvent3(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
     G_M2 = pow(GMp,2);                                               
     tau = q2_dis/4/pow(m_p,2); 
 
-    d_sig = pow(alpha,2)/4./pow(e_lab,2)/pow(sin2,2)/(1.+2.*e_lab/m_p*sin2) *((G_E2+tau*G_M2)/(1.+tau)*cos2 + 2.*tau*G_M2*sin2); // this cross se \
-    // ction is already d2sigma/dOdE for elastic scattering, eta and delta of equation of A.13 are already applied and the delta is already expanded \
+    d_sig = pow(alpha,2)/4./pow(e_lab,2)/pow(sin2,2)/(1.+2.*e_lab/m_p*sin2) *((G_E2+tau*G_M2)/(1.+tau)*cos2 + 2.*tau*G_M2*sin2); // this cross se 
+    // ction is already d2sigma/dOdE for elastic scattering, eta and delta of equation of A.13 are already applied and the delta is already expanded 
 
                                                                         
     dsigdOdE_el_nb = d_sig*nbarn ; // cross section from elas.c is determined in mubarn, so I substitute hbc2 with nbarn for termining it in nanobarn                                                        
@@ -847,6 +854,428 @@ void eicPhysics::MakeEvent3(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
     
 
 
+}
+
+void eicPhysics::MakeEvent4(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *model) {
+  const double me = 0.511e-3; // GeV
+  const double alpha = 1.0/137.0;
+
+    // Moller scattering
+  double tglx = model->GetLx();
+  double tgly = model->GetLy();
+  double tglength = model->GetLength();
+
+  TVector3 tgtoff = model->GetTgtOffset();
+
+  double ionp  = sqrt( pow(ion->GetEnergy(),2.0) - pow(ion->GetMass(),2.0) );
+  double beta_lab  = ionp/ion->GetEnergy();
+  double gamma_lab = 1.0/sqrt(1.0-beta_lab*beta_lab);
+  
+  double e_lab = beam->GetEnergy()*gamma_lab*(1.0+beta_lab);
+
+  TLorentzVector e_rest( 0.0, 0.0, e_lab, e_lab);
+  TVector3 blab(0.0, 0.0, beta_lab);
+
+  // CoM <-> lab boost
+  double beta_com  = sqrt( (e_lab - me)/(e_lab + me) );
+  double gamma_com = 1.0/sqrt(1.0 - beta_com*beta_com);
+
+  double e_com = me*gamma_com;
+
+  // we have Z electrons per nucleon to scatter off of
+  double Z = ion->GetZ()+ion->GetN();
+
+  // Sample in CoM frame for now?
+
+  double thcom = acos(2.0*fRandom->Uniform()-1.0);
+  double phcom = 2.0*TMath::Pi()*fRandom->Uniform();
+
+  // Technically, there are two Moller electrons we need to track
+  // Because we're just interested in rates, let's randomly choose
+  // one and then multiply the weight factor by two
+
+  double V = 4.0*TMath::Pi(); // sampling space for dOmega
+
+  double sigma = alpha*alpha*pow(3.0+cos(thcom)*cos(thcom),2.0)/pow(sin(thcom),4.0)/(2.0*me*e_lab);
+  double weight_v = sigma*(0.197*0.197*1e-30)*V; // GeV^-2 -> m^2
+                                                //  here there would be a factor of 2 for undercounting pairs, 
+						//  but we must also divide by two because we are double covering 
+						//  phasespace because of identical particles
+
+  double pperp = e_com*sin(thcom);
+  double ppar  = e_com*cos(thcom);
+  
+  /////////////////////////////////////
+  eventdata data;
+
+  data.weight = weight_v*beam->GetLumin()*Z;
+
+  TLorentzVector lef;
+
+  double primary = 0.0;
+  if( fRandom->Integer(2) == 0 ){
+      // Choose primary electron
+      lef = TLorentzVector( pperp*cos(phcom), pperp*sin(phcom), ppar, e_com );
+      primary = 1.0;
+  } else {
+      lef = TLorentzVector( -pperp*cos(phcom), -pperp*sin(phcom),-ppar, e_com );
+      primary = -1.0;
+  }
+
+  // Put back into lab frame
+  lef.Boost(TVector3(0.0, 0.0,  beta_com));
+
+  // Fixed target kinematics...  This needs to be done properly
+  data.Q2     = 2.0*e_lab*lef.Energy()*(1.0-cos(lef.Theta()));
+  data.y      = 1.0 - lef.Energy()/e_lab;
+
+  // and collision frame
+  lef.Boost(TVector3(0.0, 0.0, -beta_lab));
+
+  //  We'll just hijack these variables since they don't mean
+  //  much for these processes.  Sorry!  -SPR 8/29/12
+  data.x      = thcom;
+  data.W      = primary;
+
+  data.ef = lef.Energy();
+  data.pf = lef.P();
+  data.theta = lef.Theta();
+  data.phi = lef.Phi();
+  
+  data.particle_id = 11;
+  data.charge = -1;
+  data.mass = me;
+  data.Z_ion = ion->GetZ();
+  data.N_ion = ion->GetN();
+
+  double vert_x, vert_y, vert_z;
+
+  vert_x = fRandom->Uniform((-tglx/2),(tglx/2)) + tgtoff.X();
+  vert_y = fRandom->Uniform((-tgly/2),(tgly/2)) + tgtoff.Y();
+  vert_z = fRandom->Uniform((-tglength/2),(tglength/2))+ tgtoff.Z();;
+
+  TVector3 vert(vert_x,vert_y,vert_z);
+
+  data.vx = vert.X();
+  data.vy = vert.Y();
+  data.vz = vert.Z();
+
+  ev->SetEventData(data);
+
+}
+
+
+void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *model) {
+
+  double radlen=0., mass=0., weight_v;
+  int particle_id, charge;
+  int modelsig = model->GetModel();
+  radlen = model->GetRadLen();
+  double tglx = model->GetLx();
+  double tgly = model->GetLy();
+  double tglength = model->GetLength();
+
+  TVector3 tgtoff = model->GetTgtOffset();
+
+
+  // Initialize variables
+  particle_id = 1e9;
+  charge      = 1e9;
+
+  double ionp  = sqrt( pow(ion->GetEnergy(),2.0) - pow(ion->GetMass(),2.0) );
+  double beta  = ionp/ion->GetEnergy();
+  double gamma = 1.0/sqrt(1.0-beta*beta);
+  
+  double e_lab = beam->GetEnergy()*gamma*(1.0+beta);
+  
+  TLorentzVector e_rest( 0.0, 0.0, e_lab, e_lab);
+  TVector3 blab(0.0, 0.0, beta);
+
+  nucl n;
+  double A = ((double) (ion->GetZ()+ion->GetN()));
+  double prot_prob = ((double) ion->GetZ())/A;
+  // Determine which type of nucleon we hit
+  if( fRandom->Uniform() < prot_prob ){
+    n = kProton;
+  } else {
+    n = kNeutron;
+  }
+
+  
+  //  TF2 *func;
+  double En_beam = beam->GetEnergy(); // Energy in MeV
+
+  if(  En_beam < 0.3 ){ 
+      fprintf( stderr, "ERROR:  Beam energy too low for implemented uniform generator\n");
+      exit(1);
+  }
+
+
+  if (modelsig == 12) { // pi+
+    particle_id = 211; 
+    charge = +1;
+    mass = 0.1396; // mass in GeV
+    //    func = new TF2("sigma_pip",Wiser_func_pip,0, En_beam,0,360,2);
+  } 
+  else if (modelsig == 13) { //pi-
+    particle_id = -211;
+    charge = -1;
+    mass = 0.1396; // mass in GeV
+    //   func = new TF2("sigma_pip",Wiser_func_pip,0, En_beam,0,360,2);
+  }
+  else if (modelsig == 14) { //pi0
+    particle_id = 111;
+    charge = 0;
+    mass = 0.1350; // mass in GeV
+    //   func = new TF2("sigma_pip",Wiser_func_pi0,0, En_beam,0,360,2);
+  }  
+        
+
+  //  func->SetParameters(En_beam,radlen);
+  //  double mom_pi= 0, theta_pi= 0;
+  //  func->GetRandom2(mom_pi,theta_pi);
+  double x_pi=0.,y_pi=0.,z_pi=0.;
+
+
+  double mom_pi, theta_pi, targprop;
+  double phi_pi = fRandom->Uniform(0, 2.0*TMath::Pi());
+
+  double intrad = 2.0*log(e_lab/0.000511)/(137.0*3.14159);
+
+  double radratio = 3.0*intrad/(4.0*radlen);
+
+  targprop = radratio*
+      (sqrt( 1.0 + fRandom->Uniform()*( pow(radratio, -2.0) + 2.0/radratio ) ) - 1.0 );
+
+  // This is fixed
+  radlen = targprop*radlen*100.*(4.0/3.0) + intrad*100.0; 
+
+  int type;
+
+  float En_beam2 = float(En_beam);
+
+  double scale = 1.2;
+
+  float mom_pi2, theta_pi2;
+
+  float radlen2 = float(radlen);
+
+  double max =0.0;
+
+  // Scan for maximum
+
+  int npidx  = 5;
+  int nthidx = 5;
+
+  int i, j;
+  for( i = 0; i < npidx; i++ ){
+      for( j = 0; j < nthidx; j++ ){
+	  // Scan around 2 GeV
+	  mom_pi2   = 0.1*((double) i)*En_beam2/npidx + mass;  // These are guesses, but they work for E down to 0.3 GeV
+	  theta_pi2 = 10.0*((double) j)/nthidx/En_beam2;
+
+	  weight_v = 0.0;
+
+	  if (particle_id == 211) {
+	      //   weight_v = WISER_ALL_FIT(mom_pi);
+	      //  weight_v = WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,1);
+	      switch( n ){
+		  case kProton:
+		      type = 1;
+		      break;
+		  case kNeutron:
+		      type = 2;
+		      break;
+		  default:
+		      type = 1;
+		      break;
+	      }
+
+	      weight_v = wiser_sigma( En_beam2, mom_pi2, theta_pi2*3.14159/180., radlen2/100.0, type-1);
+	  }
+	  else if (particle_id == -211) {
+	      // weight_v = WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,2);
+	      switch( n ){
+		  case kProton:
+		      type = 2;
+		      break;
+		  case kNeutron:
+		      type = 1;
+		      break;
+		  default:
+		      type = 2;
+		      break;
+	      }
+	      weight_v = wiser_sigma( En_beam2, mom_pi2, theta_pi2*3.14159/180., radlen2/100.0, type-1);
+	  }
+	  else if (particle_id == 111) {
+	      //  weight_v = 0.5 * ( WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,1) + WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,2)) ;
+
+
+	      weight_v =
+		 ( wiser_sigma( En_beam2, mom_pi2, theta_pi2*3.14159/180., radlen2/100.0, 0) + 
+		   wiser_sigma( En_beam2, mom_pi2, theta_pi2*3.14159/180., radlen2/100.0, 0) ) /2.0;
+
+	  }
+
+	  if( weight_v > max ){ 
+	      max   = weight_v;
+//	      printf("Max is fixed by p = %f, th = %f (%f)\n", mom_pi2, theta_pi2, weight_v );
+	 
+	  }
+      }
+  }
+
+  max *= scale;
+
+  if( max < 0.0 ){ printf("Kinematics too close to threshold\n"); exit(1);}
+
+  int cnt = 0;
+
+  double testval = 0.0;
+
+  do { 
+      mom_pi = fRandom->Uniform(En_beam2);
+
+      theta_pi = acos( fRandom->Uniform(-1.0, 1.0) );
+      phi_pi   = 2.0*TMath::Pi()*fRandom->Uniform();
+
+      x_pi = mom_pi*sin(theta_pi)*cos(phi_pi);
+      y_pi = mom_pi*sin(theta_pi)*sin(phi_pi);
+      z_pi = mom_pi*cos(theta_pi);
+
+      // of a sphere of radius mom_pi
+      TVector3 v3_pi(x_pi,y_pi,z_pi);
+
+      //  The radiation spectrum is proportional to 4/3/k (for small k).
+      //  Internal factor for lab system when E >> Mn is (alpha/pi)ln(Elab/me)
+
+      mom_pi2 = float(mom_pi);
+      theta_pi2 = float(theta_pi*180.0/3.14159); // theta pi in deg
+
+      if (particle_id == 211) {
+	  //   weight_v = WISER_ALL_FIT(mom_pi);
+	  //  weight_v = WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,1);
+	  switch( n ){
+	      case kProton:
+		  type = 1;
+		  break;
+	      case kNeutron:
+		  type = 2;
+		  break;
+	      default:
+		  type = 1;
+		  break;
+	  }
+
+	  //printf("%f %f %f %f\n", En_beam2, mom_pi2, theta_pi2, radlen2 );
+
+	  weight_v = wiser_sigma( En_beam2, mom_pi2, theta_pi2*3.14159/180., radlen2/100.0, type-1);
+      }
+      else if (particle_id == -211) {
+	  // weight_v = WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,2);
+	  switch( n ){
+	      case kProton:
+		  type = 2;
+		  break;
+	      case kNeutron:
+		  type = 1;
+		  break;
+	      default:
+		  type = 2;
+		  break;
+	  }
+	  weight_v = wiser_sigma( En_beam2, mom_pi2, theta_pi2*3.14159/180., radlen2/100.0, type-1);
+      }
+      else if (particle_id == 111) {
+	      weight_v =
+		 ( wiser_sigma( En_beam2, mom_pi2, theta_pi2*3.14159/180., radlen2/100.0, 0) + 
+		   wiser_sigma( En_beam2, mom_pi2, theta_pi2*3.14159/180., radlen2/100.0, 0) ) /2.0;
+      }
+      cnt++;
+
+
+      double v = fRandom->Uniform();
+
+      testval = max*v;
+      if( weight_v > max ){
+	  printf("out of bounds in uniform part %f > %f (p = %f, th = %f)\n", weight_v, max, mom_pi, theta_pi);
+	  exit(1);
+      }
+
+  } while ( weight_v < testval );
+
+//  printf("Number of trials = %d, max = %f, weight_v = %g\n", cnt, max, weight_v );
+
+  double ef = sqrt(pow(mom_pi,2) + pow(mass,2));
+
+  // Generating the vertex randomly in the target
+  TVector3 vert;
+  double vert_x, vert_y,vert_z;
+
+  vert_x = fRandom->Uniform((-tglx/2),(tglx/2))+tgtoff.X(); ;
+  vert_y = fRandom->Uniform((-tgly/2),(tgly/2))+tgtoff.Y(); ;
+  vert_z = (targprop-0.5)*tglength+tgtoff.Z();
+
+  vert.SetXYZ(vert_x,vert_y,vert_z);
+  
+  eventdata data;
+  if( 0.0 < weight_v && weight_v < 1e9 ){
+    data.weight  = weight_v * En_beam * 4 * TMath::Pi() * A; // nanobars/GeV-str-nuclei * (DeltaE sample generated) * (Full angle generated) * (Number of nucleons)
+    //    data.weight *= beam->GetLumin();
+    data.weight *= 1e-37 ; // nb to m^2
+
+    data.weight *= beam->GetLumin();
+	
+  } else {
+    // Unphysical for some reason
+
+    data.weight = 0.0;
+  }
+
+  // Fixed target kinematics...  This needs to be done properly
+  // for particle other than scattering electron, these vlaues are not meaningful
+  data.Q2     = 0.0;
+  data.x      = 0.0;
+  data.y      = 0.0;
+  data.W      = 0.0;
+
+
+  data.ef = ef;
+  data.pf = mom_pi;
+  data.theta = theta_pi;
+  data.phi = phi_pi;
+  
+  data.particle_id = particle_id;
+  data.charge = charge;
+  data.mass = mass;
+  data.Z_ion = ion->GetZ();
+  data.N_ion = ion->GetN();
+  data.vx = vert.X();
+  data.vy = vert.Y();
+  data.vz = vert.Z();
+
+  data.g1_theta = Gamma1.Theta();
+  data.g1_phi   = Gamma1.Phi();
+  data.g1_p     = Gamma1.P();
+
+  data.g2_theta = Gamma2.Theta();
+  data.g2_phi   = Gamma2.Phi();
+  data.g2_p     = Gamma2.P();
+  
+  ev->SetEventData(data);
+
+  return;
+  
+}
+
+
+void eicPhysics::SampleWiserPThZ( double En_beam, double &p, double &th, double &z, double *pars ){
+  p = fRandom->Uniform(En_beam); 
+  th = acos(fRandom->Uniform(-1.0, 1.0)); 
+  z = fRandom->Uniform(); 
+
+  return;
 }
 
 double eicPhysics::F1( double x, double Q2, nucl n ){
@@ -1149,8 +1578,8 @@ double eicPhysics::g1gZ( double x, double Q2, nucl n ){
     double sin2thW = 0.23119;
     double gV_u =  0.5 - 4.0*sin2thW/3.0;
     double gV_d = -0.5 + 2.0*sin2thW/3.0;
-    double gA_u =  1.0/2.0;
-    double gA_d = -1.0/2.0;
+    //double gA_u =  1.0/2.0;
+    //double gA_d = -1.0/2.0;
 
     double g1sum = 0.0;
 
@@ -1196,9 +1625,9 @@ double eicPhysics::g5gZ( double x, double Q2, nucl n ){
     double e_u =  2.0/3.0;
     double e_d = -1.0/3.0;
 
-    double sin2thW = 0.23119;
-    double gV_u =  0.5 - 4.0*sin2thW/3.0;
-    double gV_d = -0.5 + 2.0*sin2thW/3.0;
+    //double sin2thW = 0.23119;
+    //double gV_u =  0.5 - 4.0*sin2thW/3.0;
+    //double gV_d = -0.5 + 2.0*sin2thW/3.0;
     double gA_u =  1.0/2.0;
     double gA_d = -1.0/2.0;
 
@@ -1241,8 +1670,8 @@ double eicPhysics::g1Z( double x, double Q2, nucl n ){
     // region so there's nothing useful here anyways
     if( Q2 < 1.0 ) { Q2 = 1.0; }
 
-    double e_u =  2.0/3.0;
-    double e_d = -1.0/3.0;
+    //double e_u =  2.0/3.0;
+    //double e_d = -1.0/3.0;
 
     double sin2thW = 0.23119;
     double gV_u =  0.5 - 4.0*sin2thW/3.0;
@@ -1291,8 +1720,8 @@ double eicPhysics::g5Z( double x, double Q2, nucl n ){
     // region so there's nothing useful here anyways
     if( Q2 < 1.0 ) { Q2 = 1.0; }
 
-    double e_u =  2.0/3.0;
-    double e_d = -1.0/3.0;
+    //double e_u =  2.0/3.0;
+    //double e_d = -1.0/3.0;
 
     double sin2thW = 0.23119;
     double gV_u =  0.5 - 4.0*sin2thW/3.0;
@@ -1550,19 +1979,19 @@ void eicPhysics::ReadPolTable(){
     // First three lines are bad
     
     int i,j,k;
-    char dummy[255];
+    //char dummy[255];
     char *dummy2 = new char[255];
     double doubledummy;
     size_t dsize;
 
-    int nscan;
+    //int nscan;
     getline(&dummy2, &dsize, f);
     getline(&dummy2, &dsize, f);
     getline(&dummy2, &dsize, f);
 
     for( i = 0; i < fNQ2; i++ ){
 	for( j = 0; j < fNx; j++ ){
-	    nscan = fscanf(f, "%lf%lf%lf%lf%lf%lf%lf", &fDeltaqQ2[i][j], &fDeltaqx[i][j],
+	    fscanf(f, "%lf%lf%lf%lf%lf%lf%lf", &fDeltaqQ2[i][j], &fDeltaqx[i][j],
 	       &fDeltaq[0][i][j], &fDeltaq[1][i][j], &fDeltaq[2][i][j], &fDeltaq[3][i][j], &fDeltaq[4][i][j]);
 	  //  printf("nscan= %d, x = %g, Q2 = %f  Dubar = %f\n", nscan, fDeltaqx[i][j], fDeltaqQ2[i][j], fDeltaq[0][i][j] );
 	}
@@ -1581,7 +2010,7 @@ void eicPhysics::ReadPolTable(){
     
     for( i = 0; i < fNQ2lin; i++ ){
 	for( j = 0; j < fNxlin-1; j++ ){
-	    nscan = fscanf(f2, "%lf%lf%lf%lf%lf%lf%lf%lf", &fDeltaqxlin[i][j], &fDeltaqQ2lin[i][j],
+	    fscanf(f2, "%lf%lf%lf%lf%lf%lf%lf%lf", &fDeltaqxlin[i][j], &fDeltaqQ2lin[i][j],
 	       &fDeltaqlin[0][i][j], &fDeltaqlin[1][i][j], &fDeltaqlin[2][i][j], &fDeltaqlin[3][i][j], &fDeltaqlin[4][i][j], &doubledummy);
 	  //  printf("nscan= %d, x = %g, Q2 = %f  Dubar = %f\n", nscan, fDeltaqx[i][j], fDeltaqQ2[i][j], fDeltaq[0][i][j] );
 	//    printf("%f %f %f %f %f %f %f\n", fDeltaqQ2lin[i][j], fDeltaqxlin[i][j],

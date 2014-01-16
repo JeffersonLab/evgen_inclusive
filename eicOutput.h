@@ -37,6 +37,8 @@ class eicOutput {
 
 	eventdata fData;
 
+	eicInput *fInput;
+
 
 };
 #endif//__eicOutput_h

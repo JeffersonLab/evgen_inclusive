@@ -21,18 +21,24 @@ void eicProcess::Run(){
 
     int evt;
     int nprnt = finp->GetNprnt();
-    TString modelst[10];
-    modelst[0] = "electron DIS";
-    modelst[1] = "pi+";
-    modelst[2] = "pi-";
-    modelst[3] = "pi0";
-    modelst[4] = "electron elastic";        
-    modelst[5] = "K+";
-    modelst[6] = "K-";
-    modelst[7] = "Ks";
-    modelst[8] = "Kl";
-    modelst[9] = "p";   
-    TString fmtst[3];    
+    TString fmtst[3];
+    TString modelst[14];
+    modelst[0] = "Electron DIS";
+    modelst[1] = "Pi+";
+    modelst[2] = "Pi-";
+    modelst[3] = "Pi0";
+    modelst[4] = "Elastic";
+    modelst[5] = "Moller";
+    modelst[6] = "K+";
+    modelst[7] = "K-";
+    modelst[8] = "Ks";
+    modelst[9] = "Kl";
+    modelst[10] = "p";
+
+    modelst[11] = "Pi+ Uniform";
+    modelst[12] = "Pi- Uniform";
+    modelst[13] = "Pi0 Uniform";
+
     fmtst[0] = "ROOT";
     fmtst[1] = "ROOT and LUND";
     fmtst[2] = "ROOT and SOLLUND";
@@ -57,11 +63,24 @@ void eicProcess::Run(){
 	  fout->Write(fevt);
       }
     }
-    else { // pion generator
+    else if (model == 6) { // electron ELASTIC generator
+      for( evt = 0; evt < nevt; evt++ ){
+	  if( (evt%nprnt) == 0 ){printf("Event %10d \n", evt);}
+	  fphy->MakeEvent4(fbeam, fion, fevt, fmodel);
+	  fout->Write(fevt);
+      }
+    }
+    else if( model < 11 ) { // standard pion generator
       printf("Pion cross section \n");
       for( evt = 0; evt < nevt; evt++ ){
 	  if( (evt%nprnt) == 0 ){printf("Event %10d \n", evt);}
 	  fphy->MakeEvent2(fbeam, fion, fevt, fmodel);
+	  fout->Write(fevt);
+      }
+    } else { // Uniform Pion generator
+      for( evt = 0; evt < nevt; evt++ ){
+	  if( (evt%nprnt) == 0 ){printf("Event %10d \n", evt);}
+	  fphy->MakeEvent5(fbeam, fion, fevt, fmodel);
 	  fout->Write(fevt);
       }
     }

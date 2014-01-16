@@ -14,6 +14,8 @@ eicOutput::eicOutput(eicInput *inp, char *fileout){
     fRunTime = inp->GetRunTime();
     fNevt    = ((double) inp->GetNevt());
 
+    fInput = inp;
+
     InitTree();
 
     return;
@@ -431,7 +433,7 @@ void  eicOutput::MakeFileSOLLUND(){
     pz = pmod * cos(theta);
 
 
-    if (particle_id != 111) {
+    if ( fInput->Get_model() != 4 ) {
       OUT << "1" << " \t "  << weight << " \t " << (Z_ion + N_ion)  << " \t " << Z_ion  << " \t " << "0"  << " \t " << "0" << " \t "  << x << " \t " << y  << " \t " << W  << " \t " << Q2  << " \t " << nu << endl;
       OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << mass << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
     }

@@ -10,7 +10,6 @@ eicInput::eicInput(const char *file){
     if( !f ){ printf("%s cannot be opened\n", file); exit(1); }
 
     char dummy[255];
-    int nscan;
 
     fscanf(f, "%s%d", dummy, &fData.nevt);
     fscanf(f, "%s%d", dummy, &fData.nprnt);
