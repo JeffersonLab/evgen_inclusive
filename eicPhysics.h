@@ -91,6 +91,9 @@ class eicPhysics {
 	 // Pion part
 //	 double Wiser( int Z, int N, char PART, double E_IN, double P_IN, double TH_IN, double radlen_IN);
 
+	 bool fHaveTotalXs;
+	 double fTotal1Xs, fTotal0Xs;
+
 	 /* double QUADMO(double &PLOWER,double &PUPPER,double &EPSLON, int &NLVL); */
 	 /* double WISER_ALL_FIT(double E_GAMMA); */
 	 /* double WISER_ALL_SIG(double E0,double P,double THETA_DEG,double RAD_LEN,double TYPE); */

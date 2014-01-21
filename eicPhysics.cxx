@@ -23,6 +23,10 @@ eicPhysics::eicPhysics(){
     printf("Seed number %d\n",fRandom->GetSeed());
     ReadPolTable();
 
+    fHaveTotalXs = false;
+    fTotal1Xs     = 0.0;
+    fTotal0Xs     = 0.0;
+
     return;
 }
 
@@ -423,6 +427,7 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   
   //  TF2 *func;
   double En_beam = beam->GetEnergy(); // Energy in MeV
+  
   if (modelsig == 2) { // pi+
     particle_id = 211; 
     charge = +1;
@@ -975,6 +980,7 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   double tgly = model->GetLy();
   double tglength = model->GetLength();
 
+
   TVector3 tgtoff = model->GetTgtOffset();
 
 
@@ -1004,6 +1010,7 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   
   //  TF2 *func;
   double En_beam = beam->GetEnergy(); // Energy in MeV
+
 
   if(  En_beam < 0.3 ){ 
       fprintf( stderr, "ERROR:  Beam energy too low for implemented uniform generator\n");
@@ -1048,7 +1055,7 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
       (sqrt( 1.0 + fRandom->Uniform()*( pow(radratio, -2.0) + 2.0/radratio ) ) - 1.0 );
 
   // This is fixed
-  radlen = targprop*radlen*100.*(4.0/3.0) + intrad*100.0; 
+  double fracradlen = targprop*radlen*(4.0/3.0) + intrad; 
 
   int type;
 
@@ -1058,7 +1065,7 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
 
   float mom_pi2, theta_pi2;
 
-  float radlen2 = float(radlen);
+  float radlen2 = float(fracradlen);
 
   double max =0.0;
 
@@ -1068,11 +1075,22 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   int nthidx = 5;
 
   int i, j;
+
+  if( !fHaveTotalXs ){
+      printf("Calculating total wiser cross section\n");
+      fTotal0Xs = wiser_total_sigma( En_beam2, intrad, radlen*4.0/3.0, 0);
+      fTotal1Xs = wiser_total_sigma( En_beam2, intrad, radlen*4.0/3.0, 1);
+      printf("Calculated\n");
+      fHaveTotalXs = true;
+  } 	  
+
+  double totalxs = 0.0;
+
   for( i = 0; i < npidx; i++ ){
       for( j = 0; j < nthidx; j++ ){
 	  // Scan around 2 GeV
 	  mom_pi2   = 0.1*((double) i)*En_beam2/npidx + mass;  // These are guesses, but they work for E down to 0.3 GeV
-	  theta_pi2 = 10.0*((double) j)/nthidx/En_beam2;
+	  theta_pi2 = (10.0*((double) j)/nthidx/En_beam2)*3.14159/180;
 
 	  weight_v = 0.0;
 
@@ -1091,7 +1109,7 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
 		      break;
 	      }
 
-	      weight_v = wiser_sigma( En_beam2, mom_pi2, theta_pi2*3.14159/180., radlen2/100.0, type-1);
+	      weight_v = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, type-1);
 	  }
 	  else if (particle_id == -211) {
 	      // weight_v = WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,2);
@@ -1106,15 +1124,14 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
 		      type = 2;
 		      break;
 	      }
-	      weight_v = wiser_sigma( En_beam2, mom_pi2, theta_pi2*3.14159/180., radlen2/100.0, type-1);
+	      weight_v = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, type-1);
 	  }
 	  else if (particle_id == 111) {
 	      //  weight_v = 0.5 * ( WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,1) + WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,2)) ;
 
-
 	      weight_v =
-		 ( wiser_sigma( En_beam2, mom_pi2, theta_pi2*3.14159/180., radlen2/100.0, 0) + 
-		   wiser_sigma( En_beam2, mom_pi2, theta_pi2*3.14159/180., radlen2/100.0, 0) ) /2.0;
+		 ( wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 0) + 
+		   wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 1) ) /2.0;
 
 	  }
 
@@ -1151,7 +1168,7 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
       //  Internal factor for lab system when E >> Mn is (alpha/pi)ln(Elab/me)
 
       mom_pi2 = float(mom_pi);
-      theta_pi2 = float(theta_pi*180.0/3.14159); // theta pi in deg
+      theta_pi2 = float(theta_pi); // theta pi in deg
 
       if (particle_id == 211) {
 	  //   weight_v = WISER_ALL_FIT(mom_pi);
@@ -1159,38 +1176,46 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
 	  switch( n ){
 	      case kProton:
 		  type = 1;
+		  totalxs = fTotal0Xs;
 		  break;
 	      case kNeutron:
 		  type = 2;
+		  totalxs = fTotal1Xs;
 		  break;
 	      default:
 		  type = 1;
+		  totalxs = fTotal0Xs;
 		  break;
 	  }
 
 	  //printf("%f %f %f %f\n", En_beam2, mom_pi2, theta_pi2, radlen2 );
 
-	  weight_v = wiser_sigma( En_beam2, mom_pi2, theta_pi2*3.14159/180., radlen2/100.0, type-1);
+	  weight_v = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, type-1);
       }
       else if (particle_id == -211) {
 	  // weight_v = WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,2);
 	  switch( n ){
 	      case kProton:
 		  type = 2;
+		  totalxs = fTotal0Xs;
 		  break;
 	      case kNeutron:
 		  type = 1;
+		  totalxs = fTotal1Xs;
 		  break;
 	      default:
 		  type = 2;
+		  totalxs = fTotal0Xs;
 		  break;
 	  }
-	  weight_v = wiser_sigma( En_beam2, mom_pi2, theta_pi2*3.14159/180., radlen2/100.0, type-1);
+	  weight_v = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, type-1);
       }
       else if (particle_id == 111) {
 	      weight_v =
-		 ( wiser_sigma( En_beam2, mom_pi2, theta_pi2*3.14159/180., radlen2/100.0, 0) + 
-		   wiser_sigma( En_beam2, mom_pi2, theta_pi2*3.14159/180., radlen2/100.0, 0) ) /2.0;
+		 ( wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 0) + 
+		   wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 0) ) /2.0;
+
+		  totalxs = fTotal0Xs = fTotal1Xs;
       }
       cnt++;
 
@@ -1221,7 +1246,7 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   
   eventdata data;
   if( 0.0 < weight_v && weight_v < 1e9 ){
-    data.weight  = weight_v * En_beam * 4 * TMath::Pi() * A; // nanobars/GeV-str-nuclei * (DeltaE sample generated) * (Full angle generated) * (Number of nucleons)
+    data.weight  = totalxs * A; // nanobars/GeV-str-nuclei * (DeltaE sample generated) * (Full angle generated) * (Number of nucleons)
     //    data.weight *= beam->GetLumin();
     data.weight *= 1e-37 ; // nb to m^2
 

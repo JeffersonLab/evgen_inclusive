@@ -1,6 +1,7 @@
 #ifndef __WISER_PION_HH
 #define __WISER_PION_HH
 #include "TF1.h"
+#include "TF3.h"
 
 #define __WISER_EPS 1e-2
 #define __WISER_N_LEG_PTS 10
@@ -218,6 +219,29 @@ Double_t wiser_all_fit(Double_t *x, Double_t *par){
     return 0.0;
 }
 
+Double_t wiser_tf3(Double_t *x, Double_t *par){
+    double Ebeam  = par[0];
+    double radint = par[1];
+    double radext = par[2];
+    int type = (int) par[3];
+
+    double pf     = x[0];
+    double th     = acos(x[1]);
+    double radlen = x[2]*radext + radint;
+
+    return wiser_sigma(Ebeam, pf, th, radlen, type);
+}
+
+Double_t wiser_total_sigma(Double_t Ebeam, Double_t intrad, Double_t extrad, Int_t type){
+    TF3 *fullwiser = new TF3("fullwiser", wiser_tf3, 0, Ebeam, -1.0, 1.0, 0, 1.0, 4);
+
+    fullwiser->SetParameter(0, Ebeam);
+    fullwiser->SetParameter(1, intrad);
+    fullwiser->SetParameter(2, extrad);
+    fullwiser->SetParameter(3, (double) type);
+
+    return fullwiser->Integral(0, Ebeam, -1,1, 0.0, 1.0)*2.0*TMath::Pi();
+}
 
 #endif//__WISER_PION_HH
 
