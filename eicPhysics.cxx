@@ -1213,9 +1213,9 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
       else if (particle_id == 111) {
 	      weight_v =
 		 ( wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 0) + 
-		   wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 0) ) /2.0;
+		   wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 1) ) /2.0;
 
-		  totalxs = fTotal0Xs = fTotal1Xs;
+		  totalxs = (fTotal0Xs + fTotal1Xs)/2.0;
       }
       cnt++;
 

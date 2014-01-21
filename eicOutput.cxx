@@ -433,16 +433,20 @@ void  eicOutput::MakeFileSOLLUND(){
     pz = pmod * cos(theta);
 
 
-    if ( fInput->Get_model() != 4 ) {
+    // NOTE:  model 4 is the weighted pi0 generator.  For now we will ignore the photons generated 
+    // and just use the pi0
+    
+//    if ( fInput->Get_model() != 4 ) {
       OUT << "1" << " \t "  << weight << " \t " << (Z_ion + N_ion)  << " \t " << Z_ion  << " \t " << "0"  << " \t " << "0" << " \t "  << x << " \t " << y  << " \t " << W  << " \t " << Q2  << " \t " << nu << endl;
       OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << mass << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
-    }
+ /*   }
     else {
       OUT << "3" << " \t "  << weight << " \t " << (Z_ion + N_ion)  << " \t " << Z_ion  << " \t " << "0"  << " \t " << "0" << " \t "  << x << " \t " << y  << " \t " << W  << " \t " << Q2  << " \t " << nu << endl;
       OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << mass << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
       OUT << " \t " << "2" << " \t " << "0.0" << " \t " << "1" << " \t " << "22" << " \t " << "0" << " \t " << "0" << " \t " << pi0_g1.Px() << " \t " << pi0_g1.Py() << " \t " << pi0_g1.Pz() << " \t " << pi0_g1.E() << " \t " << "0.0" << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
       OUT << " \t " << "3" << " \t " << "0.0" << " \t " << "1" << " \t " << "22" << " \t " << "0" << " \t " << "0" << " \t " << pi0_g2.Px() << " \t " << pi0_g2.Py() << " \t " << pi0_g2.Pz() << " \t " << pi0_g2.E() << " \t " << "0.0" << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
     }    
+    */
   }
 
   OUT.close();
