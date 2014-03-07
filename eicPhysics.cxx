@@ -973,6 +973,7 @@ void eicPhysics::MakeEvent4(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
 void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *model) {
 
   double radlen=0., mass=0., weight_v;
+  double weight_v_p, weight_v_n;
   int particle_id, charge;
   int modelsig = model->GetModel();
   radlen = model->GetRadLen();
@@ -997,15 +998,8 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   TLorentzVector e_rest( 0.0, 0.0, e_lab, e_lab);
   TVector3 blab(0.0, 0.0, beta);
 
-  nucl n;
   double A = ((double) (ion->GetZ()+ion->GetN()));
   double prot_prob = ((double) ion->GetZ())/A;
-  // Determine which type of nucleon we hit
-  if( fRandom->Uniform() < prot_prob ){
-    n = kProton;
-  } else {
-    n = kNeutron;
-  }
 
   
   //  TF2 *func;
@@ -1057,8 +1051,6 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   // This is fixed
   double fracradlen = targprop*radlen*(4.0/3.0) + intrad; 
 
-  int type;
-
   float En_beam2 = float(En_beam);
 
   double scale = 1.2;
@@ -1094,45 +1086,20 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
 
 	  weight_v = 0.0;
 
-	  if (particle_id == 211) {
-	      //   weight_v = WISER_ALL_FIT(mom_pi);
-	      //  weight_v = WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,1);
-	      switch( n ){
-		  case kProton:
-		      type = 1;
-		      break;
-		  case kNeutron:
-		      type = 2;
-		      break;
-		  default:
-		      type = 1;
-		      break;
-	      }
+	  weight_v_p = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 0);
+	  weight_v_n = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 1);
 
-	      weight_v = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, type-1);
+	  if (particle_id == 211) {
+	      weight_v = prot_prob*weight_v_p + (1.0-prot_prob)*weight_v_n;
+
 	  }
 	  else if (particle_id == -211) {
-	      // weight_v = WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,2);
-	      switch( n ){
-		  case kProton:
-		      type = 2;
-		      break;
-		  case kNeutron:
-		      type = 1;
-		      break;
-		  default:
-		      type = 2;
-		      break;
-	      }
-	      weight_v = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, type-1);
+	      weight_v = prot_prob*weight_v_n + (1.0-prot_prob)*weight_v_p;
 	  }
 	  else if (particle_id == 111) {
 	      //  weight_v = 0.5 * ( WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,1) + WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,2)) ;
 
-	      weight_v =
-		 ( wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 0) + 
-		   wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 1) ) /2.0;
-
+	      weight_v = (weight_v_p + weight_v_n) /2.0;
 	  }
 
 	  if( weight_v > max ){ 
@@ -1170,52 +1137,25 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
       mom_pi2 = float(mom_pi);
       theta_pi2 = float(theta_pi); // theta pi in deg
 
+      weight_v_p = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 0);
+      weight_v_n = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 1);
+
       if (particle_id == 211) {
 	  //   weight_v = WISER_ALL_FIT(mom_pi);
 	  //  weight_v = WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,1);
-	  switch( n ){
-	      case kProton:
-		  type = 1;
-		  totalxs = fTotal0Xs;
-		  break;
-	      case kNeutron:
-		  type = 2;
-		  totalxs = fTotal1Xs;
-		  break;
-	      default:
-		  type = 1;
-		  totalxs = fTotal0Xs;
-		  break;
-	  }
-
+	  totalxs = prot_prob*fTotal0Xs+ (1.0-prot_prob)*fTotal1Xs;
 	  //printf("%f %f %f %f\n", En_beam2, mom_pi2, theta_pi2, radlen2 );
 
-	  weight_v = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, type-1);
+	  weight_v = prot_prob*weight_v_p + (1.0-prot_prob)*weight_v_n;
       }
       else if (particle_id == -211) {
 	  // weight_v = WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,2);
-	  switch( n ){
-	      case kProton:
-		  type = 2;
-		  totalxs = fTotal0Xs;
-		  break;
-	      case kNeutron:
-		  type = 1;
-		  totalxs = fTotal1Xs;
-		  break;
-	      default:
-		  type = 2;
-		  totalxs = fTotal0Xs;
-		  break;
-	  }
-	  weight_v = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, type-1);
+	  totalxs = prot_prob*fTotal1Xs+ (1.0-prot_prob)*fTotal0Xs;
+	  weight_v = prot_prob*weight_v_n + (1.0-prot_prob)*weight_v_p;
       }
       else if (particle_id == 111) {
-	      weight_v =
-		 ( wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 0) + 
-		   wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 1) ) /2.0;
-
-		  totalxs = (fTotal0Xs + fTotal1Xs)/2.0;
+	      weight_v = (weight_v_p+weight_v_n) /2.0;
+	      totalxs = (fTotal0Xs + fTotal1Xs)/2.0;
       }
       cnt++;
 
