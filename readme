@@ -1,0 +1,83 @@
+inclusive event generator 
+
+FAST HOWTO COMPILE THIS GENERATOR
+
+1) first you need a working version of cteq C interface library 
+   orginal at http://desy.de/~znagy/hep-programs/cteq-pdf/
+   local copy in evgen/cteq-pdf-1.0.4/
+
+cd cteq-pdf-1.0.4/
+./configure
+make
+make install
+
+by default is going to write the desired library in /home/${user}/lib
+
+2) The Generator itself (by Seamus Riordan)
+Lorenzo Zana added the possibility to specify the input file and output file
+Modified the random number generator to TRandom2 class (chosen for period and speed, see http://root.cern.ch/root/html/TRandom.html). The seed now is randomly generated too, so that different parallel simulation could point to the same input file (easier for scripting and parallel processing)
+
+setup env (do this before compilation and running the code)
+
+setenv LD_LIBRARY_PATH /home/${USER}/lib
+setenv LIBRARY_PATH /home/${USER}/lib
+source /apps/root/5.34.01/setroot_CUE
+ 
+(root must have been built with OpenGL enabled. Note that the scripts supplied for installing GEMC build root with OpenGL disabled.)
+
+cd eicRate_20101102/
+make
+
+this will create the binary eicRate
+one can test it for an example in the "output" directory 
+It requires at the moment the file PolQuarkDist_fine.txt in the running directory.
+
+ eicRate : This Program Generates events 
+ Usage: eicRate -i inputfile -o outputfile 
+     -i (or -input) inputfile    input file name with correct flags (default input.dat)  
+     -o (or -output) outputfile output file name with correct flags (default output.root)
+     -h (or -help) print this message 
+
+refer to the content of input files under output dir for input options.
+
+Besides root tree output, it can produce text output files at the same time which can be used as direct input for later detector simulation. There are two type of text files
+1. lund format for vanilla GEMC to use as input which has NO rate information 
+2. solund format for solgemc use as input which has rate information.
+
+The output root tree structure is described in output/README
+
+If you have root tree output, but no lund/solund output. No need to rerun eicRate, just do the conversion with root_to_lund below
+
+3) Changing output from root format to lund format
+
+cd root_to_lund/
+make
+
+ENVIRONMENT VARIABLES FOR COMPILING (example in bash):
+If you are using root 5.28 like me seems you need to put some extra environment for your compiler for the "include" 
+LD_LIBRARY_PATH=/home/${USER}/lib:$LD_LIBRARY_PATH; export LD_LIBRARY_PATH
+LIBRARY_PATH=/home/${USER}/lib:${ROOTSYS}/lib:$LIBRARY_PATH; export LIBRARY_PATH
+C_INCLUDE_PATH=/home/${USER}/include:${ROOTSYS}/include:$C_INCLUDE_PATH; export C_INCLUDE_PATH
+CPLUS_INCLUDE_PATH=/home/${USER}/include:${ROOTSYS}/include:$CPLUS_INCLUDE_PATH; export CPLUS_INCLUDE_PATH
+
+(csh example)
+setenv LD_LIBRARY_PATH ${ROOTSYS}/lib:/home/${USER}/lib:${LD_LIBRARY_PATH}
+setenv CPLUS_INCLUDE_PATH /home/${USER}/include:${ROOTSYS}/include 
+setenv LIBRARY_PATH /home/${USER}/lib:${ROOTSYS}/lib
+
+
+ root2lund : This Program translate the output from eicRate in LUND format and Filter the scattered electron angles
+ Usage: root2lund -o outputfile -i inputfile [-th_min theta_min] [-th_max theta_max] [-ph_min phi_min] [-ph_max phi_max] [-l 1-0] [-g 1-0]
+     -o outputfile     : output file name (example pluto.lund)  
+     -i inputfile      : input file name (example pluto.root)  
+     -h help, print this message 
+   [optional] 
+     -th_min theta_min : specify theta minimum for scattered electron 
+     -th_max theta_max : specify theta maximum for scattered electron 
+     -ph_min phi_min   : specify phi minimum for scattered electron 
+     -ph_max phi_max   : specify phi maximum for scattered electron 
+     -l 1-0            : specify format input file ( lund-> 1 (just angle filtering); root->0 (default) )
+     -g 2-1-0          : specify if particle in output is a geantino ( geantino-> 1 ; charged geantino-> 2 ; normal->0 (default) )
+ --- 
+
+
