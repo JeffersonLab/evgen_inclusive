@@ -2,6 +2,8 @@ inclusive event generator
 
 FAST HOWTO COMPILE THIS GENERATOR
 
+It requires g++ and gfortran (for other configurations, modify the Makefile) and the CTEQ pdf libraries (for convenience a copy is in https://jlabsvn.jlab.org/svnroot/solid/evgen/cteq-pdf-1.0.4/
+
 1) first you need a working version of cteq C interface library 
    orginal at http://desy.de/~znagy/hep-programs/cteq-pdf/
    local copy in evgen/cteq-pdf-1.0.4/
