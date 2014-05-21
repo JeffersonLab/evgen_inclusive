@@ -70,7 +70,7 @@ void eicProcess::Run(){
 	  fout->Write(fevt);
       }
     }
-    else if( model < 11 ) { // standard pion generator
+    else if( model < 12 ) { // standard pion generator
       printf("Pion cross section \n");
       for( evt = 0; evt < nevt; evt++ ){
 	  if( (evt%nprnt) == 0 ){printf("Event %10d \n", evt);}
