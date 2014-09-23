@@ -23,9 +23,19 @@ setup env (do this before compilation and running the code)
 
 setenv LD_LIBRARY_PATH /home/${USER}/lib
 setenv LIBRARY_PATH /home/${USER}/lib
-source /apps/root/5.34.01/setroot_CUE
- 
-(root must have been built with OpenGL enabled. Note that the scripts supplied for installing GEMC build root with OpenGL disabled.)
+source your_root_env_script
+(
+In general, it can be root_version/bin/thisroot.csh
+on ifarm, it can be /apps/root/5.34.13/setroot_CUE which has content as follows
+
+setenv ROOTSYS /u/apps/root/5.34.13/root
+setenv PATH ${ROOTSYS}/bin:${PATH}
+if (!($?LD_LIBRARY_PATH)) then
+  setenv LD_LIBRARY_PATH ${ROOTSYS}/lib
+else
+  setenv LD_LIBRARY_PATH ${ROOTSYS}/lib:${LD_LIBRARY_PATH}
+endif
+)
 
 cd eicRate_20101102/
 make
@@ -43,14 +53,19 @@ It requires at the moment the file PolQuarkDist_fine.txt in the running director
 refer to the content of input files under output dir for input options.
 
 Besides root tree output, it can produce text output files at the same time which can be used as direct input for later detector simulation. There are two type of text files
-1. lund format for vanilla GEMC to use as input which has NO rate information 
-2. solund format for solgemc use as input which has rate information.
+1. lund format for GEMC to use as input
+2. solund format for solgemc use as input
 
 The output root tree structure is described in output/README
 
-If you have root tree output, but no lund/solund output. No need to rerun eicRate, just do the conversion with root_to_lund below
+The LUND format is defined as 
+OUT << "1" << " \t " << Wprate  << " \t " << Wmrate  << " \t " << "0"  << " \t " << "0" << " \t "  << x << " \t " << y  << " \t " << W  << " \t " << Q2  << " \t " << rate << endl;
 
-3) Changing output from root format to lund format
+
+############(outdated, need to update LUND format) #############################
+3) Changing output from root format to lund format 
+
+If you have root tree output, but no lund/solund output. No need to rerun eicRate, just do the conversion with root_to_lund below
 
 cd root_to_lund/
 make

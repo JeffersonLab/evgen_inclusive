@@ -16,16 +16,20 @@ model	2
 output  2
 
 # models
-# 1  e- Deep Inelastic 
+# 1  e- Deep Inelastic
 # 2  pi+
 # 3  pi-
 # 4  pi0
-# 5  e- Elastic
-# 6  K+
-# 7  K-
-# 8  Ks
-# 9  Kl
-#10  p
+# 5  ep Elastic
+# 6  Moller
+# 7  K+
+# 8  K-
+# 9  Ks
+# 10  Kl
+# 11  p
+# 12  Uniform pi+
+# 13  Uniform pi-
+# 14  Uniform pi0
 
 # output
 # 1  ROOT only

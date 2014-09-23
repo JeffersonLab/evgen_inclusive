@@ -164,6 +164,8 @@ void  eicOutput::MakeFileLUND(){
   double Q2;
   double eta_gZ;
   double rate;
+  double Wprate;
+  double Wmrate;    
   double pdf[6];
   double Dpdf[5];
 
@@ -217,6 +219,8 @@ void  eicOutput::MakeFileLUND(){
   input_chain.SetBranchAddress("Q2",&Q2);
   input_chain.SetBranchAddress("eta_gZ",&eta_gZ);
   input_chain.SetBranchAddress("rate",&rate);
+  input_chain.SetBranchAddress("Wprate",&Wprate);
+  input_chain.SetBranchAddress("Wmrate",&Wmrate);  
   input_chain.SetBranchAddress("pdf",&pdf);
   input_chain.SetBranchAddress("Dpdf",&Dpdf);
   
@@ -259,7 +263,7 @@ void  eicOutput::MakeFileLUND(){
   ofstream OUT (file.Data());
   for (int i=0; i<nentries ; i++) {
     input_chain.GetEntry(i);
-    if(i % 1000000 == 0 ){
+    if(i % 100000 == 0 ){
       printf("Analyzed %09d events of total %09d \n",i,nentries);
     }
 
@@ -292,8 +296,8 @@ void  eicOutput::MakeFileLUND(){
 //       OUT << " \t " << "3" << " \t " << "0.0" << " \t " << "1" << " \t " << "22" << " \t " << "0" << " \t " << "0" << " \t " << pi0_g2.Px() << " \t " << pi0_g2.Py() << " \t " << pi0_g2.Pz() << " \t " << pi0_g2.E() << " \t " << "0.0" << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
 //     }
     
-      OUT << "1" << " \t " << (Z_ion + N_ion)  << " \t " << Z_ion  << " \t " << "0"  << " \t " << "0" << " \t "  << x << " \t " << y  << " \t " << W  << " \t " << Q2  << " \t " << nu << endl;
-      OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << weight << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
+      OUT << "1" << " \t " << Wprate  << " \t " << Wmrate  << " \t " << "0"  << " \t " << "0" << " \t "  << x << " \t " << y  << " \t " << W  << " \t " << Q2  << " \t " << rate << endl;
+      OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << mass << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
   }
 
   OUT.close();

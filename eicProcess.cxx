@@ -63,22 +63,23 @@ void eicProcess::Run(){
 	  fout->Write(fevt);
       }
     }
-    else if (model == 6) { // electron ELASTIC generator
+    else if (model == 6) { // electron Moller generator
       for( evt = 0; evt < nevt; evt++ ){
 	  if( (evt%nprnt) == 0 ){printf("Event %10d \n", evt);}
 	  fphy->MakeEvent4(fbeam, fion, fevt, fmodel);
 	  fout->Write(fevt);
       }
     }
-    else if( model < 12 ) { // standard pion generator
-      printf("Pion cross section \n");
+    else if( model < 12 ) { // standard hadron generator
+      printf("hadron cross section with weight factor\n");
       for( evt = 0; evt < nevt; evt++ ){
 	  if( (evt%nprnt) == 0 ){printf("Event %10d \n", evt);}
 	  fphy->MakeEvent2(fbeam, fion, fevt, fmodel);
 	  fout->Write(fevt);
       }
-    } else { // Uniform Pion generator
+    } else { // Uniform hadron generator
       for( evt = 0; evt < nevt; evt++ ){
+      printf("hadron cross section without weight factor\n");	
 	  if( (evt%nprnt) == 0 ){printf("Event %10d \n", evt);}
 	  fphy->MakeEvent5(fbeam, fion, fevt, fmodel);
 	  fout->Write(fevt);

@@ -22,8 +22,7 @@ all:            $(PROGRAMS)
 
 $(EICRATE):  $(EICRATEO) piajp.o
 		@echo "this: $@, $(EICRATEO)"
-		$(LD) $(LDFLAGS) $^ $(GLIBS) -ggdb -lgfortran -O2 -lEG -lGed -lHtml -lThread -lGeom -L. -lcteqpdf $(OutPutOpt)$@
-		cp eicRate output/
+		$(LD) $(LDFLAGS) $^ $(LIBS) -ggdb -lgfortran -O2 -lEG -lGed -lHtml -lThread -lGeom -L. -lcteqpdf $(OutPutOpt)$@
 		@echo "$@ done"
 
 eicRate.$(SrcSuf): 
