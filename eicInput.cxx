@@ -12,12 +12,17 @@ eicInput::eicInput(const char *file){
     char dummy[255];
 
     fscanf(f, "%s%d", dummy, &fData.nevt);
-    fscanf(f, "%s%d", dummy, &fData.nprnt);
+//     fscanf(f, "%s%d", dummy, &fData.nprnt);
     fscanf(f, "%s%lf%s", dummy, &fData.lumin, dummy);
     fscanf(f, "%s%lf%s", dummy, &fData.runtime, dummy);
-    fscanf(f, "%s%lf%s", dummy, &fData.e_energy, dummy);
-    fscanf(f, "%s%lf%s", dummy, &fData.ion_energy, dummy);
-    fscanf(f, "%s%lf%s", dummy, &fData.ion_mass, dummy);
+    fscanf(f, "%s%lf%s", dummy, &fData.e_mom, dummy);
+    fscanf(f, "%s%lf%s", dummy, &fData.e_theta, dummy);
+    fscanf(f, "%s%lf%s", dummy, &fData.e_phi, dummy);
+    fscanf(f, "%s%lf%s", dummy, &fData.e_mass, dummy);        
+    fscanf(f, "%s%lf%s", dummy, &fData.ion_mom, dummy);
+    fscanf(f, "%s%lf%s", dummy, &fData.ion_theta, dummy);
+    fscanf(f, "%s%lf%s", dummy, &fData.ion_phi, dummy);
+    fscanf(f, "%s%lf%s", dummy, &fData.ion_mass, dummy);    
     fscanf(f, "%s%d", dummy, &fData.ion_Z);
     fscanf(f, "%s%d", dummy, &fData.ion_N);
     fscanf(f, "%s%lf%s", dummy, &fData.dens, dummy);

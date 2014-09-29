@@ -8,9 +8,14 @@ struct inputdata {
     int    nprnt;
     double lumin;
     double runtime;
-    double e_energy;
-    double ion_energy;
-    double ion_mass;
+    double e_mom;
+    double e_theta;
+    double e_phi;    
+    double e_mass;     
+    double ion_mom;
+    double ion_theta;
+    double ion_phi;        
+    double ion_mass;          
     int    ion_Z;
     int    ion_N;
     double dens;
@@ -33,12 +38,17 @@ class eicInput {
 	~eicInput();
 
 	int    GetNevt(){ return fData.nevt; }
-	int    GetNprnt(){ return fData.nprnt; }
+	int    GetNprnt(){ return int(fData.nevt/10); }
 	double GetLumin(){ return fData.lumin; }
 	double GetRunTime(){ return fData.runtime; }
-	double Get_eEnergy(){ return fData.e_energy; }
-	double Get_ionEnergy(){ return fData.ion_energy; }
-	double Get_ionMass(){ return fData.ion_mass; }
+	double Get_eMom(){ return fData.e_mom; }
+	double Get_eTheta(){ return fData.e_theta; }
+	double Get_ePhi(){ return fData.e_phi; }
+	double Get_eMass(){ return fData.e_mass; }				
+	double Get_ionMom(){ return fData.ion_mom; }
+	double Get_ionTheta(){ return fData.ion_theta; }
+	double Get_ionPhi(){ return fData.ion_phi; }
+	double Get_ionMass(){ return fData.ion_mass; }			
 	int    Get_ionZ(){ return fData.ion_Z; }
 	int    Get_ionN(){ return fData.ion_N; }
 	double Get_dens(){ return fData.dens; }

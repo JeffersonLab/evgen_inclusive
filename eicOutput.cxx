@@ -263,8 +263,8 @@ void  eicOutput::MakeFileLUND(){
   ofstream OUT (file.Data());
   for (int i=0; i<nentries ; i++) {
     input_chain.GetEntry(i);
-    if(i % 100000 == 0 ){
-      printf("Analyzed %09d events of total %09d \n",i,nentries);
+    if(i % (nentries/10) == 0 ){
+      printf("Analyzed %d events of total %d \n",i,nentries);
     }
 
     if (x>0)   nu = Q2 / (2 * MASS_p * x) ;

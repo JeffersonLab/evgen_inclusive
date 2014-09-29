@@ -82,8 +82,12 @@ Double_t wiser_sigma(Double_t Ebeam, Double_t pf, Double_t thf, Double_t rad_len
 	case 2:
 	    M_X = mass_Lambda;
 	    break;
-	// p/p-bar production is twice the mass of the proton
+	case 3:
+	    M_X = mass_K + mass_p;
+	    break;	    
 	case 4:
+	    M_X= 0; 
+	// p/p-bar production is twice the mass of the proton	    
 	case 5:
 	    M_X = 2.0*mass_p;
 	    break;

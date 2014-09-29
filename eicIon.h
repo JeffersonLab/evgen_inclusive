@@ -9,17 +9,20 @@ class eicIon{
     public:
 	eicIon(eicInput *inp = 0);
 	~eicIon();
-
-	double GetEnergy() { return fEnergy; }
-	void   SetEnergy(double e) {  fEnergy = e; }
-	double GetLumin() { return fLumin; }
-	void   SetLumin(double l) {  fLumin = l; }
-
+	
+	double GetMom() { return fMom; }
+	double GetTheta() { return fTheta; }
+	double GetPhi() { return fPhi; }	
 	double GetMass() { return fMass; }
+	double GetEnergy() { return fEnergy; }	
 	int    GetZ() { return fZ; }
 	int    GetN() { return fN; }
-
+	
+	void   SetMom(double p) {  fMom = p; }	
+	void   SetTheta( double theta ){ fTheta = theta; }	
+	void   SetPhi( double phi ){ fPhi = phi; }	
 	void   SetMass( double m ){ fMass = m; }
+	void   SetEnergy(double e) {  fEnergy = e; }			
 	void   SetZ( int z ){ fZ = z; }
 	void   SetN( int n ){ fN = n; }
 
@@ -29,9 +32,11 @@ class eicIon{
 	void SetEMCtype(emcType t){ fEMC = t; }
 
     private:
-	double fLumin;
+	double fMom;
+	double fTheta;
+	double fPhi;
+	double fMass;	
 	double fEnergy;
-	double fMass;
 	int    fZ;
 	int    fN;
 

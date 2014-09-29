@@ -92,7 +92,7 @@ class eicPhysics {
 //	 double Wiser( int Z, int N, char PART, double E_IN, double P_IN, double TH_IN, double radlen_IN);
 
 	 bool fHaveTotalXs;
-	 double fTotal1Xs, fTotal0Xs;
+	 double fTotalXs_pip, fTotalXs_pim,fTotalXs_Kp,fTotalXs_Km,fTotalXs_p,fTotalXs_pbar;
 
 	 /* double QUADMO(double &PLOWER,double &PUPPER,double &EPSLON, int &NLVL); */
 	 /* double WISER_ALL_FIT(double E_GAMMA); */
