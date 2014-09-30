@@ -29,6 +29,7 @@ class eicPhysics {
 	void MakeEvent3( eicBeam *, eicIon *, eicEvent *, eicModel *);
 	void MakeEvent4( eicBeam *, eicIon *, eicEvent *, eicModel *);
 	void MakeEvent5( eicBeam *, eicIon *, eicEvent *, eicModel *);
+	void MakeEvent5_findmax( eicBeam *, eicIon *, eicEvent *, eicModel *);	
 
 	void SampleWiserPThZ(double, double &, double &, double &, double *);
 
@@ -101,5 +102,6 @@ class eicPhysics {
 	 /* double Wiser_func_pim(double *x, double *par); */
 	 /* double Wiser_func_pi0(double *x, double *par); */
 	 
+	 double max;	 
 };
 #endif//__eicPhysics_h

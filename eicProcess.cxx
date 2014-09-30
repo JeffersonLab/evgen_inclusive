@@ -88,6 +88,7 @@ void eicProcess::Run(){
     }
     else if(10<=model && model <=18 ) { // Uniform hadron generator
       printf("hadron cross section without weight factor\n");	      
+      fphy->MakeEvent5_findmax(fbeam, fion, fevt, fmodel);      
       for( evt = 0; evt < nevt; evt++ ){
 	  if( (evt%nprnt) == 0 ){printf("Event %10d \n", evt);}
 	  fphy->MakeEvent5(fbeam, fion, fevt, fmodel);

@@ -943,6 +943,201 @@ void eicPhysics::MakeEvent4(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
 
 }
 
+void eicPhysics::MakeEvent5_findmax(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *model) {
+  double radlen=0., mass=0., weight_v;
+  double weight_v_pip, weight_v_pim,weight_v_Kp,weight_v_Km,weight_v_p,weight_v_pbar;
+  int particle_id, charge;
+  int modelsig = model->GetModel();
+  radlen = model->GetRadLen();
+  double tglx = model->GetLx();
+  double tgly = model->GetLy();
+  double tglength = model->GetLength();
+
+
+  TVector3 tgtoff = model->GetTgtOffset();
+
+
+  // Initialize variables
+  particle_id = 1e9;
+  charge      = 1e9;
+
+  TLorentzVector ion_lab(ion->GetMom()*sin(ion->GetTheta())*cos(ion->GetPhi()),ion->GetMom()*sin(ion->GetTheta())*sin(ion->GetPhi()),ion->GetMom()*cos(ion->GetTheta()),sqrt(pow(ion->GetMom(),2)+pow(ion->GetMass(),2)));
+
+  TLorentzVector beam_lab(beam->GetMom()*sin(beam->GetTheta())*cos(beam->GetPhi()),beam->GetMom()*sin(beam->GetTheta())*sin(beam->GetPhi()),beam->GetMom()*cos(beam->GetTheta()),sqrt(pow(beam->GetMom(),2)+pow(beam->GetMass(),2)));
+     
+  TVector3 bv_ion_lab=ion_lab.BoostVector();
+  TLorentzVector beam_ionrest=beam_lab;
+  beam_ionrest.Boost(-bv_ion_lab);
+
+  double A = ((double) (ion->GetZ()+ion->GetN()));
+  double prot_prob = ((double) ion->GetZ())/A;
+  
+  double En_beam = beam_ionrest.E();   
+
+  if(  En_beam < 0.3 ){ 
+      fprintf( stderr, "ERROR:  Beam energy too low for implemented uniform generator\n");
+      exit(1);
+  }
+
+  //  TF2 *func;  
+  if (modelsig == 10) { // pi+
+    particle_id = 211; 
+    charge = +1;
+    mass = 0.1396; // mass in GeV
+    //    func = new TF2("sigma_pip",Wiser_func_pip,0, En_beam,0,360,2);
+  } 
+  else if (modelsig == 11) { //pi-
+    particle_id = -211;
+    charge = -1;
+    mass = 0.1396; // mass in GeV
+    //   func = new TF2("sigma_pip",Wiser_func_pip,0, En_beam,0,360,2);
+  }
+  else if (modelsig == 12) { //pi0
+    particle_id = 111;
+    charge = 0;
+    mass = 0.1350; // mass in GeV
+    //   func = new TF2("sigma_pip",Wiser_func_pi0,0, En_beam,0,360,2);
+  }  
+  else if (modelsig == 13) { //K+
+    particle_id = 321;
+    charge = +1;
+    mass = 0.4937; // mass in GeV
+    //   func = new TF2("sigma_pip",Wiser_func_pi0,0, En_beam,0,360,2);
+  }  
+  else if (modelsig == 14) { //K-
+    particle_id = -321;
+    charge = -1;
+    mass = 0.4937; // mass in GeV
+    //   func = new TF2("sigma_pip",Wiser_func_pi0,0, En_beam,0,360,2);
+  }  
+  else if (modelsig == 15) { //Ks
+    particle_id = 310;
+    charge = 0;
+    mass = 0.4976; // mass in GeV
+    //   func = new TF2("sigma_pip",Wiser_func_pi0,0, En_beam,0,360,2);
+  }  
+  else if (modelsig == 16) { //Kl
+    particle_id = 130;
+    charge = 0;
+    mass = 0.4976; // mass in GeV
+    //   func = new TF2("sigma_pip",Wiser_func_pi0,0, En_beam,0,360,2);
+  }    
+  else if (modelsig == 17) { //p
+    particle_id = 2212;
+    charge = +1;
+    mass = 0.9383; // mass in GeV
+    //   func = new TF2("sigma_pip",Wiser_func_pi0,0, En_beam,0,360,2);
+  }  
+  else if (modelsig == 18) { //p-bar
+    particle_id = -2212;
+    charge = -1;
+    mass = 0.9383; // mass in GeV
+    //   func = new TF2("sigma_pip",Wiser_func_pi0,0, En_beam,0,360,2);
+  }
+
+  //  func->SetParameters(En_beam,radlen);
+  //  double mom_pi= 0, theta_pi= 0;
+  //  func->GetRandom2(mom_pi,theta_pi);
+  double x_pi=0.,y_pi=0.,z_pi=0.;
+
+
+  double ef, mom_pi, theta_pi, targprop;
+  double phi_pi = fRandom->Uniform(0, 2.0*TMath::Pi());
+
+  double intrad = 2.0*log(En_beam/0.000511)/(137.0*3.14159);
+
+  double radratio = 3.0*intrad/(4.0*radlen);
+
+  targprop = radratio*
+      (sqrt( 1.0 + fRandom->Uniform()*( pow(radratio, -2.0) + 2.0/radratio ) ) - 1.0 );
+
+  // This is fixed
+  double fracradlen = targprop*radlen*(4.0/3.0) + intrad; 
+
+  float En_beam2 = float(En_beam);
+
+  float mom_pi2, theta_pi2;
+
+  float radlen2 = float(fracradlen);
+
+  max =0.0;
+
+  // Scan for maximum
+
+  int npidx  = 100;
+  int nthidx = 100;
+
+  int i, j;
+
+  for( i = 0; i < npidx; i++ ){
+      for( j = 0; j < nthidx; j++ ){
+	  // Scan around 2 GeV
+// 	  mom_pi2   = 0.1*((double) i)*En_beam2/npidx + mass;  // These are guesses, but they work for E down to 0.3 GeV
+// 	  theta_pi2 = (10.0*((double) j)/nthidx/En_beam2)*3.14159/180;
+	  mom_pi2   = 0.5*((double) i)*En_beam2/npidx + mass;
+	  theta_pi2 = (90.0*((double) j)/nthidx)*3.14159/180;
+
+	  weight_v = 0.0;
+
+	  weight_v_pip = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 0);
+	  weight_v_pim = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 1);
+	  weight_v_Kp = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 2);
+	  weight_v_Km = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 3);
+	  weight_v_p = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 4);
+	  weight_v_pbar = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 5);	  
+
+	  if (particle_id == 211) {
+	      weight_v = prot_prob*weight_v_pip + (1.0-prot_prob)*weight_v_pim;
+	  }
+	  else if (particle_id == -211) {
+	      weight_v = prot_prob*weight_v_pim + (1.0-prot_prob)*weight_v_pip;
+	  }
+	  else if (particle_id == 111) {
+	      weight_v = (weight_v_pip + weight_v_pim) /2.0;
+	  }
+	  else if (particle_id == 321) {
+	      weight_v = prot_prob*weight_v_Kp + (1.0-prot_prob)*weight_v_Km;
+	  }
+	  else if (particle_id == -321) {
+	      weight_v = prot_prob*weight_v_Km + (1.0-prot_prob)*weight_v_Kp;
+	  }
+	  else if (particle_id == 310 || particle_id == 130) {
+	      weight_v = 0.5*(weight_v_Kp + weight_v_Km) /2.0;
+	  }
+	  else if (particle_id == 2212) {
+	      weight_v = weight_v_p;
+	  }
+	  else if (particle_id == -2212) {
+	      weight_v = weight_v_pbar;
+	  }	  
+	  
+
+	  if( weight_v > max ){ 
+	      max   = weight_v;	 
+	  }
+      }
+  }
+
+  double scale = 1.0;  
+  max *= scale;
+
+  if( max < 0.0 ){ printf("Kinematics too close to threshold\n"); exit(1);}
+  else printf("Found Max crossection %f at p = %f, th = %f\n", max, mom_pi2, theta_pi2);
+  
+  if( !fHaveTotalXs ){
+      printf("Calculating total wiser cross section\n");
+      fTotalXs_pip = wiser_total_sigma( En_beam2, intrad, radlen*4.0/3.0, 0);
+      fTotalXs_pim = wiser_total_sigma( En_beam2, intrad, radlen*4.0/3.0, 1);
+      fTotalXs_Kp = wiser_total_sigma( En_beam2, intrad, radlen*4.0/3.0, 2);
+      fTotalXs_Km = wiser_total_sigma( En_beam2, intrad, radlen*4.0/3.0, 3);
+      fTotalXs_p = wiser_total_sigma( En_beam2, intrad, radlen*4.0/3.0, 4);
+      fTotalXs_pbar = wiser_total_sigma( En_beam2, intrad, radlen*4.0/3.0, 5);      
+      printf("Calculated\n");
+      fHaveTotalXs = true;
+  } 	    
+  
+}
+
 //hadron generator according to wiser (distributed according to crossection)
 void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *model) {
 
@@ -1058,85 +1253,9 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
 
   float En_beam2 = float(En_beam);
 
-  double scale = 1.2;
-
   float mom_pi2, theta_pi2;
 
   float radlen2 = float(fracradlen);
-
-  double max =0.0;
-
-  // Scan for maximum
-
-  int npidx  = 5;
-  int nthidx = 5;
-
-  int i, j;
-
-  if( !fHaveTotalXs ){
-      printf("Calculating total wiser cross section\n");
-      fTotalXs_pip = wiser_total_sigma( En_beam2, intrad, radlen*4.0/3.0, 0);
-      fTotalXs_pim = wiser_total_sigma( En_beam2, intrad, radlen*4.0/3.0, 1);
-      fTotalXs_Kp = wiser_total_sigma( En_beam2, intrad, radlen*4.0/3.0, 2);
-      fTotalXs_Km = wiser_total_sigma( En_beam2, intrad, radlen*4.0/3.0, 3);
-      fTotalXs_p = wiser_total_sigma( En_beam2, intrad, radlen*4.0/3.0, 4);
-      fTotalXs_pbar = wiser_total_sigma( En_beam2, intrad, radlen*4.0/3.0, 5);      
-      printf("Calculated\n");
-      fHaveTotalXs = true;
-  } 	  
-
-  for( i = 0; i < npidx; i++ ){
-      for( j = 0; j < nthidx; j++ ){
-	  // Scan around 2 GeV
-	  mom_pi2   = 0.1*((double) i)*En_beam2/npidx + mass;  // These are guesses, but they work for E down to 0.3 GeV
-	  theta_pi2 = (10.0*((double) j)/nthidx/En_beam2)*3.14159/180;
-
-	  weight_v = 0.0;
-
-	  weight_v_pip = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 0);
-	  weight_v_pim = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 1);
-	  weight_v_Kp = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 2);
-	  weight_v_Km = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 3);
-	  weight_v_p = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 4);
-	  weight_v_pbar = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 5);	  
-
-	  if (particle_id == 211) {
-	      weight_v = prot_prob*weight_v_p + (1.0-prot_prob)*weight_v_pim;
-	  }
-	  else if (particle_id == -211) {
-	      weight_v = prot_prob*weight_v_pim + (1.0-prot_prob)*weight_v_pip;
-	  }
-	  else if (particle_id == 111) {
-	      weight_v = (weight_v_pip + weight_v_pim) /2.0;
-	  }
-	  else if (particle_id == 321) {
-	      weight_v = prot_prob*weight_v_Kp + (1.0-prot_prob)*weight_v_Km;
-	  }
-	  else if (particle_id == -321) {
-	      weight_v = prot_prob*weight_v_Km + (1.0-prot_prob)*weight_v_Kp;
-	  }
-	  else if (particle_id == 310 || particle_id == 130) {
-	      weight_v = 0.5*(weight_v_Kp + weight_v_Km) /2.0;
-	  }
-	  else if (particle_id == 2212) {
-	      weight_v = weight_v_p;
-	  }
-	  else if (particle_id == -2212) {
-	      weight_v = weight_v_pbar;
-	  }	  
-	  
-
-	  if( weight_v > max ){ 
-	      max   = weight_v;
-//	      printf("Max is fixed by p = %f, th = %f (%f)\n", mom_pi2, theta_pi2, weight_v );
-	 
-	  }
-      }
-  }
-
-  max *= scale;
-
-  if( max < 0.0 ){ printf("Kinematics too close to threshold\n"); exit(1);}
   
   int cnt = 0;
   double totalxs = 0.0;  
