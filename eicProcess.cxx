@@ -57,7 +57,7 @@ void eicProcess::Run(){
     printf("Format = %s \n", fmtst[fmt].Data() );
 
     if (model == 20) { // electron DIS generator
-      for( evt = 0; evt < nevt; evt++ ){
+      for( evt = 1; evt <= nevt; evt++ ){
 	  if( (evt%nprnt) == 0 ){printf("Event %10d \n", evt);}
 	  fphy->MakeEvent(fbeam, fion, fevt, fmodel);
 	  fout->Write(fevt);
@@ -65,14 +65,14 @@ void eicProcess::Run(){
     }
     else if (model == 21) { // electron ELASTIC generator
       printf("Elastic cross section \n");
-      for( evt = 0; evt < nevt; evt++ ){
+      for( evt = 1; evt <= nevt; evt++ ){
 	  if( (evt%nprnt) == 0 ){printf("Event %10d \n", evt);}
 	  fphy->MakeEvent3(fbeam, fion, fevt, fmodel);
 	  fout->Write(fevt);
       }
     }
     else if (model == 22) { // electron Moller generator
-      for( evt = 0; evt < nevt; evt++ ){
+      for( evt = 1; evt <= nevt; evt++ ){
 	  if( (evt%nprnt) == 0 ){printf("Event %10d \n", evt);}
 	  fphy->MakeEvent4(fbeam, fion, fevt, fmodel);
 	  fout->Write(fevt);
@@ -80,7 +80,7 @@ void eicProcess::Run(){
     }
     else if(0<=model && model <=8 ) { // standard hadron generator
       printf("hadron cross section with weight factor\n");
-      for( evt = 0; evt < nevt; evt++ ){
+      for( evt = 1; evt <= nevt; evt++ ){
 	  if( (evt%nprnt) == 0 ){printf("Event %10d \n", evt);}
 	  fphy->MakeEvent2(fbeam, fion, fevt, fmodel);
 	  fout->Write(fevt);
@@ -89,7 +89,7 @@ void eicProcess::Run(){
     else if(10<=model && model <=18 ) { // Uniform hadron generator
       printf("hadron cross section without weight factor\n");	      
       fphy->MakeEvent5_findmax(fbeam, fion, fevt, fmodel);      
-      for( evt = 0; evt < nevt; evt++ ){
+      for( evt = 1; evt <= nevt; evt++ ){
 	  if( (evt%nprnt) == 0 ){printf("Event %10d \n", evt);}
 	  fphy->MakeEvent5(fbeam, fion, fevt, fmodel);
 	  fout->Write(fevt);
