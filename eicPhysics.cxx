@@ -1064,8 +1064,8 @@ void eicPhysics::MakeEvent5_findmax(eicBeam *beam, eicIon *ion, eicEvent *ev , e
 
   // Scan for maximum
 
-  int npidx  = 100;
-  int nthidx = 100;
+  int npidx  = 300;
+  int nthidx = 300;
 
   int i, j;
 
@@ -1074,8 +1074,8 @@ void eicPhysics::MakeEvent5_findmax(eicBeam *beam, eicIon *ion, eicEvent *ev , e
 	  // Scan around 2 GeV
 // 	  mom_pi2   = 0.1*((double) i)*En_beam2/npidx + mass;  // These are guesses, but they work for E down to 0.3 GeV
 // 	  theta_pi2 = (10.0*((double) j)/nthidx/En_beam2)*3.14159/180;
-	  mom_pi2   = 0.5*((double) i)*En_beam2/npidx + mass;
-	  theta_pi2 = (90.0*((double) j)/nthidx)*3.14159/180;
+	  mom_pi2   = 0.9*((double) i)*En_beam2/npidx + mass;
+	  theta_pi2 = (180.0*((double) j)/nthidx)*3.14159/180;
 
 	  weight_v = 0.0;
 
@@ -1118,7 +1118,7 @@ void eicPhysics::MakeEvent5_findmax(eicBeam *beam, eicIon *ion, eicEvent *ev , e
       }
   }
 
-  double scale = 1.0;  
+  double scale = 1.1;  
   max *= scale;
 
   if( max < 0.0 ){ printf("Kinematics too close to threshold\n"); exit(1);}
