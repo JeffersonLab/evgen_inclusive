@@ -417,7 +417,9 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   TVector3 bv_ion_lab=ion_lab.BoostVector();
   TLorentzVector beam_ionrest=beam_lab;
   beam_ionrest.Boost(-bv_ion_lab);
-
+//   cout << "!!! " << beam_lab.P() << "\t" <<beam_lab.Theta() << "\t" << beam_lab.Phi() << "\t" << beam_lab.E() << endl; 
+//   cout << beam_ionrest.P() << "\t" <<beam_ionrest.Theta() << "\t" << beam_ionrest.Phi() << "\t" << beam_ionrest.E() << endl;
+  
   double En_beam = beam_ionrest.E(); 
   
 //   nucl n;
@@ -502,7 +504,10 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   
   TLorentzVector pi_ionrest(0,0,0,0),pi_lab(0,0,0,0);    
   pi_ionrest.SetPxPyPzE(mom_pi*sin(theta_pi)*cos(phi_pi),mom_pi*sin(theta_pi)*sin(phi_pi),mom_pi*cos(theta_pi),ef);
-  pi_lab=pi_ionrest;
+//   cout << pi_ionrest.P() << "\t" <<pi_ionrest.Theta() << "\t" << pi_ionrest.Phi() << "\t" << pi_ionrest.E() << endl;   
+  pi_ionrest.Rotate(TVector3(0,0,1).Angle(beam_ionrest.Vect()),TVector3(0,0,1).Cross(beam_ionrest.Vect()));   //wiser only takes theta relative to +z as assumed electron beam direction,need to rotate to actual electron beam direction
+//   cout << pi_ionrest.P() << "\t" <<pi_ionrest.Theta() << "\t" << pi_ionrest.Phi() << "\t" << pi_ionrest.E() << endl;   
+  pi_lab=pi_ionrest;  
   pi_lab.Boost(bv_ion_lab);
 //   cout << pi_ionrest.P() << "\t" <<pi_ionrest.Theta() << "\t" << pi_ionrest.Phi() << "\t" << pi_ionrest.E() << endl; 
 //   cout << pi_lab.P() << "\t" <<pi_lab.Theta() << "\t" << pi_lab.Phi() << "\t" << pi_lab.E() << endl;
@@ -661,7 +666,9 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   data.vy = vert.Y();
   data.vz = vert.Z();
 
+  Gamma1.Rotate(TVector3(0,0,1).Angle(beam_ionrest.Vect()),TVector3(0,0,1).Cross(beam_ionrest.Vect()));   //wiser only takes theta relative to +z as assumed electron beam direction,need to rotate to actual electron beam direction    
   Gamma1.Boost(bv_ion_lab);
+  Gamma2.Rotate(TVector3(0,0,1).Angle(beam_ionrest.Vect()),TVector3(0,0,1).Cross(beam_ionrest.Vect()));   //wiser only takes theta relative to +z as assumed electron beam direction,need to rotate to actual electron beam direction    
   Gamma2.Boost(bv_ion_lab);
   
   data.g1_theta = Gamma1.Theta();
@@ -1261,7 +1268,7 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   
   int cnt = 0;
   double totalxs = 0.0;  
-  double testval = 0.0;
+  double testval = 0.0;  
   TLorentzVector pi_ionrest(0,0,0,0),pi_lab(0,0,0,0);  
   do { 
       mom_pi = fRandom->Uniform(En_beam2);
@@ -1272,6 +1279,7 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
       ef = sqrt(pow(mom_pi,2) + pow(mass,2));      
       
       pi_ionrest.SetPxPyPzE(mom_pi*sin(theta_pi)*cos(phi_pi),mom_pi*sin(theta_pi)*sin(phi_pi),mom_pi*cos(theta_pi),ef);
+      pi_ionrest.Rotate(TVector3(0,0,1).Angle(beam_ionrest.Vect()),TVector3(0,0,1).Cross(beam_ionrest.Vect()));   //wiser only takes theta relative to +z as assumed electron beam direction,need to rotate to actual electron beam direction      
       pi_lab=pi_ionrest;
       pi_lab.Boost(bv_ion_lab);
     //   cout << pi_ionrest.P() << "\t" <<pi_ionrest.Theta() << "\t" << pi_ionrest.Phi() << "\t" << pi_ionrest.E() << endl; 
@@ -1391,7 +1399,9 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   data.vy = vert.Y();
   data.vz = vert.Z();
 
+  Gamma1.Rotate(TVector3(0,0,1).Angle(beam_ionrest.Vect()),TVector3(0,0,1).Cross(beam_ionrest.Vect()));   //wiser only takes theta relative to +z as assumed electron beam direction,need to rotate to actual electron beam direction    
   Gamma1.Boost(bv_ion_lab);
+  Gamma2.Rotate(TVector3(0,0,1).Angle(beam_ionrest.Vect()),TVector3(0,0,1).Cross(beam_ionrest.Vect()));   //wiser only takes theta relative to +z as assumed electron beam direction,need to rotate to actual electron beam direction    
   Gamma2.Boost(bv_ion_lab);
   
   data.g1_theta = Gamma1.Theta();
