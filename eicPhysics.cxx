@@ -1069,6 +1069,7 @@ void eicPhysics::MakeEvent5_findmax(eicBeam *beam, eicIon *ion, eicEvent *ev , e
 
   int i, j;
 
+  double max_mom_pi2=0,max_theta_pi2=0;
   for( i = 0; i < npidx; i++ ){
       for( j = 0; j < nthidx; j++ ){
 	  // Scan around 2 GeV
@@ -1111,9 +1112,10 @@ void eicPhysics::MakeEvent5_findmax(eicBeam *beam, eicIon *ion, eicEvent *ev , e
 	      weight_v = weight_v_pbar;
 	  }	  
 	  
-
 	  if( weight_v > max ){ 
 	      max   = weight_v;	 
+	      max_mom_pi2 = mom_pi2;
+	      max_theta_pi2 = theta_pi2;
 	  }
       }
   }
@@ -1122,7 +1124,7 @@ void eicPhysics::MakeEvent5_findmax(eicBeam *beam, eicIon *ion, eicEvent *ev , e
   max *= scale;
 
   if( max < 0.0 ){ printf("Kinematics too close to threshold\n"); exit(1);}
-  else printf("Found Max crossection %f at p = %f, th = %f\n", max, mom_pi2, theta_pi2);
+  else printf("Found Max crossection %f at p = %f, th = %f\n", max, max_mom_pi2, max_theta_pi2);
   
   if( !fHaveTotalXs ){
       printf("Calculating total wiser cross section\n");
