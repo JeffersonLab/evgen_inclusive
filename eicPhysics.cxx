@@ -1247,8 +1247,8 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   double x_pi=0.,y_pi=0.,z_pi=0.;
 
 
-  double ef, mom_pi, theta_pi, targprop;
-  double phi_pi = fRandom->Uniform(0, 2.0*TMath::Pi());
+  double ef, mom_pi, theta_pi,phi_pi, targprop;
+//   double phi_pi = fRandom->Uniform(0, 2.0*TMath::Pi());
 
   double intrad = 2.0*log(En_beam/0.000511)/(137.0*3.14159);
 
