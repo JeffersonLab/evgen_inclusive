@@ -571,11 +571,11 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
     type = 2;
     wiser_all_sig_(&En_beam2,&mom_pi2,&theta_pi2,&radlen2,&type,&weight_f);
     weight_v = 0.5 * double(weight_f) + weight_v;
-    TVector3 vp(1.,1.,1.);
-    vp.SetMag(mom_pi);
-    vp.SetTheta(theta_pi);
-    vp.SetPhi(phi_pi);
-    Decay_pi0(vp,vert);    
+//     TVector3 vp(1.,1.,1.);
+//     vp.SetMag(mom_pi);
+//     vp.SetTheta(theta_pi);
+//     vp.SetPhi(phi_pi);
+//     Decay_pi0(vp,vert);    
   }
   else if (particle_id == 321) {
     //   weight_v = WISER_ALL_FIT(mom_pi);
