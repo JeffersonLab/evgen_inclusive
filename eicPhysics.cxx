@@ -1042,49 +1042,39 @@ void eicPhysics::MakeEvent5_findmax(eicBeam *beam, eicIon *ion, eicEvent *ev , e
     //   func = new TF2("sigma_pip",Wiser_func_pi0,0, En_beam,0,360,2);
   }
 
-  //  func->SetParameters(En_beam,radlen);
-  //  double mom_pi= 0, theta_pi= 0;
-  //  func->GetRandom2(mom_pi,theta_pi);
-  double x_pi=0.,y_pi=0.,z_pi=0.;
-
-
-  double ef, mom_pi, theta_pi, targprop;
-  double phi_pi = fRandom->Uniform(0, 2.0*TMath::Pi());
-
   double intrad = 2.0*log(En_beam/0.000511)/(137.0*3.14159);
 
-  double radratio = 3.0*intrad/(4.0*radlen);
-
-  targprop = radratio*
-      (sqrt( 1.0 + fRandom->Uniform()*( pow(radratio, -2.0) + 2.0/radratio ) ) - 1.0 );
+//   double radratio = 3.0*intrad/(4.0*radlen);
+  
+//   targprop = radratio*
+//       (sqrt( 1.0 + fRandom->Uniform()*( pow(radratio, -2.0) + 2.0/radratio ) ) - 1.0 );
 
   // This is fixed
-  double fracradlen = targprop*radlen*(4.0/3.0) + intrad; 
+//   double fracradlen = targprop*radlen*(4.0/3.0) + intrad; 
 
+//   float radlen2 = float(fracradlen);
+  
   float En_beam2 = float(En_beam);
 
-  float mom_pi2, theta_pi2;
-
-  float radlen2 = float(fracradlen);
-
-  max =0.0;
-
+  float targprop = 1.0;
+  float radlen2=targprop*float(radlen)*(4.0/3.0) + intrad; //max always happens at full target length
+  
   // Scan for maximum
-
+  max =0.0;
+  
   int npidx  = 300;
   int nthidx = 300;
-
-  int i, j;
-
-  double max_mom_pi2=0,max_theta_pi2=0;
-  for( i = 0; i < npidx; i++ ){
-      for( j = 0; j < nthidx; j++ ){
+  
+  float max_mom_pi2=0,max_theta_pi2=0;
+  for(int i = 0; i < npidx; i++ ){
+      for(int j = 0; j < nthidx; j++ ){	
+	  float mom_pi2, theta_pi2;	
 	  // Scan around 2 GeV
 // 	  mom_pi2   = 0.1*((double) i)*En_beam2/npidx + mass;  // These are guesses, but they work for E down to 0.3 GeV
 // 	  theta_pi2 = (10.0*((double) j)/nthidx/En_beam2)*3.14159/180;
 	  mom_pi2   = 0.9*((double) i)*En_beam2/npidx + mass;
 	  theta_pi2 = (180.0*((double) j)/nthidx)*3.14159/180;
-
+	  
 	  weight_v = 0.0;
 
 	  weight_v_pip = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 0);
@@ -1124,6 +1114,7 @@ void eicPhysics::MakeEvent5_findmax(eicBeam *beam, eicIon *ion, eicEvent *ev , e
 	      max_mom_pi2 = mom_pi2;
 	      max_theta_pi2 = theta_pi2;
 	  }
+	  
       }
   }
 
@@ -1241,36 +1232,33 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
     //   func = new TF2("sigma_pip",Wiser_func_pi0,0, En_beam,0,360,2);
   }
 
-  //  func->SetParameters(En_beam,radlen);
-  //  double mom_pi= 0, theta_pi= 0;
-  //  func->GetRandom2(mom_pi,theta_pi);
-  double x_pi=0.,y_pi=0.,z_pi=0.;
-
-
-  double ef, mom_pi, theta_pi,phi_pi, targprop;
-//   double phi_pi = fRandom->Uniform(0, 2.0*TMath::Pi());
-
   double intrad = 2.0*log(En_beam/0.000511)/(137.0*3.14159);
+ 
+//   double radratio = 3.0*intrad/(4.0*radlen);
 
-  double radratio = 3.0*intrad/(4.0*radlen);
-
-  targprop = radratio*
-      (sqrt( 1.0 + fRandom->Uniform()*( pow(radratio, -2.0) + 2.0/radratio ) ) - 1.0 );
+//   targprop = radratio*
+//       (sqrt( 1.0 + fRandom->Uniform()*( pow(radratio, -2.0) + 2.0/radratio ) ) - 1.0 );
 
   // This is fixed
-  double fracradlen = targprop*radlen*(4.0/3.0) + intrad; 
+//   double fracradlen = targprop*radlen*(4.0/3.0) + intrad; 
 
+//     float radlen2 = float(fracradlen);
+  
   float En_beam2 = float(En_beam);
 
-  float mom_pi2, theta_pi2;
-
-  float radlen2 = float(fracradlen);
+  float targprop;  
+  float radlen2;
   
   int cnt = 0;
   double totalxs = 0.0;  
-  double testval = 0.0;  
+  double testval = 0.0; 
+  
   TLorentzVector pi_ionrest(0,0,0,0),pi_lab(0,0,0,0);  
   do { 
+      targprop = fRandom->Uniform();
+      radlen2 = targprop*float(radlen)*(4.0/3.0) + intrad;
+    
+      double ef, mom_pi, theta_pi,phi_pi;
       mom_pi = fRandom->Uniform(En_beam2);
 
       theta_pi = acos( fRandom->Uniform(-1.0, 1.0) );
@@ -1284,7 +1272,8 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
       pi_lab.Boost(bv_ion_lab);
     //   cout << pi_ionrest.P() << "\t" <<pi_ionrest.Theta() << "\t" << pi_ionrest.Phi() << "\t" << pi_ionrest.E() << endl; 
     //   cout << pi_lab.P() << "\t" <<pi_lab.Theta() << "\t" << pi_lab.Phi() << "\t" << pi_lab.E() << endl;
-      
+
+      double x_pi=0.,y_pi=0.,z_pi=0.;      
       x_pi = mom_pi*sin(theta_pi)*cos(phi_pi);
       y_pi = mom_pi*sin(theta_pi)*sin(phi_pi);
       z_pi = mom_pi*cos(theta_pi);
@@ -1292,12 +1281,10 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
       // of a sphere of radius mom_pi
       TVector3 v3_pi(x_pi,y_pi,z_pi);
 
-      //  The radiation spectrum is proportional to 4/3/k (for small k).
-      //  Internal factor for lab system when E >> Mn is (alpha/pi)ln(Elab/me)
-
+      float mom_pi2, theta_pi2;      
       mom_pi2 = float(mom_pi);
-      theta_pi2 = float(theta_pi); // theta pi in deg
-
+      theta_pi2 = float(theta_pi);
+      
       weight_v_pip = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 0);
       weight_v_pim = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 1);
       weight_v_Kp = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 2);
@@ -1344,7 +1331,7 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
 
       testval = max*v;
       if( weight_v > max ){
-	  printf("out of bounds in uniform part %f > %f (p = %f, th = %f)\n", weight_v, max, mom_pi, theta_pi);
+	  printf("out of bounds in uniform part %f > %f (p = %f, th = %f), targprop = %f \n", weight_v, max, mom_pi, theta_pi,targprop);
 	  exit(1);
       }
 
