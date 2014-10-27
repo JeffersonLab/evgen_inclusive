@@ -13,7 +13,7 @@
 
 class eicProcess {
     public:
-         eicProcess(const char *file,char *file2);
+         eicProcess(const char *file,char *file2, double nevent, int whichmodel);
 	~eicProcess();
 
 	void Run();
@@ -27,6 +27,8 @@ class eicProcess {
 	eicPhysics  *fphy;
 	eicEvent    *fevt;
 	eicModel    *fmodel;
-
+	
+	double nevt;
+	int model;
 };
 #endif//__eicProcess_h

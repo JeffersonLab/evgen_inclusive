@@ -1,4 +1,3 @@
-nevt    100000
 lumin	1.2e37 Hz/cm^2
 runtime 1.0    hours
 e-_mom	11     GeV
@@ -16,7 +15,6 @@ length	15	cm
 ras_x	0.5	cm
 ras_y	0.5	cm	
 offset  0.0 0.0 -315.0 cm
-model	0
 output  1
 
 # models
@@ -39,7 +37,7 @@ output  1
 # 17  p			(distributed according to crossection)
 # 18  pbar		(distributed according to crossection)
 # 20  e- Deep Inelastic (uniformly distributed with weight)
-# 21  ep Elastic  	(uniformly distributed with weight)
+# 21  e- Elastic  	(uniformly distributed with weight)
 # 22  Moller  		(uniformly distributed with weight)
 
 # output

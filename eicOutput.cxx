@@ -1,6 +1,6 @@
 #include "eicOutput.h"
 
-eicOutput::eicOutput(eicInput *inp, char *fileout){
+eicOutput::eicOutput(eicInput *inp, char *fileout,double nevent, int whichmodel){
     char defaultname[255] = "output.root";
 
     if( fileout ){
@@ -12,8 +12,9 @@ eicOutput::eicOutput(eicInput *inp, char *fileout){
     fOutfile = new TFile(fOutName, "RECREATE");
     fTree = new TTree("T", "EIC Monte Carlo");
     fRunTime = inp->GetRunTime();
-    fNevt    = ((double) inp->GetNevt());
-
+    fNevt    = nevent;
+    fModel   = whichmodel;
+    
     fInput = inp;
 
     InitTree();
@@ -132,8 +133,7 @@ void eicOutput::Write( eicEvent *ev ){
     fData.Wmrate    = fData.Wmweight/fNevt;
     fData.Wmweight *= fRunTime/fNevt;
 
-    int model=fInput->Get_model();
-    if((0<=model && model <=8) && fData.rate<=0.) { 
+    if((0<=fModel && fModel <=8) && fData.rate<=0.) { 
       return;	  // skip the useless event from standard hadron generator    
     }
     else{

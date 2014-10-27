@@ -11,7 +11,7 @@
 
 class eicModel{
     public:
-	eicModel(eicInput *inp = 0);
+	eicModel(eicInput *inp, int whichmodel);
 	~eicModel();
 
 	int    GetModel() { return model; }

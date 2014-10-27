@@ -17,7 +17,7 @@ using namespace std;
 
 class eicOutput {
     public:
-        eicOutput(eicInput *inp = 0, char *fileout="output.root");
+        eicOutput(eicInput *inp = 0, char *fileout="output.root", double nevent=-1,int whichmodel=-1);
 	~eicOutput();
 
 	void Write( eicEvent *ev );
@@ -34,6 +34,8 @@ class eicOutput {
 
 	double fRunTime;
 	double fNevt;
+	
+	int fModel;
 
 	eventdata fData;
 

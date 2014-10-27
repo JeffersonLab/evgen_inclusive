@@ -1,10 +1,10 @@
 #include "eicModel.h"
 
-eicModel::eicModel(eicInput *inp):model(0){
+eicModel::eicModel(eicInput *inp, int whichmodel):model(0){
   double dens,X0=0.;
   int Z,N;
     if( inp ){
-	model  = inp->Get_model();
+	model  = whichmodel;
 
 
 	Z = inp->Get_ionZ();

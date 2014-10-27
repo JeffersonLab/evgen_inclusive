@@ -4,8 +4,6 @@
 #include "TObject.h"
 
 struct inputdata {
-    int    nevt;
-    int    nprnt;
     double lumin;
     double runtime;
     double e_mom;
@@ -27,8 +25,7 @@ struct inputdata {
     double off_y;
     double off_z;
 
-    int	   model;  // 1= electron ; 2=pi+ ; 3=pi- ; 4=pi0 
-    int    out_fmt; // 1=root 2=root+LUND 3=root+SOLLUND
+    int    out_fmt;
 
 };
 
@@ -37,8 +34,6 @@ class eicInput {
 	 eicInput(const char *file);
 	~eicInput();
 
-	int    GetNevt(){ return fData.nevt; }
-	int    GetNprnt(){ return int(fData.nevt/10); }
 	double GetLumin(){ return fData.lumin; }
 	double GetRunTime(){ return fData.runtime; }
 	double Get_eMom(){ return fData.e_mom; }
@@ -55,7 +50,6 @@ class eicInput {
 	double Get_length(){ return fData.length; }
 	double Get_lenx(){ return fData.lenx; }
 	double Get_leny(){ return fData.leny; }
-	int    Get_model(){ return fData.model; }
 	int    Get_fmt(){ return fData.out_fmt; }
 
 	double GetTgtXoff(){ return fData.off_x; }

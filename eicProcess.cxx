@@ -1,26 +1,30 @@
 #include "eicProcess.h"
 
-eicProcess::eicProcess(const char *file, char *file2){
+eicProcess::eicProcess(const char *file, char *file2, double nevent,int whichmodel){
     finp   = new eicInput(file);
 
     fphy  = new eicPhysics();
     fbeam = new eicBeam(finp);
     fion  = new eicIon(finp);
 
-    fout  = new eicOutput(finp,file2);
+    fout  = new eicOutput(finp,file2,nevent,whichmodel);
 
     fevt  = new eicEvent();
-    fmodel = new eicModel(finp);
+    fmodel = new eicModel(finp,whichmodel);
+    
+    nevt = nevent;
+    model = whichmodel;
+    
     return;
 }
 
 void eicProcess::Run(){
-    int nevt = finp->GetNevt();
+//     int nevt = finp->GetNevt();
 
     printf("nevt = %d\n", nevt);
 
     int evt;
-    int nprnt = finp->GetNprnt();
+    int nprnt = nevt/10;
     TString fmtst[3];
     TString modelst[23];
     modelst[0] = "Pi+ weighted";
@@ -43,15 +47,14 @@ void eicProcess::Run(){
     modelst[17] = "p normalized";
     modelst[18] = "p-bar normalized";   
     
-    modelst[20] = "Electron DIS weighted";    
-    modelst[21] = "Elastic weighted";
-    modelst[22] = "Moller weighted";
+    modelst[20] = "e- DIS weighted";    
+    modelst[21] = "e- Elastic weighted";
+    modelst[22] = "e- Moller weighted";
 
     fmtst[0] = "ROOT";
     fmtst[1] = "ROOT and LUND";
     fmtst[2] = "ROOT and SOLLUND";
     int fmt = finp->Get_fmt();
-    int model = fmodel->GetModel();
 
     printf("Model = %s \n", modelst[model].Data() );
     printf("Format = %s \n", fmtst[fmt].Data() );
