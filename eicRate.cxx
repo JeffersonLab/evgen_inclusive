@@ -3,33 +3,37 @@
 
 
 int main(int argc, char **argv){
-    char default_file[255] = "input.dat";
-    char defaultname[255] = "output.root";
+//     char default_file[255] = "input.dat";
+//     char defaultname[255] = "output.root";
     Parse_Args( &argc, argv );
    
- 
-    eicProcess *proc;
+    bool missing=false;
     if (strlen(input_gen_file) == 0)  {
-      strcpy(input_gen_file,default_file);
-      printf ("No input file specified. Using default input file %s \n",default_file);  
-      Print_Usage();
+//       strcpy(input_gen_file,default_file);
+//       printf ("No input file specified. Using default input file %s \n",default_file);
+         printf ("No input file specified\n");        
     }
     if (strlen(output_gen_file) == 0)  {
-      strcpy(output_gen_file,defaultname);
-      printf ("No output file specified. Using default output file %s \n",defaultname); 
-      Print_Usage();
+//       strcpy(output_gen_file,defaultname);
+//       printf ("No output file specified. Using default output file %s \n",defaultname);       
+      printf ("No output file specified\n");             
+      missing=true;      
     }
     if (nevent == -1)  {
-      printf ("I don't know how many events to run\n"); 
-      Print_Usage();
-      exit(1);      
+      printf ("I don't know how many events to run\n");
+      missing=true;
     } 
     if (whichmodel == -1)  {
       printf ("I don't know which model to run\n"); 
+      missing=true;      
+    }     
+
+    if(missing==true){
       Print_Usage();
       exit(1);      
-    }     
- 
+    }
+
+    eicProcess *proc;      
     proc = new eicProcess(input_gen_file,output_gen_file,nevent,whichmodel);
  
     proc->Run();
@@ -89,6 +93,7 @@ void Parse_Args(int *argc, char **argv) {
 
 
 void Print_Usage() {
+  printf (" ----------------------------------------------------------------------- \n");
   printf (" eicRate : This Program Generates events \n");  
   printf (" Usage: eicRate -i inputfile -o outputfile -n nevent -m model\n");  
   printf ("     -i (or -input) inputfile    input file name with correct flags (example input.dat)  \n");  
@@ -117,5 +122,5 @@ void Print_Usage() {
   printf ("		21  e- Elastic  (uniformly distributed with weight)\n");
   printf ("		22  e- Moller 	(uniformly distributed with weight)\n");  
   printf ("     -h (or -help) print this message \n");
-  printf (" --- \n\n");
+  printf (" ----------------------------------------------------------------------- \n");
 }
