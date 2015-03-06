@@ -1,0 +1,46 @@
+lumin	0.265e39  Hz/cm^2
+runtime 1.0    hours
+e-_mom	11     GeV
+e-_the  0      rad
+e-_phi  0      rad
+e-_m	0.000511 GeV
+ion_mom	0      GeV
+ion_the 0      rad
+ion_phi 0      rad
+ion_m	0.938  GeV
+ion_Z	1
+ion_N	1
+dens	0.071 g/cm^3	
+length	40	cm
+ras_x	0.5	cm
+ras_y	0.5	cm	
+offset  0.0 0.0 10.0 cm
+output  1
+
+# models
+# 0  pi+		(uniformly distributed with weight)
+# 1  pi-		(uniformly distributed with weight)
+# 2  pi0		(uniformly distributed with weight)
+# 3  K+			(uniformly distributed with weight)
+# 4  K-			(uniformly distributed with weight)
+# 5  Ks			(uniformly distributed with weight)
+# 6  Kl			(uniformly distributed with weight)
+# 7  p			(uniformly distributed with weight)
+# 8  pbar		(uniformly distributed with weight)
+# 10  pi+		(distributed according to crossection)
+# 11  pi-		(distributed according to crossection)
+# 12  pi0		(distributed according to crossection)
+# 13  K+		(distributed according to crossection)
+# 14  K-		(distributed according to crossection)
+# 15  Ks		(distributed according to crossection)
+# 16  Kl		(distributed according to crossection)
+# 17  p			(distributed according to crossection)
+# 18  pbar		(distributed according to crossection)
+# 20  e- Deep Inelastic (uniformly distributed with weight)
+# 21  e- Elastic  	(uniformly distributed with weight)
+# 22  Moller  		(uniformly distributed with weight)
+
+# output
+# 0  ROOT only
+# 1  ROOT + LUND
+# 2  ROOT + SOLLUND
