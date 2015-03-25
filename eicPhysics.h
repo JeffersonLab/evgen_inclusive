@@ -15,6 +15,9 @@
 
 #include "TRandom2.h"
 
+#include "G2PPhysBase.h"
+#include "G2PPhysPB.h"
+
 #define MASS_P 0.938
 
 using namespace std;
@@ -29,7 +32,8 @@ class eicPhysics {
 	void MakeEvent3( eicBeam *, eicIon *, eicEvent *, eicModel *);
 	void MakeEvent4( eicBeam *, eicIon *, eicEvent *, eicModel *);
 	void MakeEvent5( eicBeam *, eicIon *, eicEvent *, eicModel *);
-	void MakeEvent5_findmax( eicBeam *, eicIon *, eicEvent *, eicModel *);	
+	void MakeEvent5_findmax( eicBeam *, eicIon *, eicEvent *, eicModel *);
+    void MakeEvent6( eicBeam *, eicIon *, eicEvent *, eicModel *);//Ziheng Added
 
 	void SampleWiserPThZ(double, double &, double &, double &, double *);
 

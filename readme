@@ -28,6 +28,7 @@ Modified the random number generator to TRandom2 class (chosen for period and sp
 
 i) setup env (do this before compilation and running the code)
 
+
 setenv LD_LIBRARY_PATH /home/${USER}/lib
 setenv LIBRARY_PATH /home/${USER}/lib
 source your_root_env_script
@@ -86,7 +87,8 @@ see detailed explaination below
     # 18  pbar		(distributed according to crossection)
     # 20  e- Deep Inelastic (uniformly distributed with weight)
     # 21  e- Elastic  	(uniformly distributed with weight)
-    # 22  Moller  		(uniformly distributed with weight)    
+    # 22  Moller  		(uniformly distributed with weight)
+    # 23  P.Bosted      (uniformly distributed with weight)    
 
 Besides root tree output, it can produce text output files at the same time which can be used as direct input for later detector simulation. There are two type of text files
 1. lund format for GEMC to use as input
@@ -99,6 +101,8 @@ The LUND format is defined as
       OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << mass << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
 
 iv) analysis result
+
+.x plot.C("output.root")
 
 there are some root script under output dir for use to anylysis the resulting root file
 open them to see how to use

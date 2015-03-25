@@ -3,12 +3,16 @@
 #include "cteqpdf.h"
 
 #include "wiser_pion.h"
+//#include " "
 
 #include <stdio.h>
 #include <math.h>
 #include <assert.h>
 
 #include "TRandom.h"
+
+//#include "../G2PPhys/G2PPhysBase.h"
+//#include "../G2PPhys/G2PPhysPB.h"
 
 
 extern"C" {
@@ -1400,10 +1404,139 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
   data.g2_p     = Gamma2.P();
   
   ev->SetEventData(data);
+    
 
   return;
   
 }
+
+
+//===================Ziheng Try==============
+void eicPhysics::MakeEvent6(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *model) {
+    
+    G2PPhysBase *pPhys =  new G2PPhysPB();
+    
+    // Radiative correction parameters for P.B. fit: RadLength[2]=(Tb,Ta);
+    // Tb: total radiative length before scattering in radiation length;
+    // Ta: total radiative length after scattering in radiation length;
+    double RadLength[2]={0,0};  // Set Radiative correction. None here.
+    const double me = 0.511e-3; // Set electron mass in GeV
+    const double Mp = 0.93825;
+    const double Mn = 0.93957;
+    
+//1. tell pPhy the beam and target
+    // Beam: BeamParticle #11(electron), radiative correction {Tb=0,Ta=0};
+    // Target: Atom# Z, nucleon# A, Mass M;
+    
+    // ??we have A electrons per nucleon to scatter off of
+    // 11 for electron beam.
+    int A = (ion->GetZ()+ion->GetN());
+    int Z = ion->GetZ();
+    double M = Mp;
+    //the same mass used in Bosted.f line 91
+    pPhys->SetParticle(11);
+    pPhys->SetPars(RadLength,2);
+    pPhys->SetTarget(Z, A);
+//    pPhys->SetTargetMass(M);
+    
+//2.get uniform vert_xyz
+    //what physics meaning of tglx, vert_x, tftoff?
+    double tglx = model->GetLx();
+    double tgly = model->GetLy();
+    double tglength = model->GetLength();
+    TVector3 tgtoff = model->GetTgtOffset();
+    
+    double vert_x = fRandom->Uniform((-tglx/2),(tglx/2)) + tgtoff.X();
+    double vert_y = fRandom->Uniform((-tgly/2),(tgly/2)) + tgtoff.Y();
+    double vert_z = fRandom->Uniform((-tglength/2),(tglength/2))+ tgtoff.Z();
+    //printf("vx=%f, vy=%f, vz = %f \n", vert_x,vert_y,vert_z);
+    
+    
+//3.calculate crossection in given Ei, Ef, theta
+    double Ei = beam->GetEnergy();
+    double Ef = fRandom->Uniform(0,Ei);
+    double Pf = sqrt(Ef*Ef-me*me);
+    double phi = 2.0*TMath::Pi()*fRandom->Uniform(0,1.0);
+    double theta = TMath::Pi()*fRandom->Uniform(0,1.0);
+    //printf("Ei=%f, Ef=%f, Pf=%f, phi=%f,theta=%f \n", Ei, Ef, Pf, phi, theta);
+    
+    
+    double Q2 = 4.*Ei*Ef*pow((sin(abs(theta)/2.)),2);
+    double W2 = M*M + 2*M*( Ei - Ef ) - Q2;
+    double x = Q2/(2*M*(Ei-Ef));
+    double y = 1.0 - Ef/Ei;
+    //printf("x=%f,Q2=%f, w2=%f \n", x,Q2,W2);
+
+    
+    double V = 4.0*TMath::Pi()*(Ei-0);
+    // V has unit of GeV*sr
+    double sigma = 0;
+    double weight_v = 0;
+ 
+    
+//4. Use P Bosted fit
+    
+/*-------------------------------------------------------------------------------------
+|   Fit to inelastic cross sections for A(e,e')X
+|   valid for all W<3 GeV and all Q2<10 GeV2
+|
+|   Inputs: Z, A (double precision)are Z and A of nucleus
+|                                  (use Z=0., A=1. to get free neutron)
+|           Qsq (double precision) is 4-vector momentum transfer squared
+|                                  (positive in chosen metric)
+|           Wsq (double precision) is invarinat mass squared of final
+|                                  state calculated assuming electron scattered from
+|                                  a free proton
+|
+|   outputs: F1, F2 (double precision) are structure functions per nucleus
+|   
+|   Version of 10/20/2006 P. Bosted
+--------------------------------------------------------------------------------------*/
+    
+    
+    if ( W2>0 )
+    {
+        sigma = pPhys->GetXS(Ei,Ef,theta)*1e6;
+        //cross section in units of nb (1e-33 cm^2, 1e-37 m^2);
+        //the GetXS return in ub/MeV-sr of total nucleis
+        //1e6 from ub/MeV-sr to nb/GeV-sr
+        // sigma in unit of nb/GeV-sr
+        weight_v = sigma*beam->GetLumin()*V*1e-37;
+        //1e-37 for nb to m^2;
+        //luminosity Hz/m^2
+        if (isnan(sigma)) {sigma = 0;weight_v = 0;}
+    }
+    
+    //printf(" sigma=%f, weight_v=%f \n", sigma, weight_v);
+
+
+ //5. write the date sheet
+    eventdata data;
+    
+        data.weight = weight_v;
+        data.Q2     = Q2;
+        data.x      = x;
+        data.y      = y;
+        data.W      = sqrt(W2);
+        data.ef     = Ef;
+        data.pf     = Pf;
+        data.theta  = theta;
+        data.phi    = phi;
+        data.particle_id = 11;
+        data.charge = -1;
+        data.Z_ion  = ion->GetZ();
+        data.N_ion  = ion->GetN();
+        data.vx     = vert_x;
+        data.vy     = vert_y;
+        data.vz     = vert_z;
+    
+    ev->SetEventData(data);
+
+    }
+
+//=====================END====================
+
+
 
 void eicPhysics::SampleWiserPThZ( double En_beam, double &p, double &th, double &z, double *pars ){
   p = fRandom->Uniform(En_beam); 

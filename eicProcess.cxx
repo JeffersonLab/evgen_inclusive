@@ -26,7 +26,7 @@ void eicProcess::Run(){
     int evt;
     int nprnt = nevt/10;
     TString fmtst[3];
-    TString modelst[23];
+    TString modelst[25];
     modelst[0] = "Pi+ weighted";
     modelst[1] = "Pi- weighted";
     modelst[2] = "Pi0 weighted";
@@ -50,6 +50,8 @@ void eicProcess::Run(){
     modelst[20] = "e- DIS weighted";    
     modelst[21] = "e- Elastic weighted";
     modelst[22] = "e- Moller weighted";
+    modelst[23] = "e- P. Bosted weighted -spatial even";
+    modelst[24] = "e- P. Bosted weighted -xy even";
 
     fmtst[0] = "ROOT";
     fmtst[1] = "ROOT and LUND";
@@ -81,6 +83,22 @@ void eicProcess::Run(){
 	  fout->Write(fevt);
       }
     }
+    
+    
+    
+    //=====================Ziheng TRIAl=================
+    else if (model == 23) { // P. Bosted Fit
+        for( evt = 1; evt <= nevt; evt++ ){
+            if( (evt%nprnt) == 0 ){printf("Event %10d \n", evt);}
+            fphy->MakeEvent6(fbeam, fion, fevt, fmodel);
+            fout->Write(fevt);
+        }
+    }
+    //=========================END=====================
+    
+    
+    
+    
     else if(0<=model && model <=8 ) { // standard hadron generator
       printf("hadron cross section with weight factor\n");
       for( evt = 1; evt <= nevt; evt++ ){

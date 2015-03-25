@@ -20,7 +20,7 @@ FFLAGS= -O2
 
 all:            $(PROGRAMS)
 
-$(EICRATE):  $(EICRATEO) piajp.o
+$(EICRATE):  $(EICRATEO) piajp.o bosted.o
 		@echo "this: $@, $(EICRATEO)"
 		$(LD) $(LDFLAGS) $^ $(LIBS) -ggdb -lgfortran -O2 -lEG -lGed -lHtml -lThread -lGeom -L. -lcteqpdf $(OutPutOpt)$@
 		@echo "$@ done"
@@ -29,11 +29,16 @@ eicRate.$(SrcSuf):
 		@echo "Generating dictionary $@..."
 		@rootcint -f $@ -c $^
 
+
 piajp.o : piajp.f
+		$(FC) -c $(FFLAGS) $< -o $@
+bosted.o : bosted.f
 		$(FC) -c $(FFLAGS) $< -o $@
 
 clean:
 		@rm -f $(OBJS) *.res core piajp.o
+		@rm -f $(OBJS) *.res core bosted.o
+
 
 distclean:      clean
 		@rm -f $(PROGRAMS) *Dict.* *.def *.exp \
