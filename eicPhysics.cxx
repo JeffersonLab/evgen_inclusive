@@ -1412,6 +1412,9 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
 
 
 //===================Ziheng Try==============
+//for Peter Bosted fit, model Number 23
+
+
 void eicPhysics::MakeEvent6(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *model) {
     
     G2PPhysBase *pPhys =  new G2PPhysPB();
@@ -1506,6 +1509,8 @@ void eicPhysics::MakeEvent6(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
         //luminosity Hz/m^2
         if (isnan(sigma)) {sigma = 0;weight_v = 0;}
     }
+    else W2=0;
+    // for W2<0 non-physical event, set W2 = 0;
     
     //printf(" sigma=%f, weight_v=%f \n", sigma, weight_v);
 
