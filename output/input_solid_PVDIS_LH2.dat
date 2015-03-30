@@ -1,4 +1,4 @@
-lumin	0.265e39  Hz/cm^2
+lumin	0.53e39  Hz/cm^2
 runtime 1.0    hours
 e-_mom	11     GeV
 e-_the  0      rad
@@ -11,11 +11,11 @@ ion_m	0.938  GeV
 ion_Z	1
 ion_N	0
 dens	0.071 g/cm^3
-length	10	cm
+length	40	cm
 ras_x	0.5	cm
 ras_y	0.5	cm	
 offset  0.0 0.0 10.0 cm
-output  0
+output  1
 
 # models
 # 0  pi+		(uniformly distributed with weight)
