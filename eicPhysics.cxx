@@ -1411,7 +1411,7 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
 }
 
 
-//===================Ziheng Try==============
+//===================Ziheng==============
 //for Peter Bosted fit, model Number 23
 
 
@@ -1439,6 +1439,7 @@ void eicPhysics::MakeEvent6(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
     //the same mass used in Bosted.f line 91
     pPhys->SetParticle(11);
     pPhys->SetPars(RadLength,2);
+    //"2" for two parameters Ta and Tb; or "0" for nothing
     pPhys->SetTarget(Z, A);
 //    pPhys->SetTargetMass(M);
     
@@ -1501,7 +1502,7 @@ void eicPhysics::MakeEvent6(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
     {
         sigma = pPhys->GetXS(Ei,Ef,theta)*1e6;
         //cross section in units of nb (1e-33 cm^2, 1e-37 m^2);
-        //the GetXS return in ub/MeV-sr of total nucleis
+        //the GetXS return in ub/MeV-sr of total nucleus
         //1e6 from ub/MeV-sr to nb/GeV-sr
         // sigma in unit of nb/GeV-sr
         weight_v = sigma*beam->GetLumin()*V*1e-37;
@@ -1521,7 +1522,7 @@ void eicPhysics::MakeEvent6(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
         data.weight = weight_v;
         data.Q2     = Q2;
         data.x      = x;
-        data.y      = y;
+        data.y      = y;//should be y; change to debug
         data.W      = sqrt(W2);
         data.ef     = Ef;
         data.pf     = Pf;
