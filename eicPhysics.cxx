@@ -1461,7 +1461,7 @@ void eicPhysics::MakeEvent6(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
     double Ef = fRandom->Uniform(0,Ei);
     double Pf = sqrt(Ef*Ef-me*me);
     double phi = 2.0*TMath::Pi()*fRandom->Uniform(0,1.0);
-    double theta = TMath::Pi()*fRandom->Uniform(0,1.0);
+    double theta = acos(fRandom->Uniform(-1,1));
     //printf("Ei=%f, Ef=%f, Pf=%f, phi=%f,theta=%f \n", Ei, Ef, Pf, phi, theta);
     
     
