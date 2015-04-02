@@ -134,7 +134,7 @@ void eicOutput::Write( eicEvent *ev ){
     fData.Wmweight *= fRunTime/fNevt;
 
 //     if((0<=fModel && fModel <=8) && fData.rate<=0.) {  // skip the useless event from standard hadron generator    
-    if(fData.rate<=0){ // skip useless events with no crossection
+    if(fData.rate<=0){ // skip useless events with no crossection and rate
       return;	 
     }
     else{
