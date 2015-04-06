@@ -157,11 +157,20 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *
 //	  /(x*y*Q2*137.0*137.0);
 	= 4.0*3.14159*((1.0-y-pow(x*y*MASS_P,2.0)/Q2)*f2nc+y*y*x*f1nc+(y-y*y/2.0)*x*f3nc)
 	  /(x*y*Q2*137.0*137.0);
-
+    
+    
+    
+//***********************Added By Ziheng**************************
+    double ds_dOmegadE = ds_dxdy*ef*J/(2.0*3.14159*M*e_lab*y);    // in GeV-2 / GeV
+    ds_dOmegadE = ds_dOmegadE* (0.197*0.197*1e7); // in nb/GeV-sr
+    // convert to nb/GeV-sr,
+    //GeV-2 to nb:  1GeV-2=(0.197*0.197*1e-30)m2 = (0.197*0.197*1e7) nb
 
 //    double ds_dOmegadE = ds_dxdy*ef*J/(2.0*M*e_rest.Energy()*3.14159*y);
+//*****************************************************************
 
-
+    
+    
 
 //    double Abeam =-eta_gZ*(gA*f1gz/f1 + Y*gV*f3gz/f1);
     double Abeam = (eta_gZ*gA*f1gz   - 2.0*eta_Z*gV*gA*f1z  
@@ -277,7 +286,8 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *
     double dsWm_dxdydphi = dsWmdxy/(2.0*3.14159);
 
     if( 0.0 < ds_dxdy && ds_dxdy < 1e9 ){
-	data.weight  = ds_dxdydphi*(0.197*0.197*1e-30)*V*J; // GeV^-2 to m^2
+	data.weight  = ds_dxdydphi*(0.197*0.197*1e-30)*V*J;
+    // GeV^-2 to m^2: 1GeV-1=0.197*1e-15 m, 1GeV-2=(0.197*0.197*1e-30)m2 = (0.197*0.197*1e7) nb
 	data.weight *= beam->GetLumin();
     } else {
 	// Unphysical for some reason
@@ -305,8 +315,8 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *
     data.Wprate   = 0.0;
     data.Wmrate   = 0.0;
 
-//    data.crs    = ds_dOmegadE;
-    data.crs    = ds_dxdy;
+    data.crs    = ds_dOmegadE;
+//    data.crs    = ds_dxdy;
 
     data.ef     = kf.Energy();
     data.theta  = kf.Theta();
@@ -1086,7 +1096,7 @@ void eicPhysics::MakeEvent5_findmax(eicBeam *beam, eicIon *ion, eicEvent *ev , e
 	  weight_v_Kp = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 2);
 	  weight_v_Km = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 3);
 	  weight_v_p = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 4);
-	  weight_v_pbar = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 5);	  
+	  weight_v_pbar = wiser_sigma( En_beam2, mom_pi2, theta_pi2, radlen2, 5);//Returns the cross section in units of nanobarns/GeV/str
 
 	  if (particle_id == 211) {
 	      weight_v = prot_prob*weight_v_pip + (1.0-prot_prob)*weight_v_pim;
@@ -1423,7 +1433,7 @@ void eicPhysics::MakeEvent6(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
     // Tb: total radiative length before scattering in radiation length;
     // Ta: total radiative length after scattering in radiation length;
     double RadLength[2]={0,0};  // Set Radiative correction. None here.
-    const double me = 0.511e-3; // Set electron mass in GeV
+    const double me = 0.000511; // Set electron mass in GeV
     const double Mp = 0.93825;
     const double Mn = 0.93957;
     
@@ -1458,7 +1468,7 @@ void eicPhysics::MakeEvent6(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
     
 //3.calculate crossection in given Ei, Ef, theta
     double Ei = beam->GetEnergy();
-    double Ef = fRandom->Uniform(0,Ei);
+    double Ef = Ei*fRandom->Uniform(0,1.0);
     double Pf = sqrt(Ef*Ef-me*me);
     double phi = 2.0*TMath::Pi()*fRandom->Uniform(0,1.0);
     double theta = acos(fRandom->Uniform(-1,1));
@@ -1520,6 +1530,7 @@ void eicPhysics::MakeEvent6(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
     eventdata data;
     
         data.weight = weight_v;
+        data.crs = sigma;
         data.Q2     = Q2;
         data.x      = x;
         data.y      = y;//should be y; change to debug
