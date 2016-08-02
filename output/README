@@ -3,7 +3,7 @@ Output for eicRate
 
 weight		weight to give counts given the luminosity and running time in 
 		the input file
-rate		counts/s given the luminosity
+rate		counts/second/event (=crossection*luminosity/Nevent)
 theta		angle of the scattered electron [rad]
 jetth		angle of three-momentum transfer [rad]
 phi		azimuthal angle of the scattered electron [rad]
@@ -34,10 +34,10 @@ y		nu/Ebeam in nucleon rest frame, kinematic variable y
 Y		Big Y, [ 1-(1-y)^2 ]/[ 1 + (1-y)^2 ]
 AWp		PV asymmetry for W+ exchange
 AWm		PV asymmetry for W- exchange
-Wpweight	Event weight to give counts for W+ exchange
-Wmweight	Event weight to give counts for W- exchange
-Wprate		Event weight to give counts/s for W+ exchange
-Wmrate		Event weight to give counts/s for W- exchange
+Wpweight	counts/event (=crossection*luminosity/Nevent*runtime) for W+ exchange
+Wmweight	counts/event (=crossection*luminosity/Nevent*runtime) for W- exchange
+Wprate		counts/second/event (=crossection*luminosity/Nevent) for W+ exchange
+Wmrate		counts/second/event (=crossection*luminosity/Nevent) for W- exchange
 jetp		Magnitude of 3-momentum transfer [GeV]
 jetE		energy Transfer [GeV]
 Z_ion		Z of the nucleus
