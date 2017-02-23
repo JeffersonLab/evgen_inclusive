@@ -12,8 +12,8 @@ ion_Z	73
 ion_N	52
 dens	0.47    g/cm^3	
 length	3.69	cm
-ras_x	0.	cm
-ras_y	0.	cm	
+ras_x	2.4	cm
+ras_y	2.4	cm	
 offset  0.0 0.0 -350 cm
 output  1
 
