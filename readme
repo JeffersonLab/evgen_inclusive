@@ -20,7 +20,7 @@ cd cteq-pdf-1.0.4/
 make
 make install
 
-by default is going to write the desired library in /home/${user}/lib
+by default is going to write the desired library in /home/${user}/lib and  /home/${user}/share
 
 2) The Generator itself (by Seamus Riordan)
 Lorenzo Zana added the possibility to specify the input file and output file
@@ -34,9 +34,9 @@ setenv LIBRARY_PATH /home/${USER}/lib
 source your_root_env_script
 (
 In general, it can be root_version/bin/thisroot.csh
-on ifarm, it can be /apps/root/5.34.13/setroot_CUE which has content as follows
+on ifarm, it can be /apps/root/5.34.36/setroot_CUE which has content as follows
 
-setenv ROOTSYS /u/apps/root/5.34.13/root
+setenv ROOTSYS /apps/root/5.34.36/root
 setenv PATH ${ROOTSYS}/bin:${PATH}
 if (!($?LD_LIBRARY_PATH)) then
   setenv LD_LIBRARY_PATH ${ROOTSYS}/lib
