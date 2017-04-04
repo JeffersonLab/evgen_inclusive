@@ -268,10 +268,10 @@ void  eicOutput::MakeFileLUND(){
   TVector3 vtemp;
 
   ofstream OUT (file.Data());
-  for (int i=1; i<=nentries ; i++) {
+  for (int i=0; i<nentries ; i++) {
     input_chain.GetEntry(i);
-    if(i % (nentries/10) == 0 ){
-      printf("Analyzed %d events of total %d \n",i,nentries);
+    if((i+1) % (nentries/10) == 0 ){
+      printf("Analyzed %d events of total %d \n",i+1,nentries);
     }
 
     if (x>0)   nu = Q2 / (2 * MASS_p * x) ;
