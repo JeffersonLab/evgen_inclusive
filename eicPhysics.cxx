@@ -581,10 +581,10 @@ void eicPhysics::MakeEvent2(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
     //  weight_v = 0.5 * ( WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,1) + WISER_ALL_SIG(En_beam,mom_pi,theta_pi,radlen,2)) ;
     type = 1;
     wiser_all_sig_(&En_beam2,&mom_pi2,&theta_pi2,&radlen2,&type,&weight_f);
-    weight_v = 0.5 * double(weight_f);
+    weight_v = 2.0 * double(weight_f);
     type = 2;
     wiser_all_sig_(&En_beam2,&mom_pi2,&theta_pi2,&radlen2,&type,&weight_f);
-    weight_v = 0.5 * double(weight_f) + weight_v;
+    weight_v = 2.0 * double(weight_f) + weight_v;
 //     TVector3 vp(1.,1.,1.);
 //     vp.SetMag(mom_pi);
 //     vp.SetTheta(theta_pi);
@@ -1105,7 +1105,7 @@ void eicPhysics::MakeEvent5_findmax(eicBeam *beam, eicIon *ion, eicEvent *ev , e
 	      weight_v = prot_prob*weight_v_pim + (1.0-prot_prob)*weight_v_pip;
 	  }
 	  else if (particle_id == 111) {
-	      weight_v = (weight_v_pip + weight_v_pim) /2.0;
+	      weight_v = (weight_v_pip + weight_v_pim) *2.0;
 	  }
 	  else if (particle_id == 321) {
 	      weight_v = prot_prob*weight_v_Kp + (1.0-prot_prob)*weight_v_Km;
@@ -1315,8 +1315,8 @@ void eicPhysics::MakeEvent5(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
 	  weight_v = prot_prob*weight_v_pim + (1.0-prot_prob)*weight_v_pip;
       }
       else if (particle_id == 111) {
-	      totalxs = (fTotalXs_pip + fTotalXs_pim)/2.0;	
-	      weight_v = (weight_v_pip+weight_v_pim) /2.0;
+	      totalxs = (fTotalXs_pip + fTotalXs_pim)*2.0;	
+	      weight_v = (weight_v_pip+weight_v_pim) *2.0;
       }
       else if (particle_id == 321) {
 	  totalxs = prot_prob*fTotalXs_Kp+ (1.0-prot_prob)*fTotalXs_Km;
