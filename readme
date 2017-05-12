@@ -16,11 +16,12 @@ It requires g++ and gfortran (for other configurations, modify the Makefile) and
    local copy in evgen/cteq-pdf-1.0.4/
 
 cd cteq-pdf-1.0.4/
-./configure
+./configure --prefix="$PWD"
 make
-make install
+make install 
 
 by default is going to write the desired library in /home/${user}/lib and  /home/${user}/share
+Use --prefix="$PWD" to have it installed at the current dir
 
 2) The Generator itself (by Seamus Riordan)
 Lorenzo Zana added the possibility to specify the input file and output file
@@ -28,14 +29,13 @@ Modified the random number generator to TRandom2 class (chosen for period and sp
 
 i) setup env (do this before compilation and running the code)
 
-
-setenv LD_LIBRARY_PATH /home/${USER}/lib
-setenv LIBRARY_PATH /home/${USER}/lib
+setenv LD_LIBRARY_PATH your_install_dir/lib
+setenv LIBRARY_PATH your_install_dir/lib
 source your_root_env_script
 (
 In general, it can be root_version/bin/thisroot.csh
-on ifarm, it can be /apps/root/5.34.36/setroot_CUE which has content as follows
 
+on ifarm, it can be /apps/root/5.34.36/setroot_CUE which has content as follows
 setenv ROOTSYS /apps/root/5.34.36/root
 setenv PATH ${ROOTSYS}/bin:${PATH}
 if (!($?LD_LIBRARY_PATH)) then
@@ -43,6 +43,8 @@ if (!($?LD_LIBRARY_PATH)) then
 else
   setenv LD_LIBRARY_PATH ${ROOTSYS}/lib:${LD_LIBRARY_PATH}
 endif
+
+if you using this with the software framwork which has a root already, just use your set_solid to avoid conflict 
 )
 
 ii) compile it 
