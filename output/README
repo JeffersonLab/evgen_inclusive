@@ -1,15 +1,14 @@
 ////////////////////////////////////
 Output for eicRate
 
-weight		weight to give counts given the luminosity and running time in 
-		the input file
-rate		counts/second/event (=crossection*luminosity/Nevent)
+weight		counts/event (=diff_crossection*psf*luminosity/Ntrials*runtime)
+rate		counts/second/event (=diff_crossection*psf*luminosity/Ntrials)
 theta		angle of the scattered electron [rad]
 jetth		angle of three-momentum transfer [rad]
 phi		azimuthal angle of the scattered electron [rad]
 x		Bjorken x
 Ef		Final electron energy
-crs		Differential cross section dsigma/dxdy [GeV^-2]
+crs		Differential cross section dsigma/dxdy [GeV^-2] for electron only channel
 F1		Structure function F1
 F2		Structure function F2
 F1gZ		Structure function F1-gammaZ
@@ -34,10 +33,10 @@ y		nu/Ebeam in nucleon rest frame, kinematic variable y
 Y		Big Y, [ 1-(1-y)^2 ]/[ 1 + (1-y)^2 ]
 AWp		PV asymmetry for W+ exchange
 AWm		PV asymmetry for W- exchange
-Wpweight	counts/event (=crossection*luminosity/Nevent*runtime) for W+ exchange
-Wmweight	counts/event (=crossection*luminosity/Nevent*runtime) for W- exchange
-Wprate		counts/second/event (=crossection*luminosity/Nevent) for W+ exchange
-Wmrate		counts/second/event (=crossection*luminosity/Nevent) for W- exchange
+Wpweight	counts/event (=diff_crossection*psf*luminosity/Ntrials*runtime) for W+ exchange
+Wmweight	counts/event (=diff_crossection*psf*luminosity/Ntrials*runtime) for W- exchange
+Wprate		counts/second/event (=diff_crossection*psf*luminosity/Ntrials) for W+ exchange
+Wmrate		counts/second/event (=diff_crossection*psf*luminosity/Ntrials) for W- exchange
 jetp		Magnitude of 3-momentum transfer [GeV]
 jetE		energy Transfer [GeV]
 Z_ion		Z of the nucleus
