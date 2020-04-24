@@ -150,5 +150,7 @@ setenv LIBRARY_PATH /home/${USER}/lib:${ROOTSYS}/lib
 2011    hadron with Wiser and LUND format added Lorenzo Zana
 2014/01 events distributed by crossection added by Seamus Riordan
 2014/07 fix collider mode by Zhiwen Zhao
+...
+2020/04 svn2root by Zhiwen Zhao from https://jlabsvn.jlab.org/svnroot/solid/evgen/eicRate_20101102/
 
 
