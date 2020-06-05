@@ -1518,7 +1518,7 @@ void eicPhysics::MakeEvent6(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel 
         weight_v = sigma*beam->GetLumin()*V*1e-37;
         //1e-37 for nb to m^2;
         //luminosity Hz/m^2
-        if (isnan(sigma)) {sigma = 0;weight_v = 0;}
+        if (std::isnan(sigma)) {sigma = 0;weight_v = 0;}
     }
     else W2=0;
     // for W2<0 non-physical event, set W2 = 0;
