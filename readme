@@ -9,12 +9,12 @@ Works for both collider and fixed target model
 
 ========= How to use it  ================
 
-It requires g++ and gfortran (for other configurations, modify the Makefile) and the CTEQ pdf libraries (for convenience a copy is in https://jlabsvn.jlab.org/svnroot/solid/evgen/cteq-pdf-1.0.4/
+It requires g++ and gfortran (for other configurations, modify the Makefile) and the CTEQ pdf libraries 
 
-1) first you need a working version of cteq C interface library 
-   orginal at http://desy.de/~znagy/hep-programs/cteq-pdf/
-   local copy in evgen/cteq-pdf-1.0.4/
+1) first you need a working version of cteq C interface library
 
+wget https://desy.de/~znagy/hep-programs/cteq-pdf/cteq-pdf-1.0.4.tar.gz
+tar zxf cteq-pdf-1.0.4.tar.gz
 cd cteq-pdf-1.0.4/
 ./configure --prefix="$PWD"
 make
@@ -29,27 +29,14 @@ Modified the random number generator to TRandom2 class (chosen for period and sp
 
 i) setup env (do this before compilation and running the code)
 
-setenv LD_LIBRARY_PATH your_install_dir/lib
-setenv LIBRARY_PATH your_install_dir/lib
+setenv LD_LIBRARY_PATH your_cteq_dir/lib
+setenv LIBRARY_PATH your_cteq_dir/lib
 source your_root_env_script
-(
-In general, it can be root_version/bin/thisroot.csh
-
-on ifarm, it can be /apps/root/5.34.36/setroot_CUE which has content as follows
-setenv ROOTSYS /apps/root/5.34.36/root
-setenv PATH ${ROOTSYS}/bin:${PATH}
-if (!($?LD_LIBRARY_PATH)) then
-  setenv LD_LIBRARY_PATH ${ROOTSYS}/lib
-else
-  setenv LD_LIBRARY_PATH ${ROOTSYS}/lib:${LD_LIBRARY_PATH}
-endif
-
-if you using this with the software framwork which has a root already, just use your set_solid to avoid conflict 
-)
+(on jlab ifarm, it can be /group/solid/apps/root/root_v6.20.02.Linux-centos7-x86_64-gcc4.8/bin/thisroot.csh)
 
 ii) compile it 
 
-cd eicRate_20101102/
+cd evgen_inclusive
 make
 
 this will create the binary eicRate
