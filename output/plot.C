@@ -1,6 +1,7 @@
-void plot(char* input_filename){
+void plot(char* input_filename,string setup){
   gStyle->SetPalette(1);
-  gStyle->SetOptStat(11111);
+//   gStyle->SetOptStat(11111);
+  gStyle->SetOptStat(0);  
 //     TFile *file=new TFile("output.root");
 //   TFile *file=new TFile("output_neutron.root");
 //     TFile *file=new TFile("output_proton.root");
@@ -16,6 +17,12 @@ void plot(char* input_filename){
     }
     else cout << "open file " << input_filename << endl;
 
+int amin=0,amax=0;
+if (setup=="PVDIS") {amin=22;amax=35;}
+else if (setup=="SIDIS_He3") {amin=8; amax=24;}
+else if (setup=="SIDIS_NH3") {amin=2; amax=50;}
+else if (setup=="JPsi") {amin=9; amax=25;}
+else {cout << "wrong setup" << endl;  exit(-1);}
       
 TTree *T = (TTree*) file->Get("T");
 
@@ -28,7 +35,9 @@ gPad->SetLogz();
 // T->Draw("Q2:x>>h1(11,0.225,0.775,10,3,12)","rate*(9./180.*3.14159<theta && theta<24./180.*3.14159)","TEXT");
 // T->Draw("Q2:x>>h1(11,0.225,0.775,10,3,12)","rate*( 9./180.*3.14159<theta && theta<24./180.*3.14159)","TEXT");
 // T->Draw("Q2:x>>h1(11,0.225,0.775,10,3,12)","rate*(W>2 && Q2 >1 && 22./180.*3.14159<theta && theta<35./180.*3.14159)","TEXT");
-T->Draw("Q2:x>>h1(11,0.225,0.775,10,3,13)","rate*(W>2 && Q2 >1 && 9./180.*3.14159<theta && theta<24./180.*3.14159)","TEXT");
+// T->Draw("Q2:x>>h1(11,0.225,0.775,10,3,13)",Form("rate*(W>2 && Q2 >1 && %f/180*3.1416<theta && theta<%f/180*3.1416)",amin,amax),"TEXT");
+// T->Draw("Q2:x>>h1(10,0,1,20,0,20)",Form("rate*(W>2 && Q2 >1 && %i/180*3.1416<theta && theta<%i/180*3.1416)",amin,amax),"TEXT");
+T->Draw("Q2:x>>h1(10,0,1,20,0,20)",Form("rate*(%i/180*3.1416<theta && theta<%i/180*3.1416)",amin,amax),"TEXT");
 
 //       dimension AXSOLMIN(11),AXSOLMAX(11),ARATESOL(5,11),AQMU2SOL(5,11) ! in Hz
 //       dimension NSOL(11)
@@ -88,7 +97,7 @@ gPad->SetLogz();
 // T->Draw("(g2_theta*180/3.1415926):g2_p>>h2(11000,0,11,180,0,180)","rate","colz");
 // T->Draw("pf:(theta*180/3.1415926)>>h2(20,20,40,22,0,11)","","colz text");
 // T->Draw("pf:(theta*180/3.1415926)>>h2(20,20,40,22,0,11)","rate","colz text");
-T->Draw("pf:(theta*180/3.1415926)>>h2(100,0,180,100,0,100)","rate","colz");
+T->Draw("pf:(theta*180/3.1415926)>>h2(180,0,180,22,0,11)","rate","colz");
 // T->Draw("theta:Ef>>h2(11,0,11,10,0,3.14)","rate","TEXT");
 // T->Draw("theta:Ef>>h2(11,0,11,10,0,3.14)","rate*(W>2 && Q2 >1)","TEXT");
 // T->Draw("(theta*180/3.1415926):pf>>h2(11000,0,11,180,0,180)","rate*(W>2 && Q2 >1)","colz");
