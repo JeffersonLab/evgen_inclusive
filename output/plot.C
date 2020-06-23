@@ -18,10 +18,10 @@ void plot(char* input_filename,string setup){
     else cout << "open file " << input_filename << endl;
 
 int amin=0,amax=0;
-if (setup=="PVDIS") {amin=22;amax=35;}
-else if (setup=="SIDIS_He3") {amin=8; amax=24;}
+if (setup=="PVDIS") {amin=20;amax=40;}
+else if (setup=="SIDIS_He3") {amin=8; amax=35;}
 else if (setup=="SIDIS_NH3") {amin=2; amax=50;}
-else if (setup=="JPsi") {amin=9; amax=25;}
+else if (setup=="JPsi") {amin=8; amax=35;}
 else {cout << "wrong setup" << endl;  exit(-1);}
       
 TTree *T = (TTree*) file->Get("T");
