@@ -122,7 +122,7 @@ some example output files at jlab ifarm /work/halla/solid/evgen/
 2014/07 fix collider mode by Zhiwen Zhao
 ...
 2020/04 svn2root by Zhiwen Zhao from https://jlabsvn.jlab.org/svnroot/solid/evgen/eicRate_20101102/
-2020/06 update customized lund output header line by Zhiwen Zhao, after v1.0 (88ad9cb)
+2020/06 change header line definition to match gemc 2.6, update readme and cl­eanup code by Zhiwen Zhao, after v1.0 (88ad9cb)
 
 ############(outdated, need to update LUND format) #############################
 3) Changing output from root format to lund format 
