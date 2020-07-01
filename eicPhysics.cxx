@@ -378,7 +378,8 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *
     data.mass    = 0.000511;
     data.particle_id = 11;
     data.charge = -1;
-    data.pf =  kf.Energy();
+//     data.pf =  kf.Energy();
+    data.pf =  kf.P();    
     data.Z_ion = ion->GetZ();
     data.N_ion = ion->GetN();
 

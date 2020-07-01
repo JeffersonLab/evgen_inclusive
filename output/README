@@ -1,13 +1,31 @@
 ////////////////////////////////////
-Output for eicRate
+Output in root file
 
+== common entries in all models ========================
 weight		counts/event (=diff_crossection*psf*luminosity/Ntrials*runtime)
 rate		counts/second/event (=diff_crossection*psf*luminosity/Ntrials)
-theta		angle of the scattered electron [rad]
+theta		theta angle of outgoing particle [rad]
+phi		azimuthal angle of outgoing particle [rad]
+Ef		particle energy [GeV]
+pf  		particle momentum [GeV]
+particle_id	PDG encoding of particle produced 
+charge		particle charge
+mass		particle mass [GeV] 
+Z_ion		Z of the nucleus
+N_ion		N of the nucleus
+vx		Vertex x position in target [m]
+vy		Vertex y position in target [m]
+vz		Vertex z position in target [m]
+
+== common entries in all electron models ========================
+x		Bjorken x  
+y		nu/Ebeam in nucleon rest frame, kinematic variable y
+Q2		Negative four-momentum transfer squared  
+W		Invariant mass of the process [GeV]
+
+== entries only in eDIS generator  ========================  
+
 jetth		angle of three-momentum transfer [rad]
-phi		azimuthal angle of the scattered electron [rad]
-x		Bjorken x
-Ef		Final electron energy
 crs		Differential cross section dsigma/dxdy [GeV^-2] for electron only channel
 F1		Structure function F1
 F2		Structure function F2
@@ -18,7 +36,6 @@ F3Wp		Structure function F3 for W+ exchange
 F1Wm		Structure function F1 for W- exchange
 F3Wm		Structure function F3 for W- exchange
 eta_gZ		eta factor [G_F MZ^2 /( alpha 2sqrt(2) pi)]*[Q^2/(Q^2+MZ^2)]
-Q2		Negative four-momentum transfer squared
 pdf		Array of pdf values for this x
 		idx 0-5 are u,d,s,u-bar,d-bar,s-bar
 Dpdf		Array of Delta-pdf (spin distribution) values for this x
@@ -28,27 +45,21 @@ A_L		PV asymmetry for unpolarize beam - long. polarized target
 A_L_g1		g1-gammaZ contribution to A_L
 A_L_g5		g5-gammaZ contribution to A_L
 A_T		Identically 0
-W		Invariant mass of the process [GeV]
-y		nu/Ebeam in nucleon rest frame, kinematic variable y
 Y		Big Y, [ 1-(1-y)^2 ]/[ 1 + (1-y)^2 ]
 AWp		PV asymmetry for W+ exchange
+AWp_g1		g1-gammaZ contribution to AWp
+AWp_g5		g5-gammaZ contribution to AWp
 AWm		PV asymmetry for W- exchange
-Wpweight	counts/event (=diff_crossection*psf*luminosity/Ntrials*runtime) for W+ exchange
-Wmweight	counts/event (=diff_crossection*psf*luminosity/Ntrials*runtime) for W- exchange
-Wprate		counts/second/event (=diff_crossection*psf*luminosity/Ntrials) for W+ exchange
-Wmrate		counts/second/event (=diff_crossection*psf*luminosity/Ntrials) for W- exchange
+AWm_g1		g1-gammaZ contribution to AWm
+AWm_g5		g5-gammaZ contribution to AWm
+Wpweight	counts/event for W+ exchange
+Wmweight	counts/event for W- exchange
+Wprate		counts/second/event for W+ exchange
+Wmrate		counts/second/event for W- exchange
 jetp		Magnitude of 3-momentum transfer [GeV]
 jetE		energy Transfer [GeV]
-Z_ion		Z of the nucleus
-N_ion		N of the nucleus
-particle_id	PDG encoding of particle produced (for pion production 
-		simulation)
-charge		Charge of particle produced (for pion production simulation)
-mass		mass of particle produce [GeV] (for pion production simulation)
-pf  		3mom of particle produce [GeV] (for pion production simulation)
-vx		Vertex x position in target [m]
-vy		Vertex y position in target [m]
-vz		Vertex z position in target [m]
+
+== entries only in hadron generator  ========================
 g1_theta	gamma 1 polar angle wrt 3mom xfer in lab for pi0 decay [rad]
 g2_theta	gamma 2 polar angle wrt 3mom xfer in lab for pi0 decay [rad]
 g1_phi  	gamma 1 azimuthal angle wrt 3mom xfer for pi0 decay [rad]

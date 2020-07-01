@@ -23,7 +23,6 @@ class eicOutput {
 	void Write( eicEvent *ev );
 	void Close();
 	void MakeFileLUND();
-	void MakeFileSOLLUND();
     private:
 	void InitTree();
 

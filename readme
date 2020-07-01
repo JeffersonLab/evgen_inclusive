@@ -5,7 +5,7 @@ Estimate "e- DIS, elastic, moller rate" and "hadron rate by Wiser fit"
 
 Generate events distributed according to crossection or uniformly distributed with weight factor
 
-Works for both collider and fixed target model
+Works for both fixed target and collider (not all models) experiment
 
 ========= How to use it  ================
 
@@ -31,24 +31,34 @@ i) setup env (do this before compilation and running the code)
 
 setenv LD_LIBRARY_PATH your_cteq_dir/lib
 setenv LIBRARY_PATH your_cteq_dir/lib
-source your_root_env_script
-(on jlab ifarm, it can be /group/solid/apps/root/root_v6.20.02.Linux-centos7-x86_64-gcc4.8/bin/thisroot.csh)
+source your_root_env_script  (only root5 works for now, root6 doesn't work for TF3->Integral in wiserpion.h)
 
+for example, setup env at jlab ifarm
+  setenv LD_LIBRARY_PATH /group/solid/apps/evgen/cteq-pdf-1.0.4/lib
+  setenv LIBRARY_PATH /group/solid/apps/evgen/cteq-pdf-1.0.4/lib
+  setenv ROOTSYS /group/solid/apps/root/root_v5.34.36.Linux-centos7-x86_64-gcc4.8  
+  #source /group/solid/apps/root/root_v5.34.36.Linux-centos7-x86_64-gcc4.8/bin/thisroot.csh
+  setenv PATH ${ROOTSYS}/bin:${PATH}  
+  if (!($?LD_LIBRARY_PATH)) then
+    setenv LD_LIBRARY_PATH ${ROOTSYS}/lib
+  else
+    setenv LD_LIBRARY_PATH ${ROOTSYS}/lib:${LD_LIBRARY_PATH}
+  endif
+ 
 ii) compile it 
 
 cd evgen_inclusive
-make
-
-this will create the binary eicRate
+make (this will create the binary eicRate)
+make distclean (clean up)
 
 iii) run it
 
-The code requires the file "PolQuarkDist_fine.txt" and "PolPdf_Linear.txt" in the running directory.
+The code requires the file "output/PolQuarkDist_fine.txt" and "output/PolPdf_Linear.txt" in the running directory.
 
-enter output directory, then run an example below
-../eicRate -i input_solid_PVDIS_LD2.dat -o output.root -n 1000 -m 0
+enter output directory, then run as follows
+../eicRate -i input_solid_PVDIS_LD2.dat -o output.root -n 1000 -m 20
 
-see detailed explaination below
+see detailed explaintion below
     -i (or -input)    input file name
     -o (or -output)   output file name
     -n (or -nevent)   number of events will be produced
@@ -59,11 +69,11 @@ see detailed explaination below
     # 0  pi+		(uniformly distributed with weight)
     # 1  pi-		(uniformly distributed with weight)
     # 2  pi0		(uniformly distributed with weight)
-    # 3  K+			(uniformly distributed with weight)
-    # 4  K-			(uniformly distributed with weight)
-    # 5  Ks			(uniformly distributed with weight)
-    # 6  Kl			(uniformly distributed with weight)
-    # 7  p			(uniformly distributed with weight)
+    # 3  K+		(uniformly distributed with weight)
+    # 4  K-		(uniformly distributed with weight)
+    # 5  Ks		(uniformly distributed with weight)
+    # 6  Kl		(uniformly distributed with weight)
+    # 7  p		(uniformly distributed with weight)
     # 8  pbar		(uniformly distributed with weight)
     # 10  pi+		(distributed according to crossection)
     # 11  pi-		(distributed according to crossection)
@@ -72,34 +82,52 @@ see detailed explaination below
     # 14  K-		(distributed according to crossection)
     # 15  Ks		(distributed according to crossection)
     # 16  Kl		(distributed according to crossection)
-    # 17  p			(distributed according to crossection)
+    # 17  p		(distributed according to crossection)
     # 18  pbar		(distributed according to crossection)
-    # 20  e- Deep Inelastic (uniformly distributed with weight)
+    # 20  e- DIS        (uniformly distributed with weight)
     # 21  e- Elastic  	(uniformly distributed with weight)
-    # 22  Moller  		(uniformly distributed with weight)
-    # 23  P.Bosted      (uniformly distributed with weight)    
+    # 22  e- Moller  	(uniformly distributed with weight)
+    # 23  e- P.Bosted fit (uniformly distributed with weight)    
 
-Besides root tree output, it can produce text output files at the same time which can be used as direct input for later detector simulation. There are two type of text files
-1. lund format for GEMC to use as input
-2. solund format for solgemc use as input
+model 20 eDIS use x,y as degree of freedom, other models use angle and mom
+
+model 0-8 has rate=0 when events in non-physical region. 
+So nevent in input is just only Ntrials which should be used for normalization, while the only rare > 0  events are sent to output
+
+mode 23 is not fully working
+
+iii) output and analysis result
 
 The output root tree structure is described in output/README
+output/plot.C can be used to plot some distribution from root output
 
-The LUND format is defined as 
-      OUT << "1" << " \t " << Wprate  << " \t " << Wmrate  << " \t " << "0"  << " \t " << "0" << " \t "  << x << " \t " << y  << " \t " << W  << " \t " << Q2  << " \t " << rate << endl;
-      OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << mass << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
+The output text file has customized LUND format defined in eicOutput.cxx
+for v1.0 (88ad9cb) and before, all models have fixed header lines with 10 entries
+after v1.0 (88ad9cb),model 20,21-23,others has all different header lines
 
-iv) analysis result
+It is direct conversion from root file and can be used by GEMC (http://gemc.jlab.org) as input to do Geant4 simulation
+particle line follow the webpage definition
+header line can be customized with 10 entries before gemc 2.3 or more after gemc 2.6
+refer to 
+https://hallaweb.jlab.org/wiki/index.php/Detector_simulation_general_note#input_format_and_passing_information_into_output
+at https://gemc.jlab.org/gemc/html/documentation/generator/lund.html
 
-.x plot.C("output.root")
+some example output files at jlab ifarm /work/halla/solid/evgen/
 
-there are some root script under output dir for use to anylysis the resulting root file
-open them to see how to use
+========= change log  ================
+
+2010    created by Seamus Riordan
+2011    hadron with Wiser and LUND format added by Lorenzo Zana
+2014/01 events distributed according to crossection added by Seamus Riordan
+2014/07 fix collider mode by Zhiwen Zhao
+...
+2020/04 svn2root by Zhiwen Zhao from https://jlabsvn.jlab.org/svnroot/solid/evgen/eicRate_20101102/
+2020/06 update customized lund output header line by Zhiwen Zhao, after v1.0 (88ad9cb)
 
 ############(outdated, need to update LUND format) #############################
 3) Changing output from root format to lund format 
 
-If you have root tree output, but no lund/solund output. No need to rerun eicRate, just do the conversion with root_to_lund below
+If you have root tree output, but no lund output. No need to rerun eicRate, just do the conversion with root_to_lund below
 
 cd root_to_lund/
 make
@@ -130,14 +158,3 @@ setenv LIBRARY_PATH /home/${USER}/lib:${ROOTSYS}/lib
      -l 1-0            : specify format input file ( lund-> 1 (just angle filtering); root->0 (default) )
      -g 2-1-0          : specify if particle in output is a geantino ( geantino-> 1 ; charged geantino-> 2 ; normal->0 (default) )
  --- 
-
-========= change log  ================
-
-2010    created by Seamus Riordan
-2011    hadron with Wiser and LUND format added Lorenzo Zana
-2014/01 events distributed by crossection added by Seamus Riordan
-2014/07 fix collider mode by Zhiwen Zhao
-...
-2020/04 svn2root by Zhiwen Zhao from https://jlabsvn.jlab.org/svnroot/solid/evgen/eicRate_20101102/
-
-

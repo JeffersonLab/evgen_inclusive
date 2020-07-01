@@ -21,11 +21,11 @@ eicProcess::eicProcess(const char *file, char *file2, double nevent,int whichmod
 void eicProcess::Run(){
 //     int nevt = finp->GetNevt();
 
-    printf("nevt = %d\n", nevt);
+    printf("nevt = %i\n", nevt);
 
     int evt;
     int nprnt = nevt/10;
-    TString fmtst[3];
+    TString fmtst[2];
     TString modelst[25];
     modelst[0] = "Pi+ weighted";
     modelst[1] = "Pi- weighted";
@@ -55,7 +55,6 @@ void eicProcess::Run(){
 
     fmtst[0] = "ROOT";
     fmtst[1] = "ROOT and LUND";
-    fmtst[2] = "ROOT and SOLLUND";
     int fmt = finp->Get_fmt();
 
     printf("Model = %s \n", modelst[model].Data() );
@@ -126,11 +125,6 @@ void eicProcess::Run(){
       printf("Creating LUND output \n") ;
       fout->MakeFileLUND();
     }
-
-    if (fmt == 2 ) { // also SOLLUND format
-      printf("Creating SOLLUND output \n") ;
-      fout->MakeFileSOLLUND();
-    } 
     
 
     return;

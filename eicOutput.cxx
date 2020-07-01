@@ -133,14 +133,18 @@ void eicOutput::Write( eicEvent *ev ){
     fData.Wmrate    = fData.Wmweight/fNevt;
     fData.Wmweight *= fRunTime/fNevt;
 
-//     if((0<=fModel && fModel <=8) && fData.rate<=0.) {  // skip the useless event from standard hadron generator    
-    if(fData.rate<=0){ // skip useless events with no crossection and rate
-      return;	 
+    if(0<=fModel && fModel <=8)  {  // skip the useless event from standard hadron generator    
+      if(fData.rate<=0.){ 
+//         cout << "skip event " << fData.rate << endl;
+	return;	 
+      }
     }
     else{
-      fTree->Fill();
+      if(fData.rate<=0.){cout << "rate 0 event ???" << endl;}      
     }
 
+    fTree->Fill();
+      
     return;
 }
 
@@ -176,12 +180,22 @@ void  eicOutput::MakeFileLUND(){
   double pdf[6];
   double Dpdf[5];
 
+  double AWp;
+  double AWp_g1;
+  double AWp_g5;
+  double AWm;
+  double AWm_g1;
+  double AWm_g5;
+  
   double Abeam;
   double Y;
 
   double A_L;
   double Y_L;
   double eta_L;
+
+  double A_L_g1;
+  double A_L_g5;
 	
   double A_T;
   double Y_T;
@@ -230,6 +244,13 @@ void  eicOutput::MakeFileLUND(){
   input_chain.SetBranchAddress("Wmrate",&Wmrate);  
   input_chain.SetBranchAddress("pdf",&pdf);
   input_chain.SetBranchAddress("Dpdf",&Dpdf);
+
+  input_chain.SetBranchAddress("AWp",&AWp);  
+  input_chain.SetBranchAddress("AWp_g1",&AWp_g1);  
+  input_chain.SetBranchAddress("AWp_g5",&AWp_g5);    
+  input_chain.SetBranchAddress("AWm",&AWm);  
+  input_chain.SetBranchAddress("AWm_g1",&AWm_g1);  
+  input_chain.SetBranchAddress("AWm_g5",&AWm_g5);    
   
   input_chain.SetBranchAddress("Abeam",&Abeam);
   input_chain.SetBranchAddress("Y",&Y);
@@ -237,7 +258,10 @@ void  eicOutput::MakeFileLUND(){
   input_chain.SetBranchAddress("A_L",&A_L);
   input_chain.SetBranchAddress("Y_L",&Y_L);
   input_chain.SetBranchAddress("eta_L",&eta_L);
-  
+
+  input_chain.SetBranchAddress("A_L_g1",&A_L_g1);
+  input_chain.SetBranchAddress("A_L_g5",&A_L_g5);
+
   input_chain.SetBranchAddress("A_T",&A_T);
   input_chain.SetBranchAddress("Y_T",&Y_T);
   input_chain.SetBranchAddress("eta_T",&eta_T);
@@ -289,178 +313,29 @@ void  eicOutput::MakeFileLUND(){
     vtemp.SetMagThetaPhi(g2_p, g2_theta, g2_phi);
     pi0_g2.SetVectM(vtemp, 0.0);
 
+// lund format at https://gemc.jlab.org/gemc/html/documentation/generator/lund.html
+// particle line follow the webpage.
+// header line can be customized, in gemc 2.3, it takes 10 entries, in gemc 2.6 and later, it can be any number of entries
 
-    // NB at now, rather than the mass of the particle, will be stored the weight. This is done because the mass is not used by GEMC. For full variables and mass value, one should use the SOLLUND format
-
-//     if (particle_id != 111) {
-//       OUT << "1" << " \t " << (Z_ion + N_ion)  << " \t " << Z_ion  << " \t " << "0"  << " \t " << "0" << " \t "  << x << " \t " << y  << " \t " << W  << " \t " << Q2  << " \t " << nu << endl;
-//       OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << weight << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
-//     }
-//     else {
-//       OUT << "3" << " \t " << (Z_ion + N_ion)  << " \t " << Z_ion  << " \t " << "0"  << " \t " << "0" << " \t "  << x << " \t " << y  << " \t " << W  << " \t " << Q2  << " \t " << nu << endl;
-//       OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << weight << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
-//       OUT << " \t " << "2" << " \t " << "0.0" << " \t " << "1" << " \t " << "22" << " \t " << "0" << " \t " << "0" << " \t " << pi0_g1.Px() << " \t " << pi0_g1.Py() << " \t " << pi0_g1.Pz() << " \t " << pi0_g1.E() << " \t " << "0.0" << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
-//       OUT << " \t " << "3" << " \t " << "0.0" << " \t " << "1" << " \t " << "22" << " \t " << "0" << " \t " << "0" << " \t " << pi0_g2.Px() << " \t " << pi0_g2.Py() << " \t " << pi0_g2.Pz() << " \t " << pi0_g2.E() << " \t " << "0.0" << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
-//     }
-
-      OUT << "1" << " \t " << Wprate  << " \t " << Wmrate  << " \t " << "0"  << " \t " << "0" << " \t "  << x << " \t " << y  << " \t " << W  << " \t " << Q2  << " \t " << rate << endl;
+    if (fModel == 20) {    
+//       OUT << "1" << " \t " << Wprate  << " \t " << Wmrate  << " \t " << "0"  << " \t " << "0" << " \t "  << x << " \t " << y  << " \t " << W  << " \t " << Q2  << " \t " << rate << endl;     
+      OUT << "1" << " \t " << x << " \t " << y  << " \t " << W  << " \t " << Q2  << " \t " << rate << " \t " << Wprate  << " \t " << Wmrate  << " \t "  << Abeam <<" \t " << A_L <<" \t " << A_L_g1 <<" \t " << A_L_g5  << " \t " << AWp  << " \t " << AWp_g1  << " \t " << AWp_g5  << " \t " << AWm  << " \t " << AWm_g1  << " \t " << AWm_g5 << endl;
+      
       OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << mass << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
-  }
-
-  OUT.close();
-
-}
-
-void  eicOutput::MakeFileSOLLUND(){
-
-  double weight;
-  double theta;
-  double phi;
-  double Ef;
-  double x;
-  double W;
-  double y;
-  double crs;
-  double f1;
-  double f2;
-  double f1gz;
-  double f3gz;
-  double g1gz;
-  double g5gz;
-  double Q2;
-  double eta_gZ;
-  double rate;
-  double pdf[6];
-  double Dpdf[5];
-
-  double Abeam;
-  double Y;
-
-  double A_L;
-  double Y_L;
-  double eta_L;
-	
-  double A_T;
-  double Y_T;
-  double eta_T;
-
-  int particle_id;
-  int charge;
-  int Z_ion;
-  int N_ion;
-  double mass;
-  TVector3 p_vertex;
-  TLorentzVector pi0_g1;
-  TLorentzVector pi0_g2;
-
-  double vx, vy, vz, pf;
-  double g1_theta, g1_phi, g1_p;
-  double g2_theta, g2_phi, g2_p;
-
-  TString file(fOutName);
-  file.ReplaceAll("root","sollund"); 
-    TChain input_chain("T");
-  input_chain.Add(fOutName);
-
-  input_chain.SetBranchAddress("weight",&weight);
-  input_chain.SetBranchAddress("theta",&theta);
-  input_chain.SetBranchAddress("phi",&phi);
-  input_chain.SetBranchAddress("Ef",&Ef);
-  input_chain.SetBranchAddress("x",&x);
-  input_chain.SetBranchAddress("W",&W);
-  input_chain.SetBranchAddress("y",&y);
-  input_chain.SetBranchAddress("crs",&crs);
-  input_chain.SetBranchAddress("F1",&f1);
-  input_chain.SetBranchAddress("F2",&f2);
-  input_chain.SetBranchAddress("F1gZ",&f1gz);
-  input_chain.SetBranchAddress("F3gZ",&f3gz);
-  input_chain.SetBranchAddress("g1gZ",&g1gz);
-  input_chain.SetBranchAddress("g5gZ",&g5gz);
-  input_chain.SetBranchAddress("Q2",&Q2);
-  input_chain.SetBranchAddress("eta_gZ",&eta_gZ);
-  input_chain.SetBranchAddress("rate",&rate);
-  input_chain.SetBranchAddress("pdf",&pdf);
-  input_chain.SetBranchAddress("Dpdf",&Dpdf);
-  
-  input_chain.SetBranchAddress("Abeam",&Abeam);
-  input_chain.SetBranchAddress("Y",&Y);
-  
-  input_chain.SetBranchAddress("A_L",&A_L);
-  input_chain.SetBranchAddress("Y_L",&Y_L);
-  input_chain.SetBranchAddress("eta_L",&eta_L);
-  
-  input_chain.SetBranchAddress("A_T",&A_T);
-  input_chain.SetBranchAddress("Y_T",&Y_T);
-  input_chain.SetBranchAddress("eta_T",&eta_T);
-
-  input_chain.SetBranchAddress("particle_id",&particle_id);
-  input_chain.SetBranchAddress("charge",&charge);
-  input_chain.SetBranchAddress("Z_ion",&Z_ion);
-  input_chain.SetBranchAddress("N_ion",&N_ion);
-  input_chain.SetBranchAddress("pf",&pf);
-  input_chain.SetBranchAddress("mass",&mass);
-
-  input_chain.SetBranchAddress("vx",&vx);
-  input_chain.SetBranchAddress("vy",&vy);
-  input_chain.SetBranchAddress("vz",&vz);
-
-  input_chain.SetBranchAddress("g1_theta",&g1_theta);
-  input_chain.SetBranchAddress("g1_phi",&g1_phi);
-  input_chain.SetBranchAddress("g1_p",&g1_p);
-
-  input_chain.SetBranchAddress("g2_theta",&g2_theta);
-  input_chain.SetBranchAddress("g2_phi",&g2_phi);
-  input_chain.SetBranchAddress("g2_p",&g2_p);
-
-
-  Int_t nentries = (Int_t)input_chain.GetEntries();
-  double pmod,px,py,pz,nu;
-  double MASS_p = 0.938;
-  TVector3 vtemp;
-
-  ofstream OUT (file.Data());
-  for (int i=0; i<nentries ; i++) {
-    input_chain.GetEntry(i);
-    if(i % 1000000 == 0 ){
-      printf("Translated %09d events of total %09d \n",i,nentries);
     }
-
-    // Vertex needs to be in units of cm
-    p_vertex.SetXYZ(vx*100.0, vy*100.0, vz*100.0);
-
-
-    vtemp.SetMagThetaPhi(g1_p, g1_theta, g1_phi);
-    pi0_g1.SetVectM(vtemp, 0.0);
-    vtemp.SetMagThetaPhi(g2_p, g2_theta, g2_phi);
-    pi0_g2.SetVectM(vtemp, 0.0);
-
-    if (x>0)   nu = Q2 / (2 * MASS_p * x) ;
-    else nu = 0;
-    pmod = pow(Ef,2) - pow(mass,2) ;
-    if (pmod > 0) pmod = sqrt(pmod);
-    else pmod =0;
-    px = pmod * sin(theta) * cos(phi);
-    py = pmod * sin(theta)* sin(phi);
-    pz = pmod * cos(theta);
-
-
-    // NOTE:  model 4 is the weighted pi0 generator.  For now we will ignore the photons generated 
-    // and just use the pi0
-    
-//    if ( fInput->Get_model() != 4 ) {
-      OUT << "1" << " \t "  << weight << " \t " << (Z_ion + N_ion)  << " \t " << Z_ion  << " \t " << "0"  << " \t " << "0" << " \t "  << x << " \t " << y  << " \t " << W  << " \t " << Q2  << " \t " << nu << endl;
+    else if (21<=fModel && fModel<=23) {    
+      OUT << "1" << " \t " << x << " \t " << y  << " \t " << W  << " \t " << Q2  << " \t " << rate << endl;
+      
       OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << mass << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
- /*   }
-    else {
-      OUT << "3" << " \t "  << weight << " \t " << (Z_ion + N_ion)  << " \t " << Z_ion  << " \t " << "0"  << " \t " << "0" << " \t "  << x << " \t " << y  << " \t " << W  << " \t " << Q2  << " \t " << nu << endl;
-      OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << mass << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
-      OUT << " \t " << "2" << " \t " << "0.0" << " \t " << "1" << " \t " << "22" << " \t " << "0" << " \t " << "0" << " \t " << pi0_g1.Px() << " \t " << pi0_g1.Py() << " \t " << pi0_g1.Pz() << " \t " << pi0_g1.E() << " \t " << "0.0" << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
-      OUT << " \t " << "3" << " \t " << "0.0" << " \t " << "1" << " \t " << "22" << " \t " << "0" << " \t " << "0" << " \t " << pi0_g2.Px() << " \t " << pi0_g2.Py() << " \t " << pi0_g2.Pz() << " \t " << pi0_g2.E() << " \t " << "0.0" << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
     }    
-    */
+    else{
+//       OUT << "1" << " \t " << Wprate  << " \t " << Wmrate  << " \t " << "0"  << " \t " << "0" << " \t "  << x << " \t " << y  << " \t " << W  << " \t " << Q2  << " \t " << rate << endl;
+      OUT << "1" << " \t " << rate << endl;      
+      
+      OUT << " \t " << "1" << " \t " << charge << " \t " << "1" << " \t " << particle_id << " \t " << "0" << " \t " << "0" << " \t " << px << " \t " << py << " \t " << pz << " \t " << Ef << " \t " << mass << " \t " << p_vertex.X()  << " \t " << p_vertex.Y() << " \t " << p_vertex.Z() << endl;
+    }
   }
-
+  
   OUT.close();
-
 
 }

@@ -28,7 +28,7 @@ class eicProcess {
 	eicEvent    *fevt;
 	eicModel    *fmodel;
 	
-	double nevt;
+	int nevt;
 	int model;
 };
 #endif//__eicProcess_h
