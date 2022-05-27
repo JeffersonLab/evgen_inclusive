@@ -199,6 +199,11 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *
 
     double A_L_g1 = eta_L*(Y_L*gA*g1gz/f1);
     double A_L_g5 = eta_L*(gV*g5gz/f1);
+    
+    if (std::isnan(Abeam) ||  std::isinf(Abeam)) {cout << "Abeam " << Abeam << endl; Abeam=0;}
+    if (std::isnan(A_L) ||  std::isinf(A_L)) {cout << "A_L " << A_L << endl; A_L=0;}
+    if (std::isnan(A_L_g1) ||  std::isinf(A_L_g1)) {cout << "A_L_g1 " << A_L_g1 << endl; A_L_g1=0;}
+    if (std::isnan(A_L_g5) ||  std::isinf(A_L_g5)) {cout << "A_L_g5 " << A_L_g5 << endl; A_L_g5=0;}    
 
     double Yp = 1.0 + pow(1.0-y,2.0);
     double Ym = 1.0 - pow(1.0-y,2.0);
@@ -225,7 +230,7 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *
 	(Yp*f2wm + Ym*x*f3wm);
     double dsWpdxy = (etaW*8.0*3.14159/(137.0*137.0*x*y*Q2))*
 	(Yp*f2wp - Ym*x*f3wp);
-
+	
     // W- exchange needs extra minus sign
     
     // Sigma+ and Sigma- each get half the luminosity,
@@ -246,7 +251,10 @@ void eicPhysics::MakeEvent(eicBeam *beam, eicIon *ion, eicEvent *ev , eicModel *
 	(-2.0*Ym*x*g1wp)/(2.0*dsWpdxy);
     double AWp_g5 = (etaW*16.0*3.14159/(137.0*137.0*x*y*Q2))*
 	(-Yp*g4wp)/(2.0*dsWpdxy);
-
+	
+      if(ds_dxdy==0) cout << "ds_dxdy " << ds_dxdy << endl;
+      if(dsWpdxy==0) {cout << "dsWpdxy " << dsWpdxy << endl; AWp=0;AWp_g1=0;AWp_g5=0;}
+      if(dsWmdxy==0) {cout << "dsWmdxy " << dsWmdxy << endl; AWm=0;AWm_g1=0;AWm_g5=0;}
 
     ////////////////////////////////////////////////////
 
